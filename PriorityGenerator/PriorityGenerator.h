@@ -19,6 +19,8 @@ public:
 
     unsigned short int XID, YID, PORT_ID;
 
+    virtual const char* moduleName() = 0;
+
     // Constructor
     PriorityGenerator(sc_module_name mn,
                       unsigned int numReqs_Grants,
@@ -44,5 +46,99 @@ typedef PriorityGenerator* new_PriorityGenerator(sc_simcontext*,
                                         unsigned short int PORT_ID);
 
 typedef void delete_PriorityGenerator(PriorityGenerator*);
+
+class tst_PG : public sc_module {
+private:
+    unsigned short int nPorts;
+public:
+    // Interface
+    sc_in_clk                    i_CLK;
+    // Signals to stimulus
+    sc_signal<bool>              w_RST;
+    sc_vector<sc_signal<bool> >  w_GRANTS;
+    sc_vector<sc_signal<bool> >  w_PRIORITIES;
+
+    // Design Under Test
+    PriorityGenerator* pg;
+
+    // Trace file
+    sc_trace_file *tf;
+
+    void tst_stimulus(){
+        unsigned short int i;
+        // Initialize
+        w_RST.write(true);
+        for(i = 0; i < nPorts; i++) {
+            w_GRANTS[i].write(false);
+        }
+        wait();
+
+        // Generating stimulus
+        for(i = 0; i < nPorts; i++) {
+            w_GRANTS[i].write(true);
+            wait();
+        }
+
+        wait();
+
+        for(i = nPorts-1; i > 0; i--) {
+            w_GRANTS[i].write(false);
+            wait();
+        }
+        w_GRANTS[0].write(false);
+        wait();
+
+        sc_stop();
+
+    }
+
+    // Function to destroy DUT instance
+    delete_PriorityGenerator* destroy_PG;
+
+    SC_HAS_PROCESS(tst_PG);
+    tst_PG(sc_module_name nm,unsigned short int numPorts,
+           new_PriorityGenerator* new_pg, delete_PriorityGenerator* del)
+                : sc_module(nm),nPorts(numPorts), i_CLK("tst_PG_CLK"),
+                  w_RST("tst_PG_RESET"), w_GRANTS("tst_PG_GRANTS",numPorts),
+                  w_PRIORITIES("tst_PG_PRIORITIES",numPorts)
+    {
+        destroy_PG = del;
+
+        // Instantiate DUT
+        pg = new_pg(sc_get_curr_simcontext(),"PG_DUT",numPorts,0,0,0);
+        // Binding DUT with testbench ports and signals
+        pg->i_CLK(i_CLK);
+        pg->i_RST(w_RST);
+        pg->i_GRANTS.bind( w_GRANTS );
+        pg->o_PRIORITIES( w_PRIORITIES );
+
+        // Defining testbench stimulus process
+        SC_CTHREAD(tst_stimulus,i_CLK.pos());
+        sensitive << i_CLK;
+
+        // Creating VCD trace file
+        tf = sc_create_vcd_trace_file(pg->moduleName());
+        // Signals to trace
+        sc_trace(tf, i_CLK, "CLK");
+        sc_trace(tf, w_RST, "RST");
+        for(unsigned short int i = 0; i < numPorts; i++) {
+            char strGrant[12];
+            sprintf(strGrant,"GRANT(%u)",i);
+            sc_trace(tf, w_GRANTS[i], strGrant);
+
+            char strPriority[15];
+            sprintf(strPriority,"PRIORITY(%u)",i);
+            sc_trace(tf, w_PRIORITIES[i], strPriority);
+        }
+    }
+
+    ~tst_PG() {
+        // Closing VCD trace file
+        sc_close_vcd_trace_file(tf);
+        // Deallocating DUT
+        destroy_PG(pg);
+    }
+
+};
 
 #endif // PRIORITYGENERATOR_H

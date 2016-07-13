@@ -13,6 +13,8 @@ public:
               unsigned short int YID,
               unsigned short int PORT_ID);
 
+    const char* moduleName() { return "PG_Static"; }
+
 };
 
 extern "C" {

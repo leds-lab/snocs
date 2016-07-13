@@ -20,6 +20,8 @@ public:
     void p_outputs();
     void p_debug();
 
+    const char* moduleName() { return "PG_Rotative"; }
+
     SC_HAS_PROCESS(PG_Rotative);
     PG_Rotative(sc_module_name mn,
               unsigned int numReqs_Grants,
