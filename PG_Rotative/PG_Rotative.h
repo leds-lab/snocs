@@ -3,7 +3,7 @@
 
 #include "../PriorityGenerator/PriorityGenerator.h"
 
-class PG_SHARED_EXPORT PG_Rotative : public PriorityGenerator {
+class PG_Rotative : public PriorityGenerator {
 public:
 
     // Internal signals
@@ -20,7 +20,7 @@ public:
     void p_outputs();
     void p_debug();
 
-    const char* moduleName() { return "PG_Rotative"; }
+    const char* moduleTypeName() { return "PG_Rotative"; }
 
     SC_HAS_PROCESS(PG_Rotative);
     PG_Rotative(sc_module_name mn,
@@ -32,12 +32,12 @@ public:
 };
 
 extern "C" {
-    PriorityGenerator* new_PG_Rotative(sc_simcontext* simcontext,
-                                     sc_module_name moduleName,
-                                     unsigned int numReqs_Grants,
-                                     unsigned short int XID,
-                                     unsigned short int YID,
-                                     unsigned short int PORT_ID) {
+    SS_EXP PriorityGenerator* new_PG(sc_simcontext* simcontext,
+                              sc_module_name moduleName,
+                              unsigned int numReqs_Grants,
+                              unsigned short int XID,
+                              unsigned short int YID,
+                              unsigned short int PORT_ID) {
         // Simcontext is needed because in shared library a
         // new and different simcontext will be created if
         // the main application simcontext is not passed to
@@ -49,7 +49,7 @@ extern "C" {
 
         return new PG_Rotative(moduleName,numReqs_Grants,XID,YID,PORT_ID);
     }
-    void delete_PG_Rotative(PriorityGenerator* pg) {
+    SS_EXP void delete_PG(PriorityGenerator* pg) {
         delete pg;
     }
 }

@@ -3,7 +3,7 @@
 
 #include "../PriorityGenerator/PriorityGenerator.h"
 
-class PG_SHARED_EXPORT PG_Static : public PriorityGenerator {
+class PG_Static : public PriorityGenerator {
 public:
 
     SC_HAS_PROCESS(PG_Static);
@@ -13,17 +13,17 @@ public:
               unsigned short int YID,
               unsigned short int PORT_ID);
 
-    const char* moduleName() { return "PG_Static"; }
+    const char* moduleTypeName() { return "PG_Static"; }
 
 };
 
 extern "C" {
-    PriorityGenerator* new_PG_Static(sc_simcontext* simcontext,
-                                     sc_module_name moduleName,
-                                     unsigned int numReqs_Grants,
-                                     unsigned short int XID,
-                                     unsigned short int YID,
-                                     unsigned short int PORT_ID) {
+    SS_EXP PriorityGenerator* new_PG(sc_simcontext* simcontext,
+                              sc_module_name moduleName,
+                              unsigned int numReqs_Grants,
+                              unsigned short int XID,
+                              unsigned short int YID,
+                              unsigned short int PORT_ID) {
         // Simcontext is needed because in shared library a
         // new and different simcontext will be created if
         // the main application simcontext is not passed to
@@ -35,10 +35,9 @@ extern "C" {
 
         return new PG_Static(moduleName,1,numReqs_Grants,XID,YID,PORT_ID);
     }
-    void delete_PG_Static(PriorityGenerator* pg) {
+    SS_EXP void delete_PG(PriorityGenerator* pg) {
         delete pg;
     }
 }
-
 
 #endif // PG_STATIC_H

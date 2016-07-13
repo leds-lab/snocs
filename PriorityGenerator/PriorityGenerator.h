@@ -1,13 +1,13 @@
 #ifndef PRIORITYGENERATOR_H
 #define PRIORITYGENERATOR_H
 
-#include "prioritygenerator_global.h"
+#include "../SoCINGlobal.h"
 #include <systemc>
 
 using namespace sc_core;
 using namespace sc_dt;
 
-class PG_SHARED_EXPORT PriorityGenerator : public sc_module {
+class PriorityGenerator : public sc_module {
 protected:
     unsigned int numPorts;
 public:
@@ -19,7 +19,7 @@ public:
 
     unsigned short int XID, YID, PORT_ID;
 
-    virtual const char* moduleName() = 0;
+    virtual const char* moduleTypeName() = 0;
 
     // Constructor
     PriorityGenerator(sc_module_name mn,
@@ -38,14 +38,14 @@ public:
 
 inline PriorityGenerator::~PriorityGenerator() {}
 
-typedef PriorityGenerator* new_PriorityGenerator(sc_simcontext*,
+typedef PriorityGenerator* create_PriorityGenerator(sc_simcontext*,
                                         sc_module_name,
                                         unsigned int numReqs_Grants,
                                         unsigned short int XID,
                                         unsigned short int YID,
                                         unsigned short int PORT_ID);
 
-typedef void delete_PriorityGenerator(PriorityGenerator*);
+typedef void destroy_PriorityGenerator(PriorityGenerator*);
 
 class tst_PG : public sc_module {
 private:
@@ -73,6 +73,9 @@ public:
         }
         wait();
 
+        w_RST.write(false);
+        wait();
+
         // Generating stimulus
         for(i = 0; i < nPorts; i++) {
             w_GRANTS[i].write(true);
@@ -93,11 +96,11 @@ public:
     }
 
     // Function to destroy DUT instance
-    delete_PriorityGenerator* destroy_PG;
+    destroy_PriorityGenerator* destroy_PG;
 
     SC_HAS_PROCESS(tst_PG);
     tst_PG(sc_module_name nm,unsigned short int numPorts,
-           new_PriorityGenerator* new_pg, delete_PriorityGenerator* del)
+           create_PriorityGenerator* new_pg, destroy_PriorityGenerator* del)
                 : sc_module(nm),nPorts(numPorts), i_CLK("tst_PG_CLK"),
                   w_RST("tst_PG_RESET"), w_GRANTS("tst_PG_GRANTS",numPorts),
                   w_PRIORITIES("tst_PG_PRIORITIES",numPorts)
@@ -117,7 +120,7 @@ public:
         sensitive << i_CLK;
 
         // Creating VCD trace file
-        tf = sc_create_vcd_trace_file(pg->moduleName());
+        tf = sc_create_vcd_trace_file(pg->moduleTypeName());
         // Signals to trace
         sc_trace(tf, i_CLK, "CLK");
         sc_trace(tf, w_RST, "RST");

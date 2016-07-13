@@ -18,4 +18,4 @@ unix {
         LIBS = -L$${SYSTEMC_PATH}/lib-linux -lsystemc -Xlinker -rpath -Xlinker $${SYSTEMC_PATH}/lib-linux
     }
 }
-HEADERS = SoCINGlobal.h
+HEADERS += SoCINGlobal.h

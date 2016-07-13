@@ -7,10 +7,7 @@
 TEMPLATE = aux
 include(../common.pri)
 
-DEFINES += PRIORITYGENERATOR_LIBRARY
-
-HEADERS +=  PriorityGenerator.h \
-            prioritygenerator_global.h
+HEADERS +=  PriorityGenerator.h
 
 SOURCES += 
 
