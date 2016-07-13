@@ -4,24 +4,14 @@
 #
 #-------------------------------------------------
 
-CONFIG -= qt
-CONFIG -= app_bundle
-
-TARGET = PriorityGenerator
-TEMPLATE = lib
-
+TEMPLATE = aux
 include(../common.pri)
 
 DEFINES += PRIORITYGENERATOR_LIBRARY
 
-SOURCES += PriorityGenerator.cpp \
-    PG_Static.cpp
+HEADERS +=  PriorityGenerator.h \
+            prioritygenerator_global.h
 
-HEADERS += PriorityGenerator.h\
-        prioritygenerator_global.h \
-    PG_Static.h
+SOURCES += 
 
-unix {
-    target.path = /usr/lib
-    INSTALLS += target
-}
+DESTDIR = ../plugins

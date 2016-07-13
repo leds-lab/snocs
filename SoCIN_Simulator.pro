@@ -1,5 +1,6 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    PriorityGenerator
-
+    PriorityGenerator \
+    PG_Static \
+    PG_Rotative

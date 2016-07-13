@@ -2,7 +2,6 @@
 #define PRIORITYGENERATOR_H
 
 #include "prioritygenerator_global.h"
-
 #include <systemc>
 
 using namespace sc_core;
@@ -25,7 +24,11 @@ public:
                       unsigned int numReqs_Grants,
                       unsigned short int XID,
                       unsigned short int YID,
-                      unsigned short int PORT_ID);
+                      unsigned short int PORT_ID)
+        : sc_module(mn),numPorts(numReqs_Grants), i_CLK("PG_CLK"),
+          i_RST("PG_RESET"),i_GRANTS("PG_GRANTS",numReqs_Grants),
+          o_PRIORITIES("PG_PRIORITIES",numReqs_Grants),XID(XID),
+          YID(YID),PORT_ID(PORT_ID) {}
 
     // Destructor
     virtual ~PriorityGenerator() = 0;

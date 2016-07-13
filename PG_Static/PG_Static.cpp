@@ -10,11 +10,11 @@ PG_Static::PG_Static(sc_module_name mn,unsigned int priority,
 
     if(priority >= numReqs_Grants) {
         o_PRIORITIES[0].initialize(true);
-        for(int i = 1; i < numReqs_Grants; i++) {
+        for(unsigned int i = 1; i < numReqs_Grants; i++) {
             o_PRIORITIES[i].initialize(false);
         }
     } else {
-        for(int i = 0; i < numReqs_Grants; i++) {
+        for(unsigned int i = 0; i < numReqs_Grants; i++) {
             if(i != priority) {
                 o_PRIORITIES[i].initialize(false);
             } else {
