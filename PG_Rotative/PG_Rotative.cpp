@@ -1,7 +1,7 @@
 #include "PG_Rotative.h"
 
 PG_Rotative::PG_Rotative(sc_module_name mn,
-                     unsigned int numReqs_Grants,
+                     unsigned short numReqs_Grants,
                      unsigned short int XID,
                      unsigned short int YID,
                      unsigned short int PORT_ID)

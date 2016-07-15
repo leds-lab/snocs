@@ -8,7 +8,7 @@ public:
 
     SC_HAS_PROCESS(PG_Static);
     PG_Static(sc_module_name mn, unsigned int priority,
-              unsigned int numReqs_Grants,
+              unsigned short int numReqs_Grants,
               unsigned short int XID,
               unsigned short int YID,
               unsigned short int PORT_ID);
@@ -33,7 +33,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new PG_Static(moduleName,1,numReqs_Grants,XID,YID,PORT_ID);
+        return new PG_Static(moduleName,0,numReqs_Grants,XID,YID,PORT_ID);
     }
     SS_EXP void delete_PG(PriorityGenerator* pg) {
         delete pg;

@@ -6,5 +6,5 @@ SUBDIRS += \
     PriorityGenerator \
     PG_Static \
     PG_Rotative \
-    PG_Tester
-
+    PG_Tester \
+    PG_RoundRobin

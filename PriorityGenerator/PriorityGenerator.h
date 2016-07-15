@@ -7,9 +7,17 @@
 using namespace sc_core;
 using namespace sc_dt;
 
+
+/////////////////////////////////////////////////////////////
+/// Interface for Priority Generators (PGs)
+/////////////////////////////////////////////////////////////
+/*!
+ * \brief The PriorityGenerator class is an interface
+ * (abstract class) for Priority Generators of the Arbiters.
+ */
 class PriorityGenerator : public sc_module {
 protected:
-    unsigned int numPorts;
+    unsigned short int numPorts;
 public:
     // Interfaces
     sc_in_clk                i_CLK;
@@ -23,7 +31,7 @@ public:
 
     // Constructor
     PriorityGenerator(sc_module_name mn,
-                      unsigned int numReqs_Grants,
+                      unsigned short int numReqs_Grants,
                       unsigned short int XID,
                       unsigned short int YID,
                       unsigned short int PORT_ID)
@@ -36,17 +44,47 @@ public:
     virtual ~PriorityGenerator() = 0;
 };
 
+/// \brief PriorityGenerator::~PriorityGenerator Virtual
+/// destructor of abstract class
 inline PriorityGenerator::~PriorityGenerator() {}
+/////////////////////////////////////////////////////////////
+/// End Priority Generator Interface
+/////////////////////////////////////////////////////////////
 
+
+/////////////////////////////////////////////////////////////
+/// Typedefs for Factory Methods of concrete PGs
+/////////////////////////////////////////////////////////////
+/*!
+ * \brief create_PriorityGenerator Typedef for instantiate a
+ * Priority Generator
+ * \param numReqs_Grants Number of input Requests and output Grants ports
+ * \param XID Column identifier of the router in the network
+ * \param YID Row identifier of the router in the network
+ * \param PORT_ID Port identifier of the router
+ * \return A method for instantiate a Priority Generator
+ */
 typedef PriorityGenerator* create_PriorityGenerator(sc_simcontext*,
                                         sc_module_name,
-                                        unsigned int numReqs_Grants,
+                                        unsigned short int numReqs_Grants,
                                         unsigned short int XID,
                                         unsigned short int YID,
                                         unsigned short int PORT_ID);
 
+/*!
+ * \brief destroy_PriorityGenerator Typedef for deallocating a
+ * Priority Generator
+ */
 typedef void destroy_PriorityGenerator(PriorityGenerator*);
+/////////////////////////////////////////////////////////////
 
+
+/////////////////////////////////////////////////////////////
+///  Testbench
+/////////////////////////////////////////////////////////////
+/*!
+ * \brief The tst_PG class is a self-contained testbench for PGs
+ */
 class tst_PG : public sc_module {
 private:
     unsigned short int nPorts;
@@ -79,16 +117,49 @@ public:
         // Generating stimulus
         for(i = 0; i < nPorts; i++) {
             w_GRANTS[i].write(true);
+        }
+        wait();
+
+        for(i = 0; i < nPorts; i++) {
+            w_GRANTS[i].write(false);
+        }
+        wait();
+
+        for(i = 0; i < nPorts; i++) {
+            w_GRANTS[i].write(true);
             wait();
         }
 
-        wait();
+        for(i = 0; i < nPorts; i++) {
+            w_GRANTS[i].write(false);
+            wait();
+        }
+
+        for(i = 0; i < nPorts; i++) {
+            w_GRANTS[i].write(true);
+            wait();
+        }
 
         for(i = nPorts-1; i > 0; i--) {
             w_GRANTS[i].write(false);
             wait();
         }
-        w_GRANTS[0].write(false);
+
+        for(i = 0; i < nPorts; i+=2) {
+            w_GRANTS[i].write(true);
+            wait();
+        }
+
+        for(i = nPorts-1; i > 0; i--) {
+            w_GRANTS[i].write(false);
+            wait();
+        }
+
+        for(i = 1; i < nPorts; i+=2) {
+            w_GRANTS[i].write(true);
+            wait();
+        }
+
         wait();
 
         sc_stop();
@@ -143,5 +214,10 @@ public:
     }
 
 };
+
+/////////////////////////////////////////////////////////////
+///  End testbench
+/////////////////////////////////////////////////////////////
+
 
 #endif // PRIORITYGENERATOR_H

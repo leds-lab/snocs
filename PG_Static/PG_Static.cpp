@@ -1,7 +1,7 @@
 #include "PG_Static.h"
 
-PG_Static::PG_Static(sc_module_name mn,unsigned int priority,
-                     unsigned int numReqs_Grants,
+PG_Static::PG_Static(sc_module_name mn, unsigned int priority,
+                     unsigned short numReqs_Grants,
                      unsigned short int XID,
                      unsigned short int YID,
                      unsigned short int PORT_ID)
