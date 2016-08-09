@@ -2,6 +2,13 @@
 
 #include <dlfcn.h>
 
+/*!
+ * \brief sc_main
+ * \param argc
+ * \param argv [0] Executable folder; [1] Plug-in file
+ * \return
+ */
+
 int sc_main(int argc, char *argv[]) {
 
     for(int i = 0; i < argc; i++) {
