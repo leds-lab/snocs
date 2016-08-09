@@ -1,6 +1,7 @@
 #include "../PriorityGenerator/PriorityGenerator.h"
 
 #include <dlfcn.h>
+#include <ctime>
 
 /*!
  * \brief sc_main
@@ -59,8 +60,11 @@ int sc_main(int argc, char *argv[]) {
     tst_PG* tst = new tst_PG("PG_Testbench",4,new_PG_t,delete_PG_t);
     tst->i_CLK(w_CLK);
 
+    clock_t t = clock();
     // Start simulation
     sc_start();
+    t = clock() - t;
+    printf("Simulated in %ld (%f secs)\n",t,((float)t)/CLOCKS_PER_SEC);
 
     delete tst;
     dlclose(lib_handle);
