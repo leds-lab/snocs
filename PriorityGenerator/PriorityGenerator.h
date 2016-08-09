@@ -3,6 +3,7 @@
 
 #include "../SoCINGlobal.h"
 #include <systemc>
+#include <ctime>
 
 using namespace sc_core;
 using namespace sc_dt;
@@ -103,6 +104,7 @@ public:
     sc_trace_file *tf;
 
     void tst_stimulus(){
+        srand(time(NULL));
         unsigned short int i;
         // Initialize
         w_RST.write(true);
@@ -116,46 +118,28 @@ public:
 
         // Generating stimulus
         for(i = 0; i < nPorts; i++) {
+            if( i > 0 ) {
+                w_GRANTS[i-1].write(false);
+            }
             w_GRANTS[i].write(true);
+            wait();
+        }
+
+        w_GRANTS[nPorts-1].write(false);
+        wait();
+
+        for(i = 0; i < nPorts * 3; i++) {
+            unsigned short int sorted = rand() % nPorts;
+            w_GRANTS[sorted].write(true);
+            wait();
+            w_GRANTS[sorted].write(false);
         }
         wait();
 
-        for(i = 0; i < nPorts; i++) {
-            w_GRANTS[i].write(false);
-        }
-        wait();
-
-        for(i = 0; i < nPorts; i++) {
-            w_GRANTS[i].write(true);
-            wait();
-        }
-
-        for(i = 0; i < nPorts; i++) {
-            w_GRANTS[i].write(false);
-            wait();
-        }
-
-        for(i = 0; i < nPorts; i++) {
-            w_GRANTS[i].write(true);
-            wait();
-        }
-
-        for(i = nPorts-1; i > 0; i--) {
-            w_GRANTS[i].write(false);
-            wait();
-        }
-
-        for(i = 0; i < nPorts; i+=2) {
-            w_GRANTS[i].write(true);
-            wait();
-        }
-
-        for(i = nPorts-1; i > 0; i--) {
-            w_GRANTS[i].write(false);
-            wait();
-        }
-
-        for(i = 1; i < nPorts; i+=2) {
+        for(i = nPorts-1; i < nPorts; i--) {
+            if(i < nPorts-1) {
+                w_GRANTS[i+1].write(false);
+            }
             w_GRANTS[i].write(true);
             wait();
         }
