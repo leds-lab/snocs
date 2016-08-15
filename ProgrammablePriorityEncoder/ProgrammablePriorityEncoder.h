@@ -39,7 +39,7 @@ public:
     sc_in<bool> i_CLK;                       // Clock
     sc_in<bool> i_RST;                       // Reset
 
-    // Arbitration signals
+    // Interfaces
     sc_vector<sc_in<bool> >  i_REQUEST;      // Requests
     sc_vector<sc_in<bool> >  i_PRIORITY;     // Priorities
     sc_vector<sc_out<bool> > o_GRANT;        // Grants
@@ -64,9 +64,9 @@ public:
     void p_OUTPUTS();
 
     SC_HAS_PROCESS(ProgrammablePriorityEncoder);
-    ProgrammablePriorityEncoder(sc_module_name mn, unsigned int short XID,
-                                unsigned int short YID, unsigned int short PORT_ID,
-                                unsigned short nPorts);
+    ProgrammablePriorityEncoder(sc_module_name mn, unsigned int short nPorts,
+                                unsigned int short XID, unsigned int short YID,
+                                unsigned short PORT_ID);
 };
 
 #endif // PROGRAMMABLEPRIORITYENCODER_H

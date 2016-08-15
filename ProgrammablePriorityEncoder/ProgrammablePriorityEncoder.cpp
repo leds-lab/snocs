@@ -1,8 +1,7 @@
 #include "ProgrammablePriorityEncoder.h"
 
-ProgrammablePriorityEncoder::ProgrammablePriorityEncoder(
-        sc_module_name mn, unsigned short XID, unsigned short YID, unsigned short PORT_ID,
-        unsigned short nPorts)
+ProgrammablePriorityEncoder::ProgrammablePriorityEncoder(sc_module_name mn, unsigned short nPorts,
+        unsigned short XID, unsigned short YID, unsigned short PORT_ID)
     : sc_module(mn), nPorts(nPorts), i_CLK("PPE_iCLK"), i_RST("PPE_iRST"), i_REQUEST("PPE_iR",nPorts),
       i_PRIORITY("PPE_iP",nPorts), o_GRANT("PPE_oG",nPorts), o_IDLE("PPE_oIDLE"),
       w_IMED_IN("PPE_wIMED_IN",nPorts), w_IMED_OUT("PPE_wIMED_OUT",nPorts), w_GRANT("PPE_wGRANT",nPorts),

@@ -120,7 +120,7 @@ public:
     // Trace file
     sc_trace_file *tf;
 
-    void tst_stimulus(){
+    void p_stimulus(){
         srand(time(NULL));
         unsigned short int i;
         // Initialize
@@ -188,7 +188,7 @@ public:
         pg->o_PRIORITIES( w_PRIORITIES );
 
         // Defining testbench stimulus process
-        SC_CTHREAD(tst_stimulus,i_CLK.pos());
+        SC_CTHREAD(p_stimulus,i_CLK.pos());
         sensitive << i_CLK;
 
         // Creating VCD trace file
