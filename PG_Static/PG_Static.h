@@ -3,7 +3,7 @@
 
 #include "../PriorityGenerator/PriorityGenerator.h"
 
-class PG_Static : public PriorityGenerator {
+class PG_Static : public IPriorityGenerator {
 public:
 
     SC_HAS_PROCESS(PG_Static);
@@ -18,7 +18,7 @@ public:
 };
 
 extern "C" {
-    SS_EXP PriorityGenerator* new_PG(sc_simcontext* simcontext,
+    SS_EXP IPriorityGenerator* new_PG(sc_simcontext* simcontext,
                               sc_module_name moduleName,
                               unsigned int numReqs_Grants,
                               unsigned short int XID,
@@ -35,7 +35,7 @@ extern "C" {
 
         return new PG_Static(moduleName,0,numReqs_Grants,XID,YID,PORT_ID);
     }
-    SS_EXP void delete_PG(PriorityGenerator* pg) {
+    SS_EXP void delete_PG(IPriorityGenerator* pg) {
         delete pg;
     }
 }

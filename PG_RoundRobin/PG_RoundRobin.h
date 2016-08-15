@@ -5,7 +5,7 @@
 
 /////////////////////////////////////////
 
-class PG_RoundRobin : public PriorityGenerator {
+class PG_RoundRobin : public IPriorityGenerator {
 public:
 
     // Internal signals
@@ -20,7 +20,6 @@ public:
     void p_NEXT_PRIORITIES();
     void p_PRIORITIES();
     void p_OUTPUTS();
-    void p_debug();
 
     SC_HAS_PROCESS(PG_RoundRobin);
     PG_RoundRobin(sc_module_name mn,
@@ -33,7 +32,7 @@ public:
 };
 
 extern "C" {
-    SS_EXP PriorityGenerator* new_PG(sc_simcontext* simcontext,
+    SS_EXP IPriorityGenerator* new_PG(sc_simcontext* simcontext,
             sc_module_name moduleName,unsigned short int numReqs_Grants,
             unsigned short int XID,unsigned short int YID, 
 			unsigned short int PORT_ID) {
@@ -48,7 +47,7 @@ extern "C" {
 
         return new PG_RoundRobin(moduleName,numReqs_Grants,XID,YID,PORT_ID);
     }
-    SS_EXP void delete_PG(PriorityGenerator* pg) {
+    SS_EXP void delete_PG(IPriorityGenerator* pg) {
         delete pg;
     }
 }

@@ -2,7 +2,7 @@
 
 PG_RoundRobin::PG_RoundRobin(sc_module_name mn,unsigned int numReqs_Grants,unsigned short int XID,
                      unsigned short int YID, unsigned short int PORT_ID)
-        : PriorityGenerator(mn,numReqs_Grants,XID,YID,PORT_ID),
+        : IPriorityGenerator(mn,numReqs_Grants,XID,YID,PORT_ID),
           r_UPDATE("PGRR_update_register"), r_GDELAYED("PGRR_Gdelayed",numReqs_Grants),
           r_NEXT_PRIORITIES("PGRR_nextP",numReqs_Grants), r_PRIORITIES("PGRR_Preg",numReqs_Grants)
 {

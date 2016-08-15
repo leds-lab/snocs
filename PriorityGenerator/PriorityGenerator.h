@@ -1,3 +1,20 @@
+/*
+--------------------------------------------------------------------------------
+PROJECT: SoCIN Simulator
+MODULE : IPriorityGenerator
+FILE   : IPriorityGenerator.h
+--------------------------------------------------------------------------------
+DESCRIPTION: It is a interface class to implement priority generators
+which determines the next priority levels by implementing a specific grant policy.
+--------------------------------------------------------------------------------
+AUTHORS: Laboratory of Embedded and Distributed Systems (LEDS - UNIVALI)
+CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
+-------------------------------- Reviews ---------------------------------------
+| Date       - Version - Author                      | Description
+--------------------------------------------------------------------------------
+| 10/08/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
+--------------------------------------------------------------------------------
+*/
 #ifndef PRIORITYGENERATOR_H
 #define PRIORITYGENERATOR_H
 
@@ -16,7 +33,7 @@ using namespace sc_dt;
  * \brief The PriorityGenerator class is an interface
  * (abstract class) for Priority Generators of the Arbiters.
  */
-class PriorityGenerator : public sc_module {
+class IPriorityGenerator : public sc_module {
 protected:
     unsigned short int numPorts;
 public:
@@ -31,7 +48,7 @@ public:
     virtual const char* moduleTypeName() = 0;
 
     // Constructor
-    PriorityGenerator(sc_module_name mn,
+    IPriorityGenerator(sc_module_name mn,
                       unsigned short int numReqs_Grants,
                       unsigned short int XID,
                       unsigned short int YID,
@@ -42,12 +59,12 @@ public:
           YID(YID),PORT_ID(PORT_ID) {}
 
     // Destructor
-    virtual ~PriorityGenerator() = 0;
+    virtual ~IPriorityGenerator() = 0;
 };
 
 /// \brief PriorityGenerator::~PriorityGenerator Virtual
 /// destructor of abstract class
-inline PriorityGenerator::~PriorityGenerator() {}
+inline IPriorityGenerator::~IPriorityGenerator() {}
 /////////////////////////////////////////////////////////////
 /// End Priority Generator Interface
 /////////////////////////////////////////////////////////////
@@ -65,7 +82,7 @@ inline PriorityGenerator::~PriorityGenerator() {}
  * \param PORT_ID Port identifier of the router
  * \return A method for instantiate a Priority Generator
  */
-typedef PriorityGenerator* create_PriorityGenerator(sc_simcontext*,
+typedef IPriorityGenerator* create_PriorityGenerator(sc_simcontext*,
                                         sc_module_name,
                                         unsigned short int numReqs_Grants,
                                         unsigned short int XID,
@@ -76,7 +93,7 @@ typedef PriorityGenerator* create_PriorityGenerator(sc_simcontext*,
  * \brief destroy_PriorityGenerator Typedef for deallocating a
  * Priority Generator
  */
-typedef void destroy_PriorityGenerator(PriorityGenerator*);
+typedef void destroy_PriorityGenerator(IPriorityGenerator*);
 /////////////////////////////////////////////////////////////
 
 
@@ -98,7 +115,7 @@ public:
     sc_vector<sc_signal<bool> >  w_PRIORITIES;
 
     // Design Under Test
-    PriorityGenerator* pg;
+    IPriorityGenerator* pg;
 
     // Trace file
     sc_trace_file *tf;

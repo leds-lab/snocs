@@ -5,7 +5,7 @@ PG_Rotative::PG_Rotative(sc_module_name mn,
                      unsigned short int XID,
                      unsigned short int YID,
                      unsigned short int PORT_ID)
-        : PriorityGenerator(mn,numReqs_Grants,XID,YID,PORT_ID),
+        : IPriorityGenerator(mn,numReqs_Grants,XID,YID,PORT_ID),
           update_register("PGRot_update_register"), Gdelayed("PGRot_Gdelayed",numReqs_Grants),
           nextP("PGRot_nextP",numReqs_Grants), Preg("PGRot_Preg",numReqs_Grants)
 {

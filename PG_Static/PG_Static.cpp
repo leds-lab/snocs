@@ -5,7 +5,7 @@ PG_Static::PG_Static(sc_module_name mn, unsigned int priority,
                      unsigned short int XID,
                      unsigned short int YID,
                      unsigned short int PORT_ID)
-        : PriorityGenerator(mn,numReqs_Grants,XID,YID,PORT_ID)
+        : IPriorityGenerator(mn,numReqs_Grants,XID,YID,PORT_ID)
 {
 
     if(priority >= numReqs_Grants) {

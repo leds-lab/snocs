@@ -5,7 +5,7 @@
 /*!
  * \brief The PG_Rotative class
  */
-class PG_Rotative : public PriorityGenerator {
+class PG_Rotative : public IPriorityGenerator {
 public:
 
     // Internal signals
@@ -42,7 +42,7 @@ public:
 };
 
 extern "C" {
-    SS_EXP PriorityGenerator* new_PG(sc_simcontext* simcontext,
+    SS_EXP IPriorityGenerator* new_PG(sc_simcontext* simcontext,
                               sc_module_name moduleName,
                               unsigned short int numReqs_Grants,
                               unsigned short int XID,
@@ -59,7 +59,7 @@ extern "C" {
 
         return new PG_Rotative(moduleName,numReqs_Grants,XID,YID,PORT_ID);
     }
-    SS_EXP void delete_PG(PriorityGenerator* pg) {
+    SS_EXP void delete_PG(IPriorityGenerator* pg) {
         delete pg;
     }
 }

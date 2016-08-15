@@ -1,0 +1,72 @@
+/*
+--------------------------------------------------------------------------------
+PROJECT: SoCIN Simulator
+MODULE : ProgramablePriorityEncoder
+FILE   : ProgramablePriorityEncoder.h
+--------------------------------------------------------------------------------
+DESCRIPTION: Programmable priority encoder that receives a set of requests and
+priorities, and, based on the current priorities, schedules one of the pending
+requests by giving it a grant. It is composed by "N" arbitration cells
+interconnected in a ripple loop (wrap-around connection), implemented by signals
+which notify the next cell if some of the previous cells has already granted a
+request. This entity also include a register which holds the last granting until
+the granted request return to 0. A new grant can only be given after the arbiter
+returns to the idle state.
+--------------------------------------------------------------------------------
+AUTHORS: Laboratory of Embedded and Distributed Systems (LEDS - UNIVALI)
+CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
+-------------------------------- Reviews ---------------------------------------
+| Date       - Version - Author                      | Description
+--------------------------------------------------------------------------------
+| 10/08/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
+--------------------------------------------------------------------------------
+*/
+
+#ifndef PROGRAMMABLEPRIORITYENCODER_H
+#define PROGRAMMABLEPRIORITYENCODER_H
+
+#include <systemc>
+
+using namespace sc_core;
+using namespace sc_dt;
+
+class ProgrammablePriorityEncoder : public sc_module {
+protected:
+    unsigned short int nPorts;
+public:
+
+    // System signals
+    sc_in<bool> i_CLK;                       // Clock
+    sc_in<bool> i_RST;                       // Reset
+
+    // Arbitration signals
+    sc_vector<sc_in<bool> >  i_REQUEST;      // Requests
+    sc_vector<sc_in<bool> >  i_PRIORITY;     // Priorities
+    sc_vector<sc_out<bool> > o_GRANT;        // Grants
+    sc_out<bool>             o_IDLE;         // Status
+
+    // Internal signals
+    sc_vector<sc_signal<bool> > w_IMED_IN;   // Some of the previous cell granted a req.
+    sc_vector<sc_signal<bool> > w_IMED_OUT;  // A grant was already given
+    sc_vector<sc_signal<bool> > w_GRANT;     // Grant signals
+    sc_vector<sc_signal<bool> > r_GRANT;     // Registered grant signals
+    sc_signal<bool>             w_IDLE;      // Signal for the idle output
+
+    // Internal data structures
+    unsigned short int XID, YID, PORT_ID;
+
+    // Module's processes
+    void p_IMED_IN();
+    void p_IMED_OUT();
+    void p_GRANT();
+    void p_GRANT_REG();
+    void p_IDLE();
+    void p_OUTPUTS();
+
+    SC_HAS_PROCESS(ProgrammablePriorityEncoder);
+    ProgrammablePriorityEncoder(sc_module_name mn, unsigned int short XID,
+                                unsigned int short YID, unsigned int short PORT_ID,
+                                unsigned short nPorts);
+};
+
+#endif // PROGRAMMABLEPRIORITYENCODER_H
