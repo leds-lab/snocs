@@ -9,4 +9,5 @@ SUBDIRS += \
     PG_Tester \
     PG_RoundRobin \
     ProgrammablePriorityEncoder \
-    Arbiter
+    Arbiter \
+    Arbiter_Tester

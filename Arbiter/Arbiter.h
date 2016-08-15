@@ -36,6 +36,7 @@ public:
     SC_HAS_PROCESS(Arbiter);
     Arbiter(sc_module_name mn, IPriorityGenerator* pg, ProgrammablePriorityEncoder* ppe, unsigned short nPorts,
             unsigned short XID, unsigned short YID, unsigned short PORT_ID);
+    ~Arbiter();
 };
 
 

@@ -24,6 +24,10 @@ Arbiter::Arbiter(sc_module_name mn, IPriorityGenerator *pg, ProgrammablePriority
 
 }
 
+Arbiter::~Arbiter() {
+    delete u_PPE;
+}
+
 
 /////////// Testbench ///////////
 tst_Arbiter::tst_Arbiter(sc_module_name mn, Arbiter *arb, unsigned short nPorts)
