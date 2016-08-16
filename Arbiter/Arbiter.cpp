@@ -77,7 +77,6 @@ void tst_Arbiter::p_stimulus() {
     wait();
 
     w_RST.write(false);
-    wait();
 
     for( unsigned short x = 0; x < nPorts; x++ ) {
         // All request OFF
@@ -85,17 +84,26 @@ void tst_Arbiter::p_stimulus() {
             w_REQUEST[i].write(false);
         }
         wait();
+        wait();
+        wait();
+        wait();
 
         // All request ON
         for(i = 0; i < nPorts; i++) {
             w_REQUEST[i].write(true);
         }
         wait();
+        wait();
+        wait();
+        wait();
     }
 
     // Disabling one request per cycle
     for( i = 0; i < nPorts; i++ ) {
         w_REQUEST[i].write(false);
+        wait();
+        wait();
+        wait();
         wait();
     }
 
@@ -104,14 +112,23 @@ void tst_Arbiter::p_stimulus() {
         // 0b0001
         w_REQUEST[0].write(true);
         wait();
+        wait();
+        wait();
+        wait();
 
         // 0b0000
         w_REQUEST[0].write(false);
+        wait();
+        wait();
+        wait();
         wait();
 
         // 0b1001
         w_REQUEST[0].write(true);
         w_REQUEST[3].write(true);
+        wait();
+        wait();
+        wait();
         wait();
 
     }
@@ -122,11 +139,17 @@ void tst_Arbiter::p_stimulus() {
             w_REQUEST[i].write(false);
         }
         wait();
+        wait();
+        wait();
+        wait();
 
         // All request ON
         for(i = 0; i < nPorts; i++) {
             w_REQUEST[i].write(true);
         }
+        wait();
+        wait();
+        wait();
         wait();
     }
 
@@ -135,7 +158,9 @@ void tst_Arbiter::p_stimulus() {
         w_REQUEST[i].write(false);
     }
     wait();
-
+    wait();
+    wait();
+    wait();
 
     sc_stop();
 }

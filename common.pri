@@ -19,3 +19,7 @@ unix {
     }
 }
 HEADERS += SoCINGlobal.h
+
+OBJECTS_DIR = ../objs
+
+CONFIG -= debug_and_release

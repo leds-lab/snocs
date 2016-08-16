@@ -3,6 +3,7 @@ CONFIG -= qt
 TEMPLATE = app
 CONFIG += console
 
-SOURCES += main.cpp
+SOURCES += \
+    tst_pg.cpp
 
 include(../common.pri)

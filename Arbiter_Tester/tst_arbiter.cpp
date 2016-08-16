@@ -3,6 +3,12 @@
 #include <dlfcn.h>
 #include <ctime>
 
+/*!
+ * \brief sc_main
+ * \param argc
+ * \param argv [0] Executable folder; [1] Plug-in file; [2] Number of ports
+ * \return 0 if success; -1 otherwise
+ */
 int sc_main(int argc, char *argv[]) {
 
     for(int i = 0; i < argc; i++) {
@@ -45,7 +51,7 @@ int sc_main(int argc, char *argv[]) {
     nPorts = atoi(argv[2]);
     XID = YID = PORT_ID = 0;
 
-    std::cout << "\nNumber of Ports: " << nPorts << std::endl;
+    printf("\nNumber of Ports: %u",nPorts);
 
     // System Clock - 10ns
     sc_clock w_CLK("CLK",10,SC_NS);
@@ -70,7 +76,6 @@ int sc_main(int argc, char *argv[]) {
     delete tb;
     delete_PG_t(pg);
     dlclose(lib_handle);
-
 
     return 0;
 }

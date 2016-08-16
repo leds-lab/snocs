@@ -4,6 +4,10 @@ TEMPLATE = app
 CONFIG += console
 TARGET = Arb_Tester
 
-SOURCES += main.cpp
-
 include(../common.pri)
+
+SOURCES += \
+    tst_arbiter.cpp
+
+OBJECTS += ../objs/ProgrammablePriorityEncoder.o \
+    ../objs/Arbiter.o
