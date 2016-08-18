@@ -2,7 +2,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 TEMPLATE = app
 CONFIG += console
-TARGET = Arb_Tester
+TARGET = tst_arbiter
 
 include(../common.pri)
 

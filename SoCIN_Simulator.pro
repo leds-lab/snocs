@@ -5,12 +5,12 @@ SUBDIRS += \
     PG_Static \
     PG_Rotative \
     PG_RoundRobin \
-    PG_Tester \
+    tst_PG \
     ProgrammablePriorityEncoder \
     Arbiter \
-    Arbiter_Tester
+    tst_Arbiter
 
 CONFIG += ordered
 
 # What subproject depends on others
-Arbiter_Tester.depends = Arbiter ProgrammablePriorityEncoder
+tst_Arbiter.depends = Arbiter ProgrammablePriorityEncoder

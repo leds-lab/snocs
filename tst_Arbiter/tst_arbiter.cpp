@@ -16,7 +16,7 @@ int sc_main(int argc, char *argv[]) {
     }
     if( argc < 3 ) {
         std::cerr << "Please specific PG plugin filename and number of ports"
-                     "\nFormat: ./Arb_Tester </dir/of/pg_plugin> NPORTS" << std::endl;
+                     "\nFormat: ./tst_Arbiter </dir/of/pg_plugin> NPORTS" << std::endl;
         return -1;
     }
 
@@ -54,7 +54,7 @@ int sc_main(int argc, char *argv[]) {
     printf("\nNumber of Ports: %u",nPorts);
 
     // System Clock - 10ns
-    sc_clock w_CLK("CLK",10,SC_NS);
+    sc_clock w_CLK("CLK",100,SC_NS);
 
     ////////////// Instantiate system components //////////////
     // Priority Generator
