@@ -78,7 +78,7 @@ void tst_Arbiter::p_stimulus() {
 
     w_RST.write(false);
 
-    for( unsigned short x = 0; x < nPorts; x++ ) {
+    for( unsigned short x = 0; x <= nPorts; x++ ) {
         // All request OFF
         for(i = 0; i < nPorts; i++) {
             w_REQUEST[i].write(false);
