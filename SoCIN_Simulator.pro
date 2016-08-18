@@ -8,7 +8,8 @@ SUBDIRS += \
     tst_PG \
     ProgrammablePriorityEncoder \
     Arbiter \
-    tst_Arbiter
+    tst_Arbiter \
+    tst_ProgrammablePriorityEncoder
 
 CONFIG += ordered
 
