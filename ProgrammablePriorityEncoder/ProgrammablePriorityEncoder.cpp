@@ -1,5 +1,7 @@
 #include "ProgrammablePriorityEncoder.h"
 
+#include <ctime>
+
 ProgrammablePriorityEncoder::ProgrammablePriorityEncoder(sc_module_name mn, unsigned short nPorts,
         unsigned short XID, unsigned short YID, unsigned short PORT_ID)
     : sc_module(mn), nPorts(nPorts), i_CLK("PPE_iCLK"), i_RST("PPE_iRST"), i_REQUEST("PPE_iR",nPorts),
@@ -8,8 +10,8 @@ ProgrammablePriorityEncoder::ProgrammablePriorityEncoder(sc_module_name mn, unsi
       r_GRANT("PPE_rGRANT",nPorts),w_IDLE("PPE_wIDLE"),XID(XID),YID(YID),PORT_ID(PORT_ID)
 {
 
-    unsigned short i;
-    // Continuar daqui
+    unsigned short i; // Loop iterator
+
     SC_METHOD(p_IMED_IN);
     for(i = 0; i < nPorts; i++) {
         sensitive << w_IMED_OUT[i];
@@ -190,4 +192,107 @@ void ProgrammablePriorityEncoder::p_OUTPUTS()
     for( unsigned short i = 0; i < nPorts; i++) {
         o_GRANT[i].write( r_GRANT[i].read() );
     }
+
+}
+
+/////////////////////////////// Testbench ///////////////////////////////
+tst_PPE::tst_PPE(sc_module_name mn, unsigned short nPorts)
+    : sc_module(mn){
+
+    w_PRIORITY.init(nPorts);
+    w_REQUEST.init(nPorts);
+    w_GRANT.init(nPorts);
+
+    u_PPE = new ProgrammablePriorityEncoder("PPE_DUT",nPorts,0,0,0);
+    u_PPE->i_CLK(i_CLK);
+    u_PPE->i_RST(w_RST);
+    u_PPE->i_PRIORITY(w_PRIORITY);
+    u_PPE->i_REQUEST(w_REQUEST);
+    u_PPE->o_GRANT(w_GRANT);
+    u_PPE->o_IDLE(w_IDLE);
+
+    tf = sc_create_vcd_trace_file("ppe_waves");
+    sc_trace(tf,i_CLK,"CLK");
+    sc_trace(tf,w_RST,"RST");
+    sc_trace(tf,w_IDLE,"o_IDLE");
+    for(unsigned short i = 0; i < nPorts; i++) {
+        char strPri[10];
+        sprintf(strPri,"i_P(%u)",i);
+        sc_trace(tf,w_PRIORITY[i],strPri);
+
+        char strReq[10];
+        sprintf(strReq,"i_R(%u)",i);
+        sc_trace(tf,w_REQUEST[i],strReq);
+
+        char strGnt[10];
+        sprintf(strGnt,"o_G(%u)",i);
+        sc_trace(tf,w_GRANT[i],strGnt);
+
+        // Internal PPE signals
+        char strWimedIn[15];
+        sprintf(strWimedIn,"w_IMED_IN(%u)",i);
+        sc_trace(tf,u_PPE->w_IMED_IN[i],strWimedIn);
+
+        char strWimedOut[16];
+        sprintf(strWimedOut,"w_IMED_OUT(%u)",i);
+        sc_trace(tf,u_PPE->w_IMED_OUT[i],strWimedOut);
+
+        char strWGnt[14];
+        sprintf(strWGnt,"w_GRANT(%u)",i);
+        sc_trace(tf,u_PPE->w_GRANT[i],strWGnt);
+
+        char strRGnt[14];
+        sprintf(strRGnt,"r_GRANT(%u)",i);
+        sc_trace(tf,u_PPE->r_GRANT[i],strRGnt);
+    }
+    sc_trace(tf,u_PPE->w_IDLE,"w_IDLE");
+
+    SC_CTHREAD(p_stimulus,i_CLK.pos());
+    sensitive << i_CLK;
+}
+
+tst_PPE::~tst_PPE() {
+    sc_close_vcd_trace_file(tf);
+    delete u_PPE;
+}
+
+void tst_PPE::p_stimulus() {
+
+    srand(time(NULL));
+    unsigned short i;
+
+    w_RST.write(true);
+    wait();
+
+    w_RST.write(false);
+    wait();
+
+    for(unsigned short x = 0; x < 3; x++) {
+
+        unsigned short rnd = rand() % nPorts;
+        w_PRIORITY[rnd].write(true);
+        // All request on
+        for(i = 0; i < nPorts; i++) {
+            w_REQUEST[i].write(true);
+        }
+        wait();
+        // All request off
+        for(i = 0; i < nPorts; i++) {
+            w_REQUEST[i].write(false);
+        }
+        wait();
+        w_PRIORITY[rnd].write(false);
+    }
+
+    for(i = 0; i < nPorts; i++) {
+        w_REQUEST[i].write(true);
+    }
+    wait();
+
+    for(i = 0; i < nPorts; i++) {
+        w_REQUEST[i].write(false);
+        wait();
+    }
+
+    sc_stop();
 }

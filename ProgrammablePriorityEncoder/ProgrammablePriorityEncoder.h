@@ -69,4 +69,35 @@ public:
                                 unsigned short PORT_ID);
 };
 
+/////////////////////////////// Testbench ///////////////////////////////
+class tst_PPE : public sc_module {
+protected:
+    unsigned short nPorts;
+public:
+
+    // Interface
+    sc_in<bool>                  i_CLK;          // Clock
+
+    // Signals
+    sc_signal<bool>              w_RST;          // Reset
+    sc_vector<sc_signal<bool> >  w_REQUEST;      // Requests
+    sc_vector<sc_signal<bool> >  w_PRIORITY;     // Priorities
+    sc_vector<sc_signal<bool> >  w_GRANT;        // Grants
+    sc_signal<bool>              w_IDLE;         // Status
+
+    // DUT
+    ProgrammablePriorityEncoder* u_PPE;
+
+    // Trace file
+    sc_trace_file* tf;
+
+    // Module process
+    void p_stimulus();
+
+    SC_HAS_PROCESS(tst_PPE);
+    tst_PPE(sc_module_name mn, unsigned short nPorts);
+
+    ~tst_PPE();
+};
+
 #endif // PROGRAMMABLEPRIORITYENCODER_H
