@@ -42,10 +42,6 @@ tst_Arbiter::tst_Arbiter(sc_module_name mn, Arbiter *arb, unsigned short nPorts)
     arb->o_GRANT(w_GRANT);
     arb->o_IDLE(w_IDLE);
 
-    // Defining testbench stimulus process
-    SC_CTHREAD(p_stimulus,i_CLK.pos());
-    sensitive << i_CLK;
-
     // Trace
     tf = sc_create_vcd_trace_file("arbiter_waves");
     sc_trace(tf,i_CLK,"CLK");
@@ -59,7 +55,15 @@ tst_Arbiter::tst_Arbiter(sc_module_name mn, Arbiter *arb, unsigned short nPorts)
         char strGnt[15];
         sprintf(strGnt,"GRANT(%u)",i);
         sc_trace(tf,w_GRANT[i],strGnt);
+
+        char strPri[15];
+        sprintf(strPri,"PRIORITY(%u)",i);
+        sc_trace(tf,arb->w_PRIORITY[i],strPri);
     }
+
+    // Defining testbench stimulus process
+    SC_THREAD(p_stimulus);
+//    sensitive << i_CLK;
 
 }
 
@@ -74,7 +78,7 @@ void tst_Arbiter::p_stimulus() {
 
     // Initialize reseted
     w_RST.write(true);
-    wait();
+    wait(100,SC_NS);
 
     w_RST.write(false);
 
@@ -83,53 +87,53 @@ void tst_Arbiter::p_stimulus() {
         for(i = 0; i < nPorts; i++) {
             w_REQUEST[i].write(false);
         }
-        wait();
-        wait();
-        wait();
-        wait();
+        wait(400,SC_NS);
+//        wait();
+//        wait();
+//        wait();
 
         // All request ON
         for(i = 0; i < nPorts; i++) {
             w_REQUEST[i].write(true);
         }
-        wait();
-        wait();
-        wait();
-        wait();
+        wait(400,SC_NS);
+//        wait();
+//        wait();
+//        wait();
     }
 
     // Disabling one request per cycle
     for( i = 0; i < nPorts; i++ ) {
         w_REQUEST[i].write(false);
-        wait();
-        wait();
-        wait();
-        wait();
+        wait(400,SC_NS);
+//        wait();
+//        wait();
+//        wait();
     }
 
     // Specific for 4 bit
     if( nPorts == 4 ) {
         // 0b0001
         w_REQUEST[0].write(true);
-        wait();
-        wait();
-        wait();
-        wait();
+        wait(400,SC_NS);
+//        wait();
+//        wait();
+//        wait();
 
         // 0b0000
         w_REQUEST[0].write(false);
-        wait();
-        wait();
-        wait();
-        wait();
+        wait(400,SC_NS);
+//        wait();
+//        wait();
+//        wait();
 
         // 0b1001
         w_REQUEST[0].write(true);
         w_REQUEST[3].write(true);
-        wait();
-        wait();
-        wait();
-        wait();
+        wait(400,SC_NS);
+//        wait();
+//        wait();
+//        wait();
 
     }
 
@@ -138,29 +142,29 @@ void tst_Arbiter::p_stimulus() {
         for(i = 0; i < nPorts; i++) {
             w_REQUEST[i].write(false);
         }
-        wait();
-        wait();
-        wait();
-        wait();
+        wait(400,SC_NS);
+//        wait();
+//        wait();
+//        wait();
 
         // All request ON
         for(i = 0; i < nPorts; i++) {
             w_REQUEST[i].write(true);
         }
-        wait();
-        wait();
-        wait();
-        wait();
+        wait(400,SC_NS);
+//        wait();
+//        wait();
+//        wait();
     }
 
     // All request OFF
     for(i = 0; i < nPorts; i++) {
         w_REQUEST[i].write(false);
     }
-    wait();
-    wait();
-    wait();
-    wait();
+//    wait();
+//    wait();
+//    wait();
+    wait(400,SC_NS);
 
     sc_stop();
 }

@@ -33,8 +33,8 @@ int sc_main(int argc, char *argv[]) {
 
     create_PriorityGenerator* new_PG_t = (create_PriorityGenerator*) dlsym(lib_handle,"new_PG");
     const char* dlsym_error = dlerror();
-    std::cout << dlsym_error << std::endl;
     if( dlsym_error ) {
+        std::cout << dlsym_error << std::endl;
         std::cerr << "Error on load symbol of factory creator function - PG: " << pluginFilename << std::endl;
         return -1;
     }
@@ -71,7 +71,7 @@ int sc_main(int argc, char *argv[]) {
     // Start simulation
     sc_start();
     t = clock() - t;
-    printf("\n\nSimulated in %ld (%f secs)\n",t,((float)t)/CLOCKS_PER_SEC);
+    printf("\n\nSimulated in %ld ms(%f secs)\n",t,((float)t)/CLOCKS_PER_SEC);
 
     delete tb;
     delete_PG_t(pg);

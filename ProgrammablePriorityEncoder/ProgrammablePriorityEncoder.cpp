@@ -48,7 +48,6 @@ void ProgrammablePriorityEncoder::p_IMED_IN()
 ////////////////////////////////////////////////////////////////////////////////
 // Status from the previous arbitration cell
 {
-
     unsigned short i; // Loop iterator
     std::vector<bool> v_IMED_OUT(nPorts); // A copy of w_IMED_OUT for bit-level operations
     std::vector<bool> v_IMED_IN(nPorts);  // A temp. var. used to calculate Imed_in
@@ -294,7 +293,10 @@ void tst_PPE::p_stimulus() {
 
     for(i = 0; i < nPorts; i++) {
         w_REQUEST[i].write(false);
+        unsigned short rnd = i + (nPorts-i-1) * ((rand() % nPorts)/10);
+        w_PRIORITY[rnd].write(true);
         wait();
+        w_PRIORITY[rnd].write(false);
     }
 
     sc_stop();
