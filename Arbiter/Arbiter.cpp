@@ -1,12 +1,12 @@
 #include "Arbiter.h"
 
-Arbiter::Arbiter(sc_module_name mn, IPriorityGenerator *pg, ProgrammablePriorityEncoder *ppe,
-                 unsigned short nPorts, unsigned short XID, unsigned short YID, unsigned short PORT_ID)
-        : sc_module(mn), nPorts(nPorts), i_CLK("Arb_iCLK"), i_RST("Arb_iRST"), i_REQUEST("Arb_REQ",nPorts),
-          o_GRANT("Arb_oGRANT",nPorts),o_IDLE("Arb_oIDLE"), w_PRIORITY("Arb_wPRIOR",nPorts), XID(XID),YID(YID),
-          PORT_ID(PORT_ID), u_PG(pg), u_PPE(ppe)
+/////////////////////////////////////////////////////////////
+/// Distributed arbiter (original SoCIN)
+/////////////////////////////////////////////////////////////
+DistributedArbiter::DistributedArbiter(sc_module_name mn,unsigned short nPorts, IPriorityGenerator *pg, ProgrammablePriorityEncoder *ppe,
+                                       unsigned short XID, unsigned short YID, unsigned short PORT_ID)
+        : IArbiter(mn,nPorts,XID,YID,PORT_ID), w_PRIORITY("DistArb_wPRIOR",nPorts), u_PG(pg), u_PPE(ppe)
 {
-
     // Binding ports
     // PPE
     u_PPE->i_CLK(i_CLK);
@@ -24,13 +24,19 @@ Arbiter::Arbiter(sc_module_name mn, IPriorityGenerator *pg, ProgrammablePriority
 
 }
 
-Arbiter::~Arbiter() {
+DistributedArbiter::~DistributedArbiter() {
     delete u_PPE;
 }
+/////////////////////////////////////////////////////////////
+/// End of distributed arbiter
+/////////////////////////////////////////////////////////////
 
 
-/////////// Testbench ///////////
-tst_Arbiter::tst_Arbiter(sc_module_name mn, Arbiter *arb, unsigned short nPorts)
+
+/////////////////////////////////////////////////////////////
+/// Arbiter testbench
+/////////////////////////////////////////////////////////////
+tst_Arbiter::tst_Arbiter(sc_module_name mn, IArbiter *arb, unsigned short nPorts)
         : sc_module(mn), nPorts(nPorts), i_CLK("tst_Arb_iCLK"), w_RST("tst_Arb_wRST"),
           w_REQUEST("tst_Arb_wREQ",nPorts), w_GRANT("tst_Arb_wGRANT",nPorts),
           w_IDLE("tst_Arb_wIDLE"),arb(arb) {
@@ -56,9 +62,6 @@ tst_Arbiter::tst_Arbiter(sc_module_name mn, Arbiter *arb, unsigned short nPorts)
         sprintf(strGnt,"GRANT(%u)",i);
         sc_trace(tf,w_GRANT[i],strGnt);
 
-        char strPri[15];
-        sprintf(strPri,"PRIORITY(%u)",i);
-        sc_trace(tf,arb->w_PRIORITY[i],strPri);
     }
 
     // Defining testbench stimulus process
@@ -168,3 +171,6 @@ void tst_Arbiter::p_stimulus() {
 
     sc_stop();
 }
+/////////////////////////////////////////////////////////////
+/// End of arbiter testbench
+/////////////////////////////////////////////////////////////
