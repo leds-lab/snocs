@@ -62,7 +62,7 @@ int sc_main(int argc, char *argv[]) {
     // Programmable Priority Encoder
     ProgrammablePriorityEncoder* ppe = new ProgrammablePriorityEncoder("PPE",nPorts,XID,YID,PORT_ID);
     // Design Under Test
-    Arbiter* arb = new Arbiter("Arbiter",pg,ppe,nPorts,XID,YID,PORT_ID);
+    IArbiter* arb = new DistributedArbiter("Arbiter",nPorts,pg,ppe,XID,YID,PORT_ID);
     // Tester (Driver) - testbench
     tst_Arbiter* tb = new tst_Arbiter("Testbench",arb,nPorts);
     tb->i_CLK(w_CLK);
