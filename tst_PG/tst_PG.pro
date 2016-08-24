@@ -7,3 +7,7 @@ SOURCES += \
     tst_pg.cpp
 
 include(../common.pri)
+
+unix {
+    LIBS += -ldl
+}

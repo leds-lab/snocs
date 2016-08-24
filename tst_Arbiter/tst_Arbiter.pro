@@ -11,3 +11,7 @@ SOURCES += \
 
 OBJECTS += ../objs/ProgrammablePriorityEncoder.o \
     ../objs/Arbiter.o
+
+unix {
+    LIBS += -ldl
+}
