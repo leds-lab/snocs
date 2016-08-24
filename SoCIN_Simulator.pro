@@ -1,5 +1,8 @@
 TEMPLATE = subdirs
 
+# What subproject depends on others
+tst_Arbiter.depends = Arbiter ProgrammablePriorityEncoder
+
 SUBDIRS += \
     PriorityGenerator \
     PG_Static \
@@ -10,8 +13,3 @@ SUBDIRS += \
     Arbiter \
     tst_Arbiter \
     tst_ProgrammablePriorityEncoder
-
-CONFIG += ordered
-
-# What subproject depends on others
-tst_Arbiter.depends = Arbiter ProgrammablePriorityEncoder
