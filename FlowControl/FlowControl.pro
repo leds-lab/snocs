@@ -10,7 +10,7 @@ include(../common.pri)
 
 SOURCES +=
 
-#DESTDIR = ../plugins
+DESTDIR = ../plugins
 
 HEADERS += \
     FlowControl.h

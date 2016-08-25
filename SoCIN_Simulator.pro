@@ -13,4 +13,6 @@ SUBDIRS += \
     Arbiter \
     tst_Arbiter \
     tst_ProgrammablePriorityEncoder \
-    FlowControl
+    FlowControl \
+    FC_Handshake \
+    FC_CreditBased

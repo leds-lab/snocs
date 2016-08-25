@@ -4,7 +4,6 @@
 #include "../PriorityGenerator/PriorityGenerator.h"
 
 /////////////////////////////////////////
-
 class PG_RoundRobin : public IPriorityGenerator {
 public:
 

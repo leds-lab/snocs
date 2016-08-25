@@ -14,6 +14,3 @@ TARGET = pgrotative
 HEADERS += PG_Rotative.h
 
 SOURCES += PG_Rotative.cpp
-
-
-
