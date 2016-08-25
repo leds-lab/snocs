@@ -13,7 +13,8 @@ public:
               unsigned short int YID,
               unsigned short int PORT_ID);
 
-    const char* moduleTypeName() { return "PG_Static"; }
+    ModuleType moduleType() const { return SoCINModule::PriorityGenerator; }
+    const char* moduleName() const { return "PG_Static"; }
 
 };
 

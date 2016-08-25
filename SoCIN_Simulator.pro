@@ -12,4 +12,5 @@ SUBDIRS += \
     ProgrammablePriorityEncoder \
     Arbiter \
     tst_Arbiter \
-    tst_ProgrammablePriorityEncoder
+    tst_ProgrammablePriorityEncoder \
+    FlowControl

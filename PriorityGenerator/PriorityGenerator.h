@@ -2,7 +2,7 @@
 --------------------------------------------------------------------------------
 PROJECT: SoCIN Simulator
 MODULE : IPriorityGenerator
-FILE   : IPriorityGenerator.h
+FILE   : PriorityGenerator.h
 --------------------------------------------------------------------------------
 DESCRIPTION: It is a interface class to implement priority generators
 which determines the next priority levels by implementing a specific grant policy.
@@ -19,21 +19,16 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #define PRIORITYGENERATOR_H
 
 #include "../SoCINGlobal.h"
-#include <systemc>
 #include <ctime>
-
-using namespace sc_core;
-using namespace sc_dt;
-
 
 /////////////////////////////////////////////////////////////
 /// Interface for Priority Generators (PGs)
 /////////////////////////////////////////////////////////////
 /*!
- * \brief The PriorityGenerator class is an interface
+ * \brief The IPriorityGenerator class is an interface
  * (abstract class) for Priority Generators of the Arbiters.
  */
-class IPriorityGenerator : public sc_module {
+class IPriorityGenerator : public SoCINModule {
 protected:
     unsigned short int numPorts;
 public:
@@ -45,26 +40,19 @@ public:
 
     unsigned short int XID, YID, PORT_ID;
 
-    virtual const char* moduleTypeName() = 0;
-
     // Constructor
     IPriorityGenerator(sc_module_name mn,
                       unsigned short int numReqs_Grants,
                       unsigned short int XID,
                       unsigned short int YID,
                       unsigned short int PORT_ID)
-        : sc_module(mn),numPorts(numReqs_Grants), i_CLK("PG_CLK"),
+        : SoCINModule(mn),numPorts(numReqs_Grants), i_CLK("PG_CLK"),
           i_RST("PG_RESET"),i_GRANTS("PG_GRANTS",numReqs_Grants),
           o_PRIORITIES("PG_PRIORITIES",numReqs_Grants),XID(XID),
           YID(YID),PORT_ID(PORT_ID) {}
 
-    // Destructor
-    virtual ~IPriorityGenerator() = 0;
+    ~IPriorityGenerator();
 };
-
-/// \brief PriorityGenerator::~PriorityGenerator Virtual
-/// destructor of abstract class
-inline IPriorityGenerator::~IPriorityGenerator() {}
 /////////////////////////////////////////////////////////////
 /// End Priority Generator Interface
 /////////////////////////////////////////////////////////////
@@ -76,6 +64,8 @@ inline IPriorityGenerator::~IPriorityGenerator() {}
 /*!
  * \brief create_PriorityGenerator Typedef for instantiate a
  * Priority Generator
+ * \param sc_simcontext A pointer of simulation context (required for correct plugins use)
+ * \param sc_module_name Name for the module to be instantiated
  * \param numReqs_Grants Number of input Requests and output Grants ports
  * \param XID Column identifier of the router in the network
  * \param YID Row identifier of the router in the network
@@ -192,7 +182,7 @@ public:
         sensitive << i_CLK;
 
         // Creating VCD trace file
-        tf = sc_create_vcd_trace_file(pg->moduleTypeName());
+        tf = sc_create_vcd_trace_file(pg->moduleName());
         // Signals to trace
         sc_trace(tf, i_CLK, "CLK");
         sc_trace(tf, w_RST, "RST");

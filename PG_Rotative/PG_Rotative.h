@@ -22,7 +22,8 @@ public:
     void p_outputs();
     void p_debug();
 
-    const char* moduleTypeName() { return "PG_Rotative"; }
+    ModuleType moduleType() const { return  SoCINModule::PriorityGenerator; }
+    const char* moduleName() const { return "PG_Rotative"; }
 
     SC_HAS_PROCESS(PG_Rotative);
     /*!
