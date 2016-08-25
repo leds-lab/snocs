@@ -1,4 +1,4 @@
-SYSTEMC_PATH = C:/SystemC
+SYSTEMC_PATH =
 INCLUDEPATH = $${SYSTEMC_PATH}/include
 
 win32 {
