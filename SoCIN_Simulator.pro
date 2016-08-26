@@ -15,4 +15,5 @@ SUBDIRS += \
     tst_ProgrammablePriorityEncoder \
     FlowControl \
     FC_Handshake \
-    FC_CreditBased
+    FC_CreditBased \
+    Memory
