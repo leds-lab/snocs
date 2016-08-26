@@ -13,6 +13,8 @@
 #ifndef SOCINMODULE_H
 #define SOCINMODULE_H
 
+#include "Parameters.h"
+
 #include <systemc>
 using namespace sc_core;
 using namespace sc_dt;
@@ -30,7 +32,7 @@ public:
                       InputFlowControl,
                       OutputFlowControl,
                       Arbiter,
-                      Buffer,
+                      Memory,
                       PriorityGenerator,
                       PriorityEncoder,
                       Other
