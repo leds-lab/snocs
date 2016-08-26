@@ -2,12 +2,27 @@
 
 #include <ctime>
 
-ProgrammablePriorityEncoder::ProgrammablePriorityEncoder(sc_module_name mn, unsigned short nPorts,
-        unsigned short XID, unsigned short YID, unsigned short PORT_ID)
-    : sc_module(mn), nPorts(nPorts), i_CLK("PPE_iCLK"), i_RST("PPE_iRST"), i_REQUEST("PPE_iR",nPorts),
-      i_PRIORITY("PPE_iP",nPorts), o_GRANT("PPE_oG",nPorts), o_IDLE("PPE_oIDLE"),
-      w_IMED_IN("PPE_wIMED_IN",nPorts), w_IMED_OUT("PPE_wIMED_OUT",nPorts), w_GRANT("PPE_wGRANT",nPorts),
-      r_GRANT("PPE_rGRANT",nPorts),w_IDLE("PPE_wIDLE"),XID(XID),YID(YID),PORT_ID(PORT_ID)
+ProgrammablePriorityEncoder::ProgrammablePriorityEncoder(sc_module_name mn,
+                                                         unsigned short nPorts,
+                                                         unsigned short XID,
+                                                         unsigned short YID,
+                                                         unsigned short PORT_ID)
+    : SoCINModule(mn),
+      nPorts(nPorts),
+      i_CLK("PPE_iCLK"),
+      i_RST("PPE_iRST"),
+      i_REQUEST("PPE_iR",nPorts),
+      i_PRIORITY("PPE_iP",nPorts),
+      o_GRANT("PPE_oG",nPorts),
+      o_IDLE("PPE_oIDLE"),
+      w_IMED_IN("PPE_wIMED_IN",nPorts),
+      w_IMED_OUT("PPE_wIMED_OUT",nPorts),
+      w_GRANT("PPE_wGRANT",nPorts),
+      r_GRANT("PPE_rGRANT",nPorts),
+      w_IDLE("PPE_wIDLE"),
+      XID(XID),
+      YID(YID),
+      PORT_ID(PORT_ID)
 {
 
     unsigned short i; // Loop iterator
@@ -40,8 +55,9 @@ ProgrammablePriorityEncoder::ProgrammablePriorityEncoder(sc_module_name mn, unsi
     for(i = 0; i < nPorts; i++) {
         sensitive << r_GRANT[i];
     }
-
 }
+
+ProgrammablePriorityEncoder::~ProgrammablePriorityEncoder() {}
 
 ////////////////////////////////////////////////////////////////////////////////
 void ProgrammablePriorityEncoder::p_IMED_IN()

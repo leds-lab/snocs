@@ -25,12 +25,9 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef PROGRAMMABLEPRIORITYENCODER_H
 #define PROGRAMMABLEPRIORITYENCODER_H
 
-#include <systemc>
+#include "../SoCINGlobal.h"
 
-using namespace sc_core;
-using namespace sc_dt;
-
-class ProgrammablePriorityEncoder : public sc_module {
+class ProgrammablePriorityEncoder : public SoCINModule {
 protected:
     unsigned short int nPorts;
 public:
@@ -64,9 +61,16 @@ public:
     void p_OUTPUTS();
 
     SC_HAS_PROCESS(ProgrammablePriorityEncoder);
-    ProgrammablePriorityEncoder(sc_module_name mn, unsigned int short nPorts,
-                                unsigned int short XID, unsigned int short YID,
+    ProgrammablePriorityEncoder(sc_module_name mn,
+                                unsigned int short nPorts,
+                                unsigned int short XID,
+                                unsigned int short YID,
                                 unsigned short PORT_ID);
+
+    ModuleType moduleType() const { return SoCINModule::PriorityEncoder; }
+    const char* moduleName() const { return "ProgrammablePriorityEncoder"; }
+
+    ~ProgrammablePriorityEncoder();
 };
 
 /////////////////////////////// Testbench ///////////////////////////////

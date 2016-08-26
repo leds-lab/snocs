@@ -10,8 +10,10 @@
 #    error "Unknown_compiler"
 #endif
 
-#include <systemc>
+#ifndef SOCINMODULE_H
+#define SOCINMODULE_H
 
+#include <systemc>
 using namespace sc_core;
 using namespace sc_dt;
 
@@ -29,7 +31,10 @@ public:
                       OutputFlowControl,
                       Arbiter,
                       Buffer,
-                      PriorityGenerator};
+                      PriorityGenerator,
+                      PriorityEncoder,
+                      Other
+                    };
 
     virtual ModuleType moduleType() const = 0;
     virtual const char* moduleName() const = 0;
@@ -40,3 +45,5 @@ public:
 };
 
 inline SoCINModule::~SoCINModule() {}
+
+#endif

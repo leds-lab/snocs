@@ -1,12 +1,8 @@
 #ifndef ARBITER_H
 #define ARBITER_H
 
-#include <systemc>
 #include "../PriorityGenerator/PriorityGenerator.h"
 #include "../ProgrammablePriorityEncoder/ProgrammablePriorityEncoder.h"
-
-using namespace sc_core;
-using namespace sc_dt;
 
 /////////////////////////////////////////////////////////////
 /// Interface for Arbiters
@@ -15,7 +11,7 @@ using namespace sc_dt;
  * \brief The Arbiter class represents the abstract class of
  * Arbiter entity used by OC (Output Controller)
  */
-class IArbiter : public sc_module {
+class IArbiter : public SoCINModule {
 protected:
     unsigned short nPorts;
 public:
@@ -31,13 +27,24 @@ public:
     // Internal data structures
     unsigned short XID, YID, PORT_ID;
 
-    IArbiter(sc_module_name mn, unsigned short nPorts,unsigned short XID, unsigned short YID, unsigned short PORT_ID)
-        : sc_module(mn), nPorts(nPorts), i_CLK("Arb_iCLK"), i_RST("Arb_iRST"), i_REQUEST("Arb_REQ",nPorts),
-          o_GRANT("Arb_oGRANT",nPorts),o_IDLE("Arb_oIDLE"), XID(XID),YID(YID),PORT_ID(PORT_ID) {}
+    IArbiter(sc_module_name mn,
+             unsigned short nPorts,
+             unsigned short XID,
+             unsigned short YID,
+             unsigned short PORT_ID)
+        : SoCINModule(mn),
+          nPorts(nPorts),
+          i_CLK("Arb_iCLK"),
+          i_RST("Arb_iRST"),
+          i_REQUEST("Arb_REQ",nPorts),
+          o_GRANT("Arb_oGRANT",nPorts),
+          o_IDLE("Arb_oIDLE"),
+          XID(XID),
+          YID(YID),
+          PORT_ID(PORT_ID) {}
 
     ~IArbiter() = 0;
 };
-
 /// \brief IArbiter::~IArbiter Virtual
 /// destructor of abstract class
 inline IArbiter::~IArbiter() {}
@@ -65,15 +72,21 @@ public:
     ProgrammablePriorityEncoder* u_PPE;
 
     SC_HAS_PROCESS(IArbiter);
-    DistributedArbiter(sc_module_name mn, unsigned short nPorts, IPriorityGenerator* pg, ProgrammablePriorityEncoder* ppe,
-                       unsigned short XID, unsigned short YID, unsigned short PORT_ID);
+    DistributedArbiter(sc_module_name mn,
+                       unsigned short nPorts,
+                       IPriorityGenerator* pg,
+                       ProgrammablePriorityEncoder* ppe,
+                       unsigned short XID,
+                       unsigned short YID,
+                       unsigned short PORT_ID);
 
+    ModuleType moduleType() const { return SoCINModule::Arbiter; }
+    const char* moduleName() const { return "DistributedArbiter"; }
     ~DistributedArbiter();
 };
 /////////////////////////////////////////////////////////////
 /// End of Distributed arbiter
 /////////////////////////////////////////////////////////////
-
 
 
 /////////////////////////////////////////////////////////////
