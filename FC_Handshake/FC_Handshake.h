@@ -124,7 +124,8 @@ extern "C" {
                                       sc_module_name moduleName,
                                       unsigned short int XID,
                                       unsigned short int YID,
-                                      unsigned short int PORT_ID) {
+                                      unsigned short int PORT_ID,
+                                      unsigned short int) {
         // Simcontext is needed because in shared library a
         // new and different simcontext will be created if
         // the main application simcontext is not passed to

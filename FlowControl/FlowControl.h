@@ -50,8 +50,9 @@ public:
           YID(YID),
           PORT_ID(PORT_ID) {}
 
-    ~IFlowControl();
+    ~IFlowControl() = 0;
 };
+inline IFlowControl::~IFlowControl(){}
 /////////////////////////////////////////////////////////////
 /// END Interface for Flow Controllers
 /////////////////////////////////////////////////////////////
@@ -91,9 +92,9 @@ public:
                 i_READ_OK("IFC_iREAD_OK"),
                 i_DATA("IFC_iDATA") {}
 
-    ~IInputFlowControl();
-
+    ~IInputFlowControl() = 0;
 };
+inline IInputFlowControl::~IInputFlowControl() {}
 /////////////////////////////////////////////////////////////
 /// END Interface for Input Flow Controllers (IFCs)
 /////////////////////////////////////////////////////////////
@@ -128,9 +129,10 @@ public:
                 o_READ("OFC_oREAD"),
                 i_READ_OK("OFC_iREAD_OK") {}
 
-    ~IOutputFlowControl();
+    ~IOutputFlowControl() = 0;
 
 };
+inline IOutputFlowControl::~IOutputFlowControl() {}
 /////////////////////////////////////////////////////////////
 /// END Interface for Output Flow Controllers (OFCs)
 /////////////////////////////////////////////////////////////
@@ -170,19 +172,21 @@ typedef void destroy_InputFlowControl(IInputFlowControl*);
 /////////////////////////////////////////////////////////////
 /*!
  * \brief create_OuputFlowControl Typedef for instantiate a
- * Output Flow Controller
+ * Output Flow Controller with buffers depth
  * \param sc_simcontext A pointer of simulation context (required for correct plugins use)
  * \param sc_module_name Name for the module to be instantiated
  * \param XID Column identifier of the router in the network
  * \param YID Row identifier of the router in the network
  * \param PORT_ID Port identifier of the router
+ * \param bufferDepth Buffers depth - used in credit-based flow control (number of credits)
  * \return A method for instantiate a Output Flow Controller
  */
 typedef IOutputFlowControl* create_OutputFlowControl(sc_simcontext*,
-                                        sc_module_name,
-                                        unsigned short int XID,
-                                        unsigned short int YID,
-                                        unsigned short int PORT_ID);
+                                                     sc_module_name,
+                                                     unsigned short int XID,
+                                                     unsigned short int YID,
+                                                     unsigned short int PORT_ID,
+                                                     unsigned short int bufferDepth);
 
 /*!
  * \brief destroy_OutputFlowControl Typedef for deallocating a

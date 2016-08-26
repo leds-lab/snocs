@@ -51,8 +51,9 @@ public:
           o_PRIORITIES("PG_PRIORITIES",numReqs_Grants),XID(XID),
           YID(YID),PORT_ID(PORT_ID) {}
 
-    ~IPriorityGenerator();
+    ~IPriorityGenerator() = 0;
 };
+inline IPriorityGenerator::~IPriorityGenerator(){}
 /////////////////////////////////////////////////////////////
 /// End Priority Generator Interface
 /////////////////////////////////////////////////////////////
