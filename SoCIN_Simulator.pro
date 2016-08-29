@@ -16,4 +16,6 @@ SUBDIRS += \
     FlowControl \
     FC_Handshake \
     FC_CreditBased \
-    Memory
+    Memory \
+    FIFO \
+    Multiplexers
