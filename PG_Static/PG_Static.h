@@ -1,3 +1,20 @@
+/*
+--------------------------------------------------------------------------------
+PROJECT: SoCIN_Simulator
+MODULE : PG_Static
+FILE   : PG_Static.h
+--------------------------------------------------------------------------------
+DESCRIPTION: That is a function which determines the next priority levels by
+implementing a static algorithm. Always the Request(0) has highest priority
+--------------------------------------------------------------------------------
+AUTHORS: Laboratory of Embedded and Distributed Systems (LEDS - UNIVALI)
+CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
+-------------------------------- Reviews ---------------------------------------
+| Date       - Version - Author                      | Description
+--------------------------------------------------------------------------------
+| 12/07/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
+--------------------------------------------------------------------------------
+*/
 #ifndef PG_STATIC_H
 #define PG_STATIC_H
 

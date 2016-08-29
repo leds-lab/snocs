@@ -20,7 +20,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 
 #include "../FlowControl/FlowControl.h"
 
-enum handshake_states {S0, S1, S2}; // States of the FSMs of handshake-type ifc and ofc
+enum handshake_states {s_S0, s_S1, s_S2}; // States of the FSMs of handshake-type ifc and ofc
 
 /////////////////////////////////////////////////////////////
 /// Concrete implementation of Input Flow Controller

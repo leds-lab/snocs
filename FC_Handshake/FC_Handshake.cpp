@@ -7,7 +7,10 @@
 /// \param XID X identifier of router in the network
 /// \param YID Y identifier of router in the network
 /// \param PORT_ID Port identifier in the router
-IFC_Handshake::IFC_Handshake(sc_module_name mn,unsigned short XID,unsigned short YID, unsigned short PORT_ID)
+IFC_Handshake::IFC_Handshake(sc_module_name mn,
+                             unsigned short XID,
+                             unsigned short YID,
+                             unsigned short PORT_ID)
     : IInputFlowControl(mn,XID,YID,PORT_ID),
       r_CUR_STATE("IFC_Handshake_rCUR_STATE"),
       w_NEXT_STATE("IFC_Handshake_wNEXT_STATE")
@@ -27,7 +30,7 @@ IFC_Handshake::IFC_Handshake(sc_module_name mn,unsigned short XID,unsigned short
  */
 void IFC_Handshake::p_CURRENT_STATE() {
     if( i_RST.read() == 1 ) {
-        r_CUR_STATE.write(S0);
+        r_CUR_STATE.write(s_S0);
     } else {
         r_CUR_STATE.write(w_NEXT_STATE.read());
     }
@@ -41,35 +44,35 @@ void IFC_Handshake::p_NEXT_STATE() {
     switch(r_CUR_STATE.read()) {
     // Waits a new incoming data (val=1) and, if the FIFO is not full
     // (wok=1), goes to the S1 state in order to receive the data.
-        case S0: {
+        case s_S0: {
             if( (i_VALID.read()) && (i_WRITE_OK.read()) ){
-                w_NEXT_STATE.write(S1);
+                w_NEXT_STATE.write(s_S1);
             } else {
-                w_NEXT_STATE.write(S0);
+                w_NEXT_STATE.write(s_S0);
             }
             break;
         }
     // Writes the data into the FIFO and goes back to the S0 state
     // if val=0, or, if not, goes to S2 state.
-        case S1: {
+        case s_S1: {
             if( !i_VALID.read() ) {
-                w_NEXT_STATE.write(S0);
+                w_NEXT_STATE.write(s_S0);
             } else {
-                w_NEXT_STATE.write(S2);
+                w_NEXT_STATE.write(s_S2);
             }
             break;
         }
     // Waits val goes to 0 to complete the data transfer.
-        case S2: {
+        case s_S2: {
             if( !i_VALID.read() ) {
-                w_NEXT_STATE.write(S0);
+                w_NEXT_STATE.write(s_S0);
             } else {
-                w_NEXT_STATE.write(S2);
+                w_NEXT_STATE.write(s_S2);
             }
             break;
         }
         default: {
-            w_NEXT_STATE.write(S0);
+            w_NEXT_STATE.write(s_S0);
         }
     }
 }
@@ -80,19 +83,19 @@ void IFC_Handshake::p_NEXT_STATE() {
 void IFC_Handshake::p_OUTPUTS() {
     switch(r_CUR_STATE.read()) {
     // Do nothing
-        case S0: {
+        case s_S0: {
             o_RETURN.write(0);
             o_WRITE.write(0);
             break;
         }
     // Acknowledges the data and writes it into the FIFO
-        case S1: {
+        case s_S1: {
             o_RETURN.write(1);
             o_WRITE.write(1);
             break;
         }
     // Holds the acknowledge high while valid is not low
-        case S2: {
+        case s_S2: {
             o_RETURN.write(1);
             o_WRITE.write(0);
             break;
@@ -133,7 +136,7 @@ OFC_Handshake::OFC_Handshake(sc_module_name mn,unsigned short XID,unsigned short
  */
 void OFC_Handshake::p_CURRENT_STATE() {
     if( i_RST.read() == 1 ) {
-        r_CUR_STATE.write(S0);
+        r_CUR_STATE.write(s_S0);
     } else {
         r_CUR_STATE.write(w_NEXT_STATE.read());
     }
@@ -148,36 +151,36 @@ void OFC_Handshake::p_NEXT_STATE() {
     // If there is a data to be sent in the selected input channel (rok=1)
     // and the receiver is not busy (ret=0), goes to the S1 state in order
     // to send the data.
-        case S0: {
+        case s_S0: {
             if( (!i_RETURN.read()) && (i_READ_OK.read()) ){
-                w_NEXT_STATE.write(S1);
+                w_NEXT_STATE.write(s_S1);
             } else {
-                w_NEXT_STATE.write(S0);
+                w_NEXT_STATE.write(s_S0);
             }
             break;
         }
     // It sends the data and, when the data is received (ret=1), goes to the
     // state S2 in order to notify the sender that the data was delivered.
-        case S1: {
+        case s_S1: {
             if( i_RETURN.read() ) {
-                w_NEXT_STATE.write(S2);
+                w_NEXT_STATE.write(s_S2);
             } else {
-                w_NEXT_STATE.write(S1);
+                w_NEXT_STATE.write(s_S1);
             }
             break;
         }
     // It notifies the sender that the data was delivered and returns to state
     // S0 or S1 (under the same conditions used in S0).
-        case S2: {
+        case s_S2: {
             if( (!i_RETURN.read()) && (i_READ_OK.read()) ) {
-                w_NEXT_STATE.write(S1);
+                w_NEXT_STATE.write(s_S1);
             } else {
-                w_NEXT_STATE.write(S0);
+                w_NEXT_STATE.write(s_S0);
             }
             break;
         }
         default: {
-            w_NEXT_STATE.write(S0);
+            w_NEXT_STATE.write(s_S0);
         }
     }
 }
@@ -188,19 +191,19 @@ void OFC_Handshake::p_NEXT_STATE() {
 void OFC_Handshake::p_OUTPUTS() {
     switch(r_CUR_STATE.read()) {
     // Do nothing
-        case S0: {
+        case s_S0: {
             o_VALID.write(0);
             o_READ.write(0);
             break;
         }
     // Validates the outgoing data.
-        case S1: {
+        case s_S1: {
             o_VALID.write(1);
             o_READ.write(0);
             break;
         }
     // Notifies the sender that the data was sent.
-        case S2: {
+        case s_S2: {
             o_VALID.write(0);
             o_READ.write(1);
             break;

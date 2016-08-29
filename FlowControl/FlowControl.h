@@ -153,10 +153,10 @@ inline IOutputFlowControl::~IOutputFlowControl() {}
  * \return A method for instantiate a Input Flow Controller
  */
 typedef IInputFlowControl* create_InputFlowControl(sc_simcontext*,
-                                        sc_module_name,
-                                        unsigned short int XID,
-                                        unsigned short int YID,
-                                        unsigned short int PORT_ID);
+                                                   sc_module_name,
+                                                   unsigned short int XID,
+                                                   unsigned short int YID,
+                                                   unsigned short int PORT_ID);
 
 /*!
  * \brief destroy_InputFlowControl Typedef for deallocating a

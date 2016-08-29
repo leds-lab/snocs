@@ -53,7 +53,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #define FIFO_OUT_LOG2_DEPTH 0 	// Log2 of OUTPUT_FIFO_DEPTH
 
 // ARBITRATION
-#define N                   4  	// Number of requests received by an arbiter
+//#define N                   4  	// Number of requests received by an arbiter
 #define LOG2_N              2  	// Log2 of N
 
 // FLOW CONTROL

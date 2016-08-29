@@ -1,9 +1,31 @@
+/*
+--------------------------------------------------------------------------------
+PROJECT: SoCIN Simulator
+MODULE : PG_Rotative
+FILE   : PG_Rotative.h
+--------------------------------------------------------------------------------
+DESCRIPTION: That is a function which determines the next priority levels by
+implementing a rotative algorithm. At each clock cycle, defined by a new
+grant to a pending request, it rotates left the current priority status and
+ensures that the request being granted will have the lowest priority level at
+the next arbitration cycle.
+--------------------------------------------------------------------------------
+AUTHORS: Laboratory of Embedded and Distributed Systems (LEDS - UNIVALI)
+CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
+-------------------------------- Reviews ---------------------------------------
+| Date       - Version - Author                      | Description
+--------------------------------------------------------------------------------
+| 12/07/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
+--------------------------------------------------------------------------------
+*/
 #ifndef PG_ROTATIVE_H
 #define PG_ROTATIVE_H
 
 #include "../PriorityGenerator/PriorityGenerator.h"
 /*!
- * \brief The PG_Rotative class
+ * \brief The PG_Rotative class implements a rotative
+ * priority generator that rotates the priorities in
+ * each arbitration
  */
 class PG_Rotative : public IPriorityGenerator {
 public:

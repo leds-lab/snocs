@@ -1,3 +1,23 @@
+/*
+--------------------------------------------------------------------------------
+PROJECT: SoCIN Simulator
+MODULE : PG_RoundRobin
+FILE   : PG_RoundRobin.h
+--------------------------------------------------------------------------------
+DESCRIPTION: That is a function which determines the next priority levels by
+implementing a round-robin algorithm. At each clock cycle, defined by a new
+grant to a pending request, it rotates left the current grants status and
+ensures that the request being granted will have the lowest priority level at
+the next arbitration cycle.
+--------------------------------------------------------------------------------
+AUTHORS: Laboratory of Embedded and Distributed Systems (LEDS - UNIVALI)
+CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
+-------------------------------- Reviews ---------------------------------------
+| Date       - Version - Author                      | Description
+--------------------------------------------------------------------------------
+| 12/07/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
+--------------------------------------------------------------------------------
+*/
 #ifndef PG_ROUNDROBIN_H
 #define PG_ROUNDROBIN_H
 

@@ -30,7 +30,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
  */
 class IMemory : public SoCINModule {
 protected:
-    unsigned short memSize;     // Memory capacity - unsigned short (16B) corresponds
+    unsigned short memSize;     // Memory size - unsigned short (16B) corresponds
                                 // to 65.536 (2^16) maximum representation
 public:
     // Interface - System
