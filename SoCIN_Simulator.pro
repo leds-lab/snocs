@@ -18,4 +18,5 @@ SUBDIRS += \
     FC_CreditBased \
     Memory \
     FIFO \
-    Multiplexers
+    Multiplexers \
+    tst_Multiplexrers
