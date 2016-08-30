@@ -1,96 +1,21 @@
 #include "Multiplexers.h"
 
-
-OneHotSignalMux::OneHotSignalMux(sc_module_name mn, unsigned short nPorts)
-    : IMultiplexer(mn,nPorts)
-{
-    i_SEL.init(nPorts);
-
-    SC_METHOD(p_OUTPUT);
-    for( unsigned short i = 0; i < nPorts; i++ ) {
-        sensitive << i_SEL[i] << i_DATA[i];
-    }
-
-}
-
-OneHotSignalMux::~OneHotSignalMux(){}
-
-void OneHotSignalMux::p_OUTPUT() {
-
-    unsigned short i;       // Loop iterator
-
-    for( i = 0; i < numPorts; i++ ) {
-        if( i_SEL[i].read() == 1 ) {
-            break;
-        }
-    }
-
-    if( i < numPorts ) {
-        o_DATA.write( i_DATA[i].read() );
-    } else {
-        o_DATA.write( 0 );
-    }
-
-}
-
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
-
-BinarySignalMux::BinarySignalMux(sc_module_name mn, unsigned short nPorts)
-    : IMultiplexer(mn,nPorts)
-{
-    selSize = (unsigned short) log2(nPorts);
-
-    i_SEL.init( selSize );
-
-    SC_METHOD(p_OUTPUT);
-    for( unsigned short i = 0; i < selSize; i++ ) {
-        sensitive << i_SEL[i];
-    }
-    for( unsigned short i = 0; i < nPorts; i++ ) {
-        sensitive << i_DATA[i];
-    }
-
-}
-
-BinarySignalMux::~BinarySignalMux(){}
-
-void BinarySignalMux::p_OUTPUT() {
-
-    unsigned short i;       // Loop iterator
-    unsigned short sel = 0; // Input selected
-
-    for( i = selSize-1; i != 0; i-- ) {
-        sel = (sel << 1) | i_SEL[i].read();
-    }
-    sel = (sel << 1) | i_SEL[0].read();
-
-    o_DATA.write( i_DATA[sel].read() );
-
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
 /////////////////////////////////////////////////////////////
 /// Testbench
 /////////////////////////////////////////////////////////////
-MultiplexerTestbench::MultiplexerTestbench(sc_module_name mn,
-                                           IMultiplexer::Encoding enc,
+template<class DATA_TYPE>
+MultiplexerTestbench<DATA_TYPE>::MultiplexerTestbench(sc_module_name mn,
+                                           IMultiplexer<DATA_TYPE> *mux,
                                            unsigned short nPorts)
     : sc_module(mn) , numPorts(nPorts) {
 
-    // Unit instantiation
-    switch( enc ) {
-        case IMultiplexer::Binary:
-            selSize = (unsigned short) log2(nPorts);
-            u_SWITCH = new BinarySignalMux("BinMux",nPorts);
-            break;
-        case IMultiplexer::OneHot:
-            selSize = nPorts;
-            u_SWITCH = new OneHotSignalMux("One-HotMux",nPorts);
-            break;
+    if( BinaryMux<DATA_TYPE>* m = dynamic_cast<BinaryMux<DATA_TYPE>*>(mux) ) {
+        selSize = (unsigned short) log2(nPorts);
+    } else {
+        selSize = nPorts;
     }
+
+    u_SWITCH = mux;
 
     // Vectors initialization
     w_SEL.init(selSize);
@@ -122,20 +47,24 @@ MultiplexerTestbench::MultiplexerTestbench(sc_module_name mn,
 
 }
 
-MultiplexerTestbench::~MultiplexerTestbench() {
+template<class DATA_TYPE>
+MultiplexerTestbench<DATA_TYPE>::~MultiplexerTestbench() {
     sc_close_vcd_trace_file(tf);
     delete u_SWITCH;
 }
 
-
-void MultiplexerTestbench::p_STIMULUS() {
+template<class DATA_TYPE>
+void MultiplexerTestbench<DATA_TYPE>::p_STIMULUS() {
 
     unsigned short i,x; // Loop iterator
+
+    DATA_TYPE tmp;
 
     wait();
 
     for( i = 0; i < numPorts; i++ ) {
-        w_DATA_IN[i].write( true );
+        tmp = i+1;
+        w_DATA_IN[i].write( tmp );
     }
     wait();
 
@@ -150,7 +79,8 @@ void MultiplexerTestbench::p_STIMULUS() {
         w_DATA_IN[0].write(false);
         wait();
         for( x = 0; x < numPorts; x++) {
-            w_DATA_IN[x].write(true);
+            tmp = (i+1) * (x+1);
+            w_DATA_IN[x].write(tmp);
         }
 
         w_SEL[i].write(false);
@@ -161,8 +91,6 @@ void MultiplexerTestbench::p_STIMULUS() {
         for(  x = 0; x < selSize; x++ ) {
             unsigned short mask = (unsigned short) pow(2,x);
             unsigned index = i & mask;
-            std::cout << "Valor: " << i << ", Bitpos: " << x << ", Mascara: " << mask << ", Index: " << index
-                      << std::endl;
             if( index ) {
                 w_SEL[x].write(true);
             } else{
@@ -178,9 +106,14 @@ void MultiplexerTestbench::p_STIMULUS() {
         w_DATA_IN[0].write(false);
         wait();
         for( x = 0; x < numPorts; x++) {
-            w_DATA_IN[x].write(true);
+            tmp = (i+1) * (x+1);
+            w_DATA_IN[x].write(tmp);
         }
     }
 
     sc_stop();
 }
+
+// Testbenchs tested
+template class MultiplexerTestbench<bool>;
+template class MultiplexerTestbench<sc_uint<DATA_WIDTH> >;
