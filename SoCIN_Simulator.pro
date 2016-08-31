@@ -19,4 +19,5 @@ SUBDIRS += \
     Memory \
     FIFO \
     Multiplexers \
-    tst_Multiplexrers
+    tst_Multiplexrers \
+    Demultiplexers
