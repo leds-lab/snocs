@@ -72,9 +72,9 @@ public:
         unsigned short i;       // Loop iterator
         for( i = 0; i < this->numPorts; i++ ) {
             if( this->i_SEL[i].read() == 1 ) {
-                o_DATA[i].write(i_DATA.read());
+                this->o_DATA[i].write(this->i_DATA.read());
             } else {
-                o_DATA[i].write(0);
+                this->o_DATA[i].write(0);
             }
         }
     }
@@ -126,7 +126,7 @@ public:
 
         for( i = 0; i < this->numPorts; ++i ) {
             if( i == sel ) {
-                this->o_DATA[i].write(i_DATA.read());
+                this->o_DATA[i].write(this->i_DATA.read());
             } else {
                 this->o_DATA[i].write(0);
             }

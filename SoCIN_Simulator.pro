@@ -20,4 +20,5 @@ SUBDIRS += \
     FIFO \
     Multiplexers \
     tst_Multiplexrers \
-    Demultiplexers
+    Demultiplexers \
+    tst_Demultiplexers

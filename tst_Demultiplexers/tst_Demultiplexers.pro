@@ -2,15 +2,14 @@ TEMPLATE = app
 CONFIG -= app_bundle
 CONFIG -= qt
 CONFIG += console
-TARGET = tst_multiplexers
+TARGET = tst_demultiplexers
 
 include(../common.pri)
 
 
-OBJECTS += ../objs/Multiplexers.o
-
+OBJECTS += ../objs/demultiplexers.o
 
 SOURCES += \
-    tst_multiplexers.cpp
+    tst_demultiplexers.cpp
 
 HEADERS +=
