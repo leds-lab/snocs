@@ -8,16 +8,10 @@ CONFIG -= qt
 CONFIG -= app_bundle
 
 include(../Memory/Memory.pro)
-
-TEMPLATE = lib
+include(../plugin.pri)
 
 TARGET = memfifo
 
 SOURCES += Fifo.cpp
 
 HEADERS += Fifo.h
-
-#unix {
-#    target.path = /usr/lib
-#    INSTALLS += target
-#}

@@ -1,6 +1,7 @@
-TARGET = tst_pg
+TARGET = Simulator
 
 include(../app.pri)
 
 SOURCES += \
-    tst_pg.cpp
+    main.cpp
+

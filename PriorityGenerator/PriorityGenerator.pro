@@ -8,7 +8,3 @@ TEMPLATE = aux
 include(../common.pri)
 
 HEADERS +=  PriorityGenerator.h
-
-SOURCES += 
-
-DESTDIR = ../plugins

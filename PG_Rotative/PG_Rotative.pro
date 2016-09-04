@@ -8,7 +8,8 @@ CONFIG -= qt
 CONFIG -= app_bundle
 
 include(../PriorityGenerator/PriorityGenerator.pro)
-TEMPLATE = lib
+include(../plugin.pri)
+
 TARGET = pgrotative
 
 HEADERS += PG_Rotative.h

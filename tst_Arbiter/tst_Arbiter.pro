@@ -1,10 +1,6 @@
-CONFIG -= app_bundle
-CONFIG -= qt
-TEMPLATE = app
-CONFIG += console
-TARGET = tst_arbiter
+include(../app.pri)
 
-include(../common.pri)
+TARGET = tst_arbiter
 
 SOURCES += \
     tst_arbiter.cpp
@@ -12,6 +8,3 @@ SOURCES += \
 OBJECTS += ../objs/ProgrammablePriorityEncoder.o \
     ../objs/Arbiter.o
 
-unix {
-    LIBS += -ldl
-}

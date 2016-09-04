@@ -183,4 +183,6 @@ public:
     ~MultiplexerTestbench();
 };
 
+// TODO: Factory Methods to Muxes instantiation
+
 #endif // MULTIPLEXERS_H

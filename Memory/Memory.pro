@@ -7,8 +7,5 @@
 TEMPLATE = aux
 include(../common.pri)
 
-DESTDIR = ../plugins
-
 HEADERS += \
     Memory.h
-

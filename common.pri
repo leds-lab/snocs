@@ -1,4 +1,4 @@
-SYSTEMC_PATH =
+SYSTEMC_PATH = C:/SystemC
 INCLUDEPATH = $${SYSTEMC_PATH}/include
 
 win32 {
@@ -18,7 +18,6 @@ unix {
         LIBS = -L$${SYSTEMC_PATH}/lib-linux -lsystemc -Xlinker -rpath -Xlinker $${SYSTEMC_PATH}/lib-linux
     }
 }
-HEADERS += SoCINGlobal.h
 
 OBJECTS_DIR = ../objs
 

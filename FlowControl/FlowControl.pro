@@ -5,12 +5,9 @@
 #-------------------------------------------------
 
 TEMPLATE = aux
+
 include(../common.pri)
-
-
-SOURCES +=
-
-DESTDIR = ../plugins
 
 HEADERS += \
     FlowControl.h
+

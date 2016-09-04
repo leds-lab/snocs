@@ -1,15 +1,9 @@
-TEMPLATE = app
-CONFIG -= app_bundle
-CONFIG -= qt
-CONFIG += console
 TARGET = tst_demultiplexers
 
-include(../common.pri)
+include(../app.pri)
 
-
-OBJECTS += ../objs/demultiplexers.o
+OBJECTS += ../objs/Demultiplexers.o
 
 SOURCES += \
     tst_demultiplexers.cpp
 
-HEADERS +=

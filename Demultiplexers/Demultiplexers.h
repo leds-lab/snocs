@@ -11,7 +11,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 -------------------------------- Reviews ---------------------------------------
 | Date       - Version - Author                      | Description
 --------------------------------------------------------------------------------
-| 29/08/2016 - 1.0     - Eduardo Alves da Silva      | First implementation
+| 31/08/2016 - 1.0     - Eduardo Alves da Silva      | First implementation
 --------------------------------------------------------------------------------
 */
 #ifndef DEMULTIPLEXERS_H
@@ -184,4 +184,7 @@ public:
 
     ~DemultiplexerTestbench();
 };
+
+// TODO: Factory Methods to Demuxes instantiation
+
 #endif // DEMULTIPLEXERS_H

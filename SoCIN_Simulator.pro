@@ -21,4 +21,6 @@ SUBDIRS += \
     Multiplexers \
     tst_Multiplexrers \
     Demultiplexers \
-    tst_Demultiplexers
+    tst_Demultiplexers \
+    Routing \
+    Simulator

@@ -1,8 +1,6 @@
-CONFIG -= qt
-CONFIG -= app_bundle
+TEMPLATE = aux
 
 include(../common.pri)
-TEMPLATE = aux
 
 HEADERS += \
     ProgrammablePriorityEncoder.h

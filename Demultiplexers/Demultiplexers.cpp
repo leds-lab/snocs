@@ -97,4 +97,4 @@ void DemultiplexerTestbench<DATA_TYPE>::p_STIMULUS() {
 
 // Testbenchs tested
 template class DemultiplexerTestbench<bool>;
-template class DemultiplexerTestbench<sc_uint<DATA_WIDTH> >;
+template class DemultiplexerTestbench<sc_uint<34> >;

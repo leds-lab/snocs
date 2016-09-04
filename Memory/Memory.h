@@ -17,7 +17,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef MEMORY_H
 #define MEMORY_H
 
-#include "../SoCINGlobal.h"
+#include "../GlobalDefs.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -34,16 +34,16 @@ protected:
                                 // to 65.536 (2^16) maximum representation
 public:
     // Interface - System
-    sc_in<bool>                  i_CLK;      // Clock
-    sc_in<bool>                  i_RST;      // Reset
+    sc_in<bool>  i_CLK;      // Clock
+    sc_in<bool>  i_RST;      // Reset
 
     // FIFO interface
-    sc_out<bool>                 o_READ_OK;  // FIFO has a data to be read (not empty)
-    sc_out<bool>                 o_WRITE_OK; // FIFO has room to be written (not full)
-    sc_in<bool>                  i_READ;     // Command to read a data from the FIFO
-    sc_in<bool>                  i_WRITE;    // Command to write a data into the FIFO
-    sc_in<sc_uint<FIFO_WIDTH> >  i_DATA;     // Input data channel
-    sc_out<sc_uint<FIFO_WIDTH> > o_DATA;     // Output data channel
+    sc_out<bool> o_READ_OK;  // FIFO has a data to be read (not empty)
+    sc_out<bool> o_WRITE_OK; // FIFO has room to be written (not full)
+    sc_in<bool>  i_READ;     // Command to read a data from the FIFO
+    sc_in<bool>  i_WRITE;    // Command to write a data into the FIFO
+    sc_in<Flit>  i_DATA;     // Input data channel
+    sc_out<Flit> o_DATA;     // Output data channel
 
     unsigned short int XID, YID, PORT_ID;
 
@@ -84,8 +84,7 @@ inline IMemory::~IMemory() {}
  * \param XID Column identifier of the router in the network
  * \param YID Row identifier of the router in the network
  * \param PORT_ID Port identifier of the router
- * \param memSize Capacity of the memory to be instantiated
- * // TODO: If memSize is 0 - no memory or unbounded memory????
+ * \param memSize Capacity of the memory to be instantiated - if is 0: no memory
  * \return A method for instantiate a Memory
  */
 typedef IMemory* create_Memory(sc_simcontext*,

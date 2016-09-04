@@ -2,6 +2,8 @@
 --------------------------------------------------------------------------------
 PROJECT: SoCIN_Simulator
 MODULE : SoCINModule - Global module used by all others components
+EXTRAS : Data type used in communication channels (Flit) and a bit width
+        (word length) type used to accomodate the real data
 FILE   : SoCINGlobal.h
 --------------------------------------------------------------------------------
 DESCRIPTION: The global interface for modules in the SoCIN simulator
@@ -14,60 +16,6 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 25/08/2016 - 1.0     - Eduardo Alves da Silva      | Initial implementation
 --------------------------------------------------------------------------------
 */
-// Detect Windows OS
-#ifdef _WIN32
-#    define SS_EXP __declspec(dllexport)
-#    define SS_IMP __declspec(dllimport)
-// Unix-based - Linux and OS X
-#elif __unix__ || __APPLE__
-#    define SS_EXP __attribute__((visibility("default")))
-#    define SS_IMP __attribute__((visibility("default")))
-#else
-#    error "Unknown_compiler"
-#endif
-
-#ifndef SOCINMODULE_H
-#define SOCINMODULE_H
-
-#include "Parameters.h"
-
-#include <systemc>
-using namespace sc_core;
-using namespace sc_dt;
-
-/*!
- * \brief The SoCINModule class is the interface for all
- * SoCIN modules
- */
-class SoCINModule : public sc_module {
-public:
-
-    /*!
-     * \brief The ModuleType enum Determines the type of module implemented
-     */
-    enum ModuleType { Router = 1,
-                      Routing,
-                      FlowControl,
-                      InputFlowControl,
-                      OutputFlowControl,
-                      Arbiter,
-                      Memory,
-                      PriorityGenerator,
-                      PriorityEncoder,
-                      NetworkInterface,
-                      Switch,
-                      Other
-                    };
-
-    virtual ModuleType moduleType() const = 0;
-    virtual const char* moduleName() const = 0;
-
-    SoCINModule(sc_module_name mn) : sc_module (mn) {}
-
-    virtual ~SoCINModule() = 0;
-};
-
-inline SoCINModule::~SoCINModule() {}
 
 //////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// Guidelines ///////////////////////////////////
@@ -135,6 +83,72 @@ CONTACT: <Main associated in the project email: e.g.: e-mail@institution.com>
 /////////////////////////////////// Guidelines ///////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
+#ifndef SOCINGLOBAL_H
+#define SOCINGLOBAL_H
 
-
+// Detect Windows OS
+#ifdef _WIN32
+#  ifdef _SHARED
+#    define SS_EXP __declspec(dllexport)
+#  else
+#    define SS_EXP __declspec(dllimport)
+#  endif
+// Unix-based - Linux and OS X
+#elif __unix__ || __APPLE__
+#    define SS_EXP __attribute__((visibility("default")))
+#    define SS_IMP __attribute__((visibility("default")))
+#else
+#    error "Unknown_compiler"
 #endif
+
+#include <systemc>
+using namespace sc_core;
+using namespace sc_dt;
+
+///////////////////////////////////////////////////////////
+/// Global definitions
+///////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////
+/// SoCIN Global Module to be used in all components interfaces and
+/// implementation
+/////////////////////////////////////////////////////////////////////////
+/*!
+ * \brief The SoCINModule class is the interface for all
+ * SoCIN modules
+ */
+class SoCINModule : public sc_module {
+public:
+
+    /*!
+     * \brief The ModuleType enum Determines the type of module implemented
+     */
+    enum ModuleType { Router = 1,
+                      Routing,
+                      FlowControl,
+                      InputFlowControl,
+                      OutputFlowControl,
+                      Arbiter,
+                      Memory,
+                      PriorityGenerator,
+                      PriorityEncoder,
+                      NetworkInterface,
+                      Switch,
+                      Other
+                    };
+
+    virtual ModuleType moduleType() const = 0;
+    virtual const char* moduleName() const = 0;
+
+    SoCINModule(sc_module_name mn) : sc_module (mn) {}
+
+    virtual ~SoCINModule() = 0;
+};
+inline SoCINModule::~SoCINModule() {}
+/////////////////////////////////////////////////////////////////////////
+/// END of SoCIN Global Module
+/////////////////////////////////////////////////////////////////////////
+
+
+
+#endif // SOCINGLOBAL_H

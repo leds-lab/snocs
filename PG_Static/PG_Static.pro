@@ -8,12 +8,10 @@ CONFIG -= qt
 CONFIG -= app_bundle
 
 include(../PriorityGenerator/PriorityGenerator.pro)
-TEMPLATE = lib
+include(../plugin.pri)
+
 TARGET = pgstatic
 
 HEADERS += PG_Static.h
 
 SOURCES += PG_Static.cpp
-
-
-

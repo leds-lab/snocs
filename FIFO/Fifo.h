@@ -36,13 +36,13 @@ class FIFO : public IMemory {
 public:
 
     // Signals
-    sc_signal<unsigned short>        r_CUR_STATE;          // Current FIFO state
-    sc_signal<unsigned short>        w_NEXT_STATE;         // Next FIFO state
-    sc_signal<unsigned short>        r_READ_POINTER;       // Read pointer
-    sc_signal<unsigned short>        r_WRITE_POINTER;      // Write pointer
-    sc_signal<unsigned short>        w_NEXT_READ_POINTER;  // Next read pointer
-    sc_signal<unsigned short>        w_NEXT_WRITE_POINTER; // Next write pointer
-    sc_vector<sc_signal<sc_uint<FIFO_WIDTH> > > r_FIFO;    // Buffer
+    sc_signal<unsigned short>   r_CUR_STATE;          // Current FIFO state
+    sc_signal<unsigned short>   w_NEXT_STATE;         // Next FIFO state
+    sc_signal<unsigned short>   r_READ_POINTER;       // Read pointer
+    sc_signal<unsigned short>   r_WRITE_POINTER;      // Write pointer
+    sc_signal<unsigned short>   w_NEXT_READ_POINTER;  // Next read pointer
+    sc_signal<unsigned short>   w_NEXT_WRITE_POINTER; // Next write pointer
+    sc_vector<sc_signal<Flit> > r_FIFO;               // Buffer
 
     // Module's processes
     // Controller

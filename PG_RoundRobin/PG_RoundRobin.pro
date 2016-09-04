@@ -8,12 +8,10 @@ CONFIG -= qt
 CONFIG -= app_bundle
 
 include(../PriorityGenerator/PriorityGenerator.pro)
-TEMPLATE = lib
+include(../plugin.pri)
+
 TARGET = pgroundrobin
 
 HEADERS += PG_RoundRobin.h
 
 SOURCES += PG_RoundRobin.cpp
-
-
-

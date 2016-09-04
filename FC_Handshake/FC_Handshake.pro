@@ -8,16 +8,10 @@ CONFIG -= qt
 CONFIG -= app_bundle
 
 include(../FlowControl/FlowControl.pro)
-
-TEMPLATE = lib
+include(../plugin.pri)
 
 TARGET = fchandshake
 
 SOURCES += FC_Handshake.cpp
 
 HEADERS += FC_Handshake.h
-
-#unix {
-#    target.path = /usr/lib
-#    INSTALLS += target
-#}

@@ -1,10 +1,6 @@
-CONFIG -= app_bundle
-CONFIG -= qt
-TEMPLATE = app
-CONFIG += console
 TARGET = tst_PPE
 
-include(../common.pri)
+include(../app.pri)
 
 SOURCES += \
     tst_ppe.cpp

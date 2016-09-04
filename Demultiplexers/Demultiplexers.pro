@@ -7,16 +7,7 @@
 TEMPLATE = aux
 include(../common.pri)
 
-
-DESTDIR = ../plugins
-
-
 SOURCES += \
     Demultiplexers.cpp
 
 HEADERS += Demultiplexers.h
-
-#unix {
-#    target.path = /usr/lib
-#    INSTALLS += target
-#}

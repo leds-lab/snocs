@@ -116,4 +116,4 @@ void MultiplexerTestbench<DATA_TYPE>::p_STIMULUS() {
 
 // Testbenchs tested
 template class MultiplexerTestbench<bool>;
-template class MultiplexerTestbench<sc_uint<DATA_WIDTH> >;
+template class MultiplexerTestbench<sc_uint<34> >;
