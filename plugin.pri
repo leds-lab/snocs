@@ -1,9 +1,9 @@
 TEMPLATE = lib
 DESTDIR = ../plugins
 QMAKE_LFLAGS += -fPIC
-DEFINES += _SHARED
+DEFINES += _EXP_SYMBOLS
 
-#unix {
-#    target.path = /usr/lib
-#    INSTALLS += target
-#}
+unix {
+    target.path = /usr/lib/socin
+    INSTALLS += target
+}

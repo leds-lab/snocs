@@ -1,131 +1,174 @@
 /*
 --------------------------------------------------------------------------------
 PROJECT: SoCIN_Simulator
-FILE   : SoCINGlobal.cpp
+MODULE : No modules - only structures of Data and global definitions
+FILE   : ProgramablePriorityEncoder.h
+--------------------------------------------------------------------------------
+DESCRIPTION: Global definitions for all the system
+             Data structures of transmission
+             Data type
+--------------------------------------------------------------------------------
+AUTHORS: Laboratory of Embedded and Distributed Systems (LEDS - UNIVALI)
+CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
+-------------------------------- Reviews ---------------------------------------
+| Date       - Version - Author                      | Description
+--------------------------------------------------------------------------------
+| 04/09/2016 - 1.0     - Eduardo Alves da Silva      | Initial implementation
 --------------------------------------------------------------------------------
 */
 #ifndef __GLOBALDEFS_H__
 #define __GLOBALDEFS_H__
 
-#define DEFAULT_GLOBAL_WIDTH 34
-#define FLIT_WIDTH UIntVar::globalWidth()
-
 #include "SoCINGlobal.h"
 
+/////////////////////////////////////////////////////////////////////////
+/// Definitions
+/////////////////////////////////////////////////////////////////////////
+#define PARAMS Parameters::instance() // Get instance of parameters
+#define FLIT_WIDTH PARAMS->wordWidth  // Width of the flit (dataWidth + framing)
+#define RIB_WIDTH PARAMS->ribWidth    // Width of the addressing field (RIB) in the header
+
+/////////////////////////////////////////////////////////////////////////
+/// Parameters of the system
+/////////////////////////////////////////////////////////////////////////
+// Singleton
+class SS_EXP Parameters {
+public:
+    // Attributes
+    int wordWidth;
+    int ribWidth;
+private:
+    // Singleton
+    static Parameters* params;
+    // Constructor - private
+    explicit Parameters(){
+        // Default values
+        wordWidth = 34;
+        ribWidth = 8;
+    }
+public:
+    static Parameters* instance() {
+        if( params == NULL ) {
+            params = new Parameters();
+        }
+        return params;
+    }
+
+};
+#ifdef _EXP_SYMBOLS
+Parameters* Parameters::params = NULL; // Defining and initializing
+#endif
 /////////////////////////////////////////////////////////////////////////
 /// Parameterizable data representation (unsigned only)
 /////////////////////////////////////////////////////////////////////////
 class SS_EXP UIntVar : public sc_unsigned {
-private:
-        static int wordWidth;
 public:
-
-	static void setGlobalWidth(int width) { if(wordWidth == 0) wordWidth = DEFAULT_GLOBAL_WIDTH; else wordWidth = width; }
-	static int globalWidth() { if(wordWidth == 0) { wordWidth = DEFAULT_GLOBAL_WIDTH; } return wordWidth; }
-
     ////////// Constructors //////////
-	UIntVar() : sc_unsigned(FLIT_WIDTH) {}
+    UIntVar() : sc_unsigned(FLIT_WIDTH) {} // Default
+    UIntVar(int v, int width)
+    : sc_unsigned( width )
+    { *this = v; }
 
-	UIntVar( const UIntVar& v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    // Follow SystemC specs
+    UIntVar( const UIntVar& v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	UIntVar( const sc_unsigned& v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    UIntVar( const sc_unsigned& v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	UIntVar( const sc_signed& v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    UIntVar( const sc_signed& v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	UIntVar( const char* v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    UIntVar( const char* v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	UIntVar( int64 v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    UIntVar( int64 v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	UIntVar( uint64 v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    UIntVar( uint64 v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	UIntVar( long v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    UIntVar( long v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	UIntVar( unsigned long v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    UIntVar( unsigned long v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	UIntVar( int v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    UIntVar( int v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	UIntVar( unsigned int v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    UIntVar( unsigned int v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	UIntVar( double v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    UIntVar( double v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	UIntVar( const sc_bv_base& v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    UIntVar( const sc_bv_base& v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	UIntVar( const sc_lv_base& v )
-	: sc_unsigned( FLIT_WIDTH )
-	{ *this = v; }
+    UIntVar( const sc_lv_base& v )
+    : sc_unsigned( FLIT_WIDTH )
+    { *this = v; }
 
-	////////// Assignment operators //////////
-        UIntVar& operator = ( const UIntVar& v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    ////////// Assignment operators //////////
+    UIntVar& operator = ( const UIntVar& v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( const sc_unsigned& v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( const sc_unsigned& v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( const sc_signed& v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( const sc_signed& v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( const char* v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( const char* v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( int64 v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( int64 v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( uint64 v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( uint64 v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( long v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( long v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( unsigned long v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( unsigned long v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( int v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( int v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( unsigned int v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( unsigned int v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( double v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( double v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( const sc_bv_base& v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( const sc_bv_base& v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( const sc_lv_base& v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( const sc_lv_base& v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( const sc_int_base& v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( const sc_int_base& v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
-        UIntVar& operator = ( const sc_uint_base& v )
-	{ sc_unsigned::operator = ( v ); return *this; }
+    UIntVar& operator = ( const sc_uint_base& v )
+    { sc_unsigned::operator = ( v ); return *this; }
 
 };
-int UIntVar::wordWidth = DEFAULT_GLOBAL_WIDTH;
 /////////////////////////////////////////////////////////////////////////
 /// END of Parameterizable data representation
 /////////////////////////////////////////////////////////////////////////
@@ -155,29 +198,29 @@ public:
     Packet* packet_ptr;   // Pointer to packet of this flit
 
     // Constructors
-	Flit() : data(0), packet_ptr(NULL) {} // Default
-	Flit(UIntVar value, Packet* packet) : data(value), packet_ptr(packet) {}     // Auxiliar
-	Flit(const Flit& f) { this->data = f.data; this->packet_ptr = f.packet_ptr;} // Copy
-	Flit(Flit& f)       { this->data = f.data; this->packet_ptr = f.packet_ptr;} // Copy
+    Flit() : data(0), packet_ptr(NULL) {} // Default
+    Flit(UIntVar value, Packet* packet) : data(value), packet_ptr(packet) {}     // Auxiliar
+    Flit(const Flit& f) { this->data = f.data; this->packet_ptr = f.packet_ptr;} // Copy
+    Flit(Flit& f)       { this->data = f.data; this->packet_ptr = f.packet_ptr;} // Copy
 
-        Flit& operator= (const Flit& flit)
-	{ this->data = flit.data; this->packet_ptr = flit.packet_ptr; return *this;}
+    Flit& operator= (const Flit& flit)
+    { this->data = flit.data; this->packet_ptr = flit.packet_ptr; return *this;}
 
-        bool operator== (const Flit& flit) const
-	{ return ( this->data == flit.data && this->packet_ptr == flit.packet_ptr ); }
+    bool operator== (const Flit& flit) const
+    { return ( this->data == flit.data && this->packet_ptr == flit.packet_ptr ); }
 
-        virtual ~Flit() {}
+    virtual ~Flit() {}
 
-	friend std::ostream& operator<<(std::ostream& os, const Flit& flit)
-	{
-		os << "{" << std::endl << "Data:" << flit.data << ","
-		   << "Packet_ID:" << flit.packet_ptr << std::endl
-		   << "}";
-		return os;
-	}
+    friend std::ostream& operator<<(std::ostream& os, const Flit& flit)
+    {
+        os << "{" << std::endl << "Data:" << flit.data << ","
+           << "Packet_ID:" << flit.packet_ptr << std::endl
+           << "}";
+        return os;
+    }
 
-	friend void sc_trace(sc_trace_file* tf, const Flit& flit, const std::string& nm)
-	{ sc_trace( tf, flit.data, nm ); }
+    friend void sc_trace(sc_trace_file* tf, const Flit& flit, const std::string& nm)
+    { sc_trace( tf, flit.data, nm ); }
 
 };
 /////////////////////////////////////////////////////////////////////////
@@ -204,7 +247,7 @@ public:
 //#define FLIT_WIDTH          34 	// Width of the flit
 //#define SIDEBAND_WIDTH      2 	// Width of the sideband field(framing bits)
 //#define DATA_WIDTH          32 	// Width of the data field
-#define RIB_WIDTH           8 	// Width of the addressing field (RIB) in the header
+//#define RIB_WIDTH           8 	// Width of the addressing field (RIB) in the header
 #define FLIT_TYPE_WIDTH     2  	// Width of the header field that specifies the flit type
 #define HEADER_LENGTH       1	// Length of the header
 #define PAYLOAD_FRAME       0	// Frame for payload flits

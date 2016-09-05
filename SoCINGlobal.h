@@ -88,7 +88,7 @@ CONTACT: <Main associated in the project email: e.g.: e-mail@institution.com>
 
 // Detect Windows OS
 #ifdef _WIN32
-#  ifdef _SHARED
+#  ifdef _EXP_SYMBOLS
 #    define SS_EXP __declspec(dllexport)
 #  else
 #    define SS_EXP __declspec(dllimport)
@@ -134,6 +134,7 @@ public:
                       PriorityEncoder,
                       NetworkInterface,
                       Switch,
+                      InputController,
                       Other
                     };
 

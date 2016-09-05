@@ -26,7 +26,19 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #define PROGRAMMABLEPRIORITYENCODER_H
 
 #include "../SoCINGlobal.h"
-
+/*!
+ * \brief The ProgrammablePriorityEncoder class implements a programmable
+ * priority encoder of SoCIN.
+ *
+ * Programmable priority encoder that receives a set of requests and
+ * priorities, and, based on the current priorities, schedules one of the pending
+ * requests by giving it a grant. It is composed by "N" arbitration cells
+ * interconnected in a ripple loop (wrap-around connection), implemented by signals
+ * which notify the next cell if some of the previous cells has already granted a
+ * request. This entity also include a register which holds the last granting until
+ * the granted request return to 0. A new grant can only be given after the arbiter
+ * returns to the idle state.
+ */
 class ProgrammablePriorityEncoder : public SoCINModule {
 protected:
     unsigned short int nPorts;

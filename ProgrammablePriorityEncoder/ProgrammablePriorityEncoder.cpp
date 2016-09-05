@@ -2,6 +2,13 @@
 
 #include <ctime>
 
+//////////////////////////////////////////////////////////////////////////////
+/// \brief ProgrammablePriorityEncoder::ProgrammablePriorityEncoder Module constructor
+/// \param mn Module name
+/// \param nPorts Number of ports - requests, priorities & grants
+/// \param XID X identifier of router in the network
+/// \param YID Y identifier of router in the network
+/// \param PORT_ID Port identifier in the router
 ProgrammablePriorityEncoder::ProgrammablePriorityEncoder(sc_module_name mn,
                                                          unsigned short nPorts,
                                                          unsigned short XID,
@@ -57,6 +64,9 @@ ProgrammablePriorityEncoder::ProgrammablePriorityEncoder(sc_module_name mn,
     }
 }
 
+/*!
+ * \brief ProgrammablePriorityEncoder::~ProgrammablePriorityEncoder Destructor
+ */
 ProgrammablePriorityEncoder::~ProgrammablePriorityEncoder() {}
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -23,4 +23,7 @@ SUBDIRS += \
     Demultiplexers \
     tst_Demultiplexers \
     Routing \
-    Simulator
+    Simulator \
+    Routing_XY \
+    RequestRegister \
+    InputController

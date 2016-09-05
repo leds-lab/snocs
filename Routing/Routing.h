@@ -19,7 +19,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef ROUTING_H
 #define ROUTING_H
 
-#include "../SoCINGlobal.h"
+#include "../GlobalDefs.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -34,12 +34,7 @@ class IRouting : public SoCINModule {
 protected:
     unsigned short numPorts;
 public:
-    // Interface - System signals
-    sc_in<bool> i_CLK;      // Clock
-    sc_in<bool> i_RST;      // Reset
-
     // FIFO interface
-    sc_in<bool> i_READ;     // Command to read a data from the FIFO
     sc_in<bool> i_READ_OK;  // FIFO has a data to be read (not empty)
     sc_in<Flit> i_DATA;     // FIFO data output
 
@@ -48,25 +43,19 @@ public:
 
     // Requests
     sc_vector<sc_out<bool> > o_REQUEST;    // Requests from the input ports
-    sc_out<bool>             o_REQUESTING; // There exists someone requesting
 
-    unsigned short XID, YID, PORT_ID;
+    unsigned short XID, YID;
 
     IRouting(sc_module_name mn,
              unsigned short nPorts,
              unsigned short XID,
-             unsigned short YID,
-             unsigned short PORT_ID)
+             unsigned short YID)
         : SoCINModule(mn) , numPorts(nPorts),
-          i_CLK("IRouting_iCLK"),
-          i_RST("IRouting_iRST"),
-          i_READ("IRouting_iREAD"),
           i_READ_OK("IRouting_iREAD_OK"),
           i_DATA("IRouting_iDATA"),
           i_IDLE("IRouting_iIDLE",nPorts),
           o_REQUEST("IRouting_oREQUEST",nPorts),
-          o_REQUESTING("IRouting_oREQUESTING"),
-          XID(XID), YID(YID), PORT_ID(PORT_ID) {}
+          XID(XID), YID(YID) {}
 
     ModuleType moduleType() const { return SoCINModule::Routing; }
 
@@ -89,15 +78,13 @@ inline IRouting::~IRouting() {}
  * \param nPorts Number of ports
  * \param XID Column identifier of the router in the network
  * \param YID Row identifier of the router in the network
- * \param PORT_ID Port identifier of the router
  * \return A method for instantiate a Routing
  */
 typedef IRouting* create_Routing(sc_simcontext*,
                                  sc_module_name,
                                  unsigned short nPorts,
                                  unsigned short int XID,
-                                 unsigned short int YID,
-                                 unsigned short int PORT_ID);
+                                 unsigned short int YID);
 
 /*!
  * \brief destroy_Routing Typedef for deallocating a
