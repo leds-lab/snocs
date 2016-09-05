@@ -27,6 +27,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #define PARAMS Parameters::instance() // Get instance of parameters
 #define FLIT_WIDTH PARAMS->wordWidth  // Width of the flit (dataWidth + framing)
 #define RIB_WIDTH PARAMS->ribWidth    // Width of the addressing field (RIB) in the header
+#define X_SIZE PARAMS->xSize
+#define Y_SIZE PARAMS->ySize
 
 /////////////////////////////////////////////////////////////////////////
 /// Parameters of the system
@@ -37,6 +39,8 @@ public:
     // Attributes
     int wordWidth;
     int ribWidth;
+    int xSize;
+    int ySize;
 private:
     // Singleton
     static Parameters* params;
@@ -45,6 +49,8 @@ private:
         // Default values
         wordWidth = 34;
         ribWidth = 8;
+        xSize = 3;
+        ySize = 3;
     }
 public:
     static Parameters* instance() {
@@ -303,12 +309,12 @@ enum stampler_fsm_state {STAMPLER_S0, STAMPLER_S1};
 ////////////////////////////////////////////////////////////////////////////////
 
 // REQUEST ENCODING
-#define REQ_L    0x10
-#define REQ_N    0x08
-#define REQ_E    0x04
-#define REQ_S    0x02
-#define REQ_W    0x01
-#define REQ_NONE 0x00
+//#define REQ_L    0x10
+//#define REQ_N    0x08
+//#define REQ_E    0x04
+//#define REQ_S    0x02
+//#define REQ_W    0x01
+//#define REQ_NONE 0x00
 
 // PORTS IDs
 #define LOCAL_ID  0

@@ -11,7 +11,7 @@ Routing_XY::Routing_XY(sc_module_name mn,
                        unsigned short nPorts,
                        unsigned short XID,
                        unsigned short YID)
-    : IRouting(mn,nPorts,XID,YID)
+    : IMesh2DRouting(mn,nPorts,XID,YID)
 {
     SC_METHOD(p_REQUEST);
     sensitive << i_READ_OK << i_DATA;
@@ -41,7 +41,9 @@ void Routing_XY::p_REQUEST() {
     std::cout << "XY - Data: " << v_DATA.to_string(SC_HEX_US,false)
               << ", F.data: " << f.data.to_string(SC_HEX_US,false)
               << ", F.data.length: " << f.data.length()
-              << ", Xdest: " << v_XDEST << ", Ydest: " << v_YDEST << ", BOP: " << v_BOP << std::endl;
+              << ", XYD: " << XID << ", YID: " << YID
+              << ", Xdest: " << v_XDEST << ", Ydest: " << v_YDEST << ", BOP: " << v_BOP
+              << ", v_REQ.length: " << v_REQUEST.length() << std::endl;
 
     // It determines if a header is present
     if ((v_BOP==1) && (i_READ_OK.read()==1)) {
@@ -54,26 +56,43 @@ void Routing_XY::p_REQUEST() {
     if (v_HEADER_PRESENT) {
         v_X = (int) v_XDEST.to_int() - (int) XID;
         v_Y = (int) v_YDEST.to_int() - (int) YID;
-
         // TODO: Continuar daqui
         // TODO: Mapear requisições
         if (v_X != 0) {
             if (v_X > 0) {
                 v_REQUEST = REQ_E;
+                std::cout << "XY - XID: " << XID << ", YID: " << YID
+                          << ", v_REQ: " << v_REQUEST.to_string(SC_BIN_US,false)
+                          << " - EAST" << std::endl;
             } else {
                 v_REQUEST = REQ_W;
+                std::cout << "XY - XID: " << XID << ", YID: " << YID
+                          << ", v_REQ: " << v_REQUEST.to_string(SC_BIN_US,false)
+                          << " - WEST" << std::endl;
             }
         } else if (v_Y != 0) {
             if (v_Y > 0) {
                 v_REQUEST = REQ_N;
+                std::cout << "XY - XID: " << XID << ", YID: " << YID
+                          << ", v_REQ: " << v_REQUEST.to_string(SC_BIN_US,false)
+                          << " - NORTH" << std::endl;
             } else {
                 v_REQUEST = REQ_S;
+                std::cout << "XY - XID: " << XID << ", YID: " << YID
+                          << ", v_REQ: " << v_REQUEST.to_string(SC_BIN_US,false)
+                          << " - SOUTH" << std::endl;
             }
         } else { // X == Y == 0
             v_REQUEST = REQ_L;
+            std::cout << "XY - XID: " << XID << ", YID: " << YID
+                      << ", v_REQ: " << v_REQUEST.to_string(SC_BIN_US,false)
+                      << " - LOCAL" << std::endl;
         }
     } else {
         v_REQUEST = REQ_NONE;
+        std::cout << "XY - XID: " << XID << ", YID: " << YID
+                  << ", v_REQ: " << v_REQUEST.to_string(SC_BIN_US,false)
+                  << " - NONE" << std::endl;
     }
 
     // Outputs

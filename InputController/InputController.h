@@ -57,7 +57,7 @@ public:
     sc_out<bool>             o_REQUESTING; // There exists someone requesting
 
     // Internal signals - data variables which implement connectors
-    sc_vector<sc_signal<bool> > w_REQUEST; // Request wires
+    sc_vector<sc_signal<bool> > w_REQUEST; // Request wires between routing and request register
 
     unsigned short XID, YID, PORT_ID;
 
