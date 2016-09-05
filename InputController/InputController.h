@@ -82,4 +82,48 @@ public:
 /// END Input Controller
 /////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////
+/// Testbench for routing
+/////////////////////////////////////////////////////////////
+
+class tst_InputController : public sc_module {
+private:
+    unsigned short nPorts;
+public:
+    // Interface - System signals
+    sc_in<bool>     i_CLK;      // Clock
+    sc_signal<bool> w_RST;      // Reset
+
+    // FIFO interface
+    sc_signal<bool> w_READ;     // Command to read a data from the FIFO
+    sc_signal<bool> w_READ_OK;  // FIFO has a data to be read (not empty)
+    sc_signal<Flit> w_DATA;     // FIFO data output
+
+    // Status of the output channels
+    sc_vector<sc_signal<bool> > w_IDLE;  // Idle signals from the output ports
+
+    // Requests
+    sc_vector<sc_signal<bool> > w_REQUEST;    // Requests from the input ports
+    sc_signal<bool>             w_REQUESTING; // There exists someone requesting
+
+    // DUT - Design Under Test
+    InputController* u_IC;
+
+    // Trace file
+    sc_trace_file* tf;
+
+    void p_STIMULUS();
+
+    SC_HAS_PROCESS(tst_InputController);
+    tst_InputController(sc_module_name mn,
+                        IRouting* routing,
+                        unsigned short nPorts,
+                        unsigned short XID,
+                        unsigned short YID,
+                        unsigned short PORT_ID);
+    ~tst_InputController();
+};
+
 #endif // INPUTCONTROLLER_H

@@ -27,8 +27,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #define PARAMS Parameters::instance() // Get instance of parameters
 #define FLIT_WIDTH PARAMS->wordWidth  // Width of the flit (dataWidth + framing)
 #define RIB_WIDTH PARAMS->ribWidth    // Width of the addressing field (RIB) in the header
-#define X_SIZE PARAMS->xSize
-#define Y_SIZE PARAMS->ySize
+#define X_SIZE PARAMS->xSize          // Network X dimension
+#define Y_SIZE PARAMS->ySize          // Network Y dimension
 
 /////////////////////////////////////////////////////////////////////////
 /// Parameters of the system

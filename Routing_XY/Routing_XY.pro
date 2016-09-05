@@ -7,7 +7,7 @@
 include(../Routing/Routing.pro)
 include(../plugin.pri)
 
-TARGET = Routing_XY
+TARGET = routing_xy
 
 SOURCES += Routing_XY.cpp
 

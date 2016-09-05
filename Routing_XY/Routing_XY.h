@@ -1,8 +1,8 @@
 /*
 --------------------------------------------------------------------------------
 PROJECT: SoCIN Simulator
-MODULE : IRouting
-FILE   : IRouting.h
+MODULE : Routing_XY
+FILE   : Routing_XY.h
 --------------------------------------------------------------------------------
 DESCRIPTION: Implements the XY routing algorithm. It takes as parameters the
 router's coordinates and compares them with the destination router's coordi-

@@ -1,10 +1,10 @@
 /*
 --------------------------------------------------------------------------------
 PROJECT: SoCIN Simulator
-MODULE : IRouting
+MODULE : IRouting - IMesh2DRouting
 FILE   : IRouting.h
 --------------------------------------------------------------------------------
-DESCRIPTION: It is the interface classes for implement routing algorithm
+DESCRIPTION: It is the interface classes for implement routing algorithms
 which determines output port in the router to determine the path to packets
 traverse the network
 --------------------------------------------------------------------------------
@@ -174,5 +174,12 @@ typedef IRouting* create_Routing(sc_simcontext*,
  */
 typedef void destroy_Routing(IRouting*);
 /////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////
+/// Testbench for routing
+/////////////////////////////////////////////////////////////
+// TODO: to implement
 
 #endif // ROUTING_H
