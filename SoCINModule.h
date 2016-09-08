@@ -117,6 +117,8 @@ public:
                       IC,
                       OC,
                       ReqRegister,
+                      InputModule,
+                      OutputModule,
                       Other
                     };
 

@@ -26,7 +26,10 @@ SUBDIRS += \
     RequestRegister \
     InputController \
     tst_InputController \
-    OutputController
+    OutputController \
+    XIN \
+    AndParam \
+    tst_AndParam
 
 OTHER_FILES += \
     app.pri \

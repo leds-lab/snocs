@@ -65,7 +65,6 @@ public:
 
     InputController(sc_module_name mn,
              unsigned short nPorts,
-             RequestRegister* reqReg,
              IRouting* routing,
              unsigned short XID,
              unsigned short YID,
@@ -143,7 +142,6 @@ public:
  */
 inline InputController::InputController(sc_module_name mn,
                                  unsigned short nPorts,
-                                 RequestRegister *reqReg,
                                  IRouting *routing,
                                  unsigned short XID,
                                  unsigned short YID,
@@ -159,7 +157,7 @@ inline InputController::InputController(sc_module_name mn,
       o_REQUESTING("IRouting_oREQUESTING"),
       w_REQUEST("IRouting_wREQUEST",nPorts),
       XID(XID), YID(YID), PORT_ID(PORT_ID),
-      u_REQ_REG(reqReg), u_ROUTING(routing)
+      u_REQ_REG(NULL), u_ROUTING(routing)
 {
     // Binding ports
     // Routing
@@ -169,6 +167,7 @@ inline InputController::InputController(sc_module_name mn,
     u_ROUTING->o_REQUEST(w_REQUEST);
 
     // Request register
+    u_REQ_REG = new RequestRegister("ReqReg",nPorts,XID,YID,PORT_ID);
     u_REQ_REG->i_CLK(i_CLK);
     u_REQ_REG->i_RST(i_RST);
     u_REQ_REG->i_DATA(i_DATA);
@@ -210,8 +209,7 @@ inline tst_InputController::tst_InputController(sc_module_name mn,
       w_REQUESTING("tst_IC_wREQUESTING"),
       XID(XID),YID(YID),PORT_ID(PORT_ID)
 {
-    RequestRegister* reqReg = new RequestRegister("ReqReg",nPorts,XID,YID,PORT_ID);
-    u_IC = new InputController("IC",nPorts,reqReg,routing,XID,YID,PORT_ID);
+    u_IC = new InputController("IC",nPorts,routing,XID,YID,PORT_ID);
     u_IC->i_CLK(i_CLK);
     u_IC->i_RST(w_RST);
     u_IC->i_DATA(w_DATA);
