@@ -115,6 +115,7 @@ public:
                       NetworkInterface,
                       Switch,
                       IC,
+                      OC,
                       ReqRegister,
                       Other
                     };

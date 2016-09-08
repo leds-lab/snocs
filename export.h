@@ -1,5 +1,5 @@
-//#ifndef __EXPORT_H__
-//#define __EXPORT_H__
+#ifndef __EXPORT_H__
+#define __EXPORT_H__
 
 // Detect Windows OS
 #ifdef _WIN32
@@ -21,4 +21,4 @@
 #    error "Unknown_compiler"
 #endif
 
-//#endif // __EXPORT_H__
+#endif // __EXPORT_H__

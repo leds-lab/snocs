@@ -26,3 +26,12 @@ SUBDIRS += \
     RequestRegister \
     InputController \
     tst_InputController \
+    OutputController
+
+OTHER_FILES += \
+    app.pri \
+    common.pri \
+    plugin.pri \
+    export.h \
+    SoCINModule.h \
+    SoCINDefines.h
