@@ -1,9 +1,5 @@
 TEMPLATE = subdirs
 
-# What subproject depends on others
-tst_Arbiter.depends = Arbiter ProgrammablePriorityEncoder
-#tst_InputController.depends = InputController RequestRegister
-
 SUBDIRS += \
     Parameters \
     PriorityGenerator \

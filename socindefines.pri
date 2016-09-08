@@ -2,3 +2,5 @@
 LIBS += -L$$PWD/plugins/ -lparameters
 INCLUDEPATH += $$PWD/Parameters
 DEPENDPATH += $$PWD/Parameters
+
+QMAKE_RPATHDIR += $ORIGIN
