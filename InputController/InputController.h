@@ -27,7 +27,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 /////////////////////////////////////////////////////////////
 /*!
  * \brief The InputController class is the implementation
- * of input controller of from SoCIN.
+ * of input controller from SoCIN.
  *
  * Controller responsible to detect the header of an incoming
  * packet, schedule an output channel to be requested
@@ -113,6 +113,8 @@ public:
     sc_trace_file* tf;
 
     void p_STIMULUS();
+
+    unsigned short XID, YID, PORT_ID;
 
     SC_HAS_PROCESS(tst_InputController);
     tst_InputController(sc_module_name mn,
@@ -205,7 +207,8 @@ inline tst_InputController::tst_InputController(sc_module_name mn,
       w_DATA("tst_IC_wDATA"),
       w_IDLE("tst_IC_wIDLE",nPorts),
       w_REQUEST("tst_IC_wREQUEST",nPorts),
-      w_REQUESTING("tst_IC_wREQUESTING")
+      w_REQUESTING("tst_IC_wREQUESTING"),
+      XID(XID),YID(YID),PORT_ID(PORT_ID)
 {
     RequestRegister* reqReg = new RequestRegister("ReqReg",nPorts,XID,YID,PORT_ID);
     u_IC = new InputController("IC",nPorts,reqReg,routing,XID,YID,PORT_ID);
@@ -261,11 +264,11 @@ inline void tst_InputController::p_STIMULUS() {
     UIntVar flit;
 
     framing[FLIT_WIDTH-2] = 1; // BOP
-    v_SRC  = 0x00;
-    v_DEST = 0x10;
+    v_SRC = (XID << RIB_WIDTH/2) | YID;
+    v_DEST = 0x00;
 
     // Assemble a header packet with specified src and dst addresses
-    flit =  ( (framing) | (v_SRC << RIB_WIDTH) | v_DEST );
+    flit =  ( (framing) | ( v_SRC << RIB_WIDTH ) | v_DEST );
 
     // Assemble transfer unit with the data previous assembled
     Flit flitTest(flit,NULL);

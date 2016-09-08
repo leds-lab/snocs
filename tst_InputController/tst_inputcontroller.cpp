@@ -50,7 +50,7 @@ int sc_main(int argc, char *argv[]) {
     unsigned short nPorts, XID, YID, PORT_ID;
     // Get number of ports
     nPorts = atoi(argv[2]);
-    XID = 0;
+    XID = 1;
     YID = 0;
     PORT_ID = 0; // LOCAL port
 
