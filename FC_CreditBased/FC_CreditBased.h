@@ -88,52 +88,5 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-/*!
- * Factory method for instantation e deallocation of modules from the plugin
- */
-extern "C" {
-////////////////// IFC Factory //////////////////
-    SS_EXP IInputFlowControl* new_IFC(sc_simcontext* simcontext,
-                                      sc_module_name moduleName,
-                                      unsigned short int XID,
-                                      unsigned short int YID,
-                                      unsigned short int PORT_ID) {
-        // Simcontext is needed because in shared library a
-        // new and different simcontext will be created if
-        // the main application simcontext is not passed to
-        // this shared library.
-        // IMPORTANT: The simcontext assignment shall be
-        // done before component instantiation.
-        sc_curr_simcontext = simcontext;
-        sc_default_global_context = simcontext;
-
-        return new IFC_CreditBased(moduleName,XID,YID,PORT_ID);
-    }
-    SS_EXP void delete_IFC(IInputFlowControl* ifc) {
-        delete ifc;
-    }
-
-////////////////// OFC Factory //////////////////
-    SS_EXP IOutputFlowControl* new_OFC(sc_simcontext* simcontext,
-                                      sc_module_name moduleName,
-                                      unsigned short int XID,
-                                      unsigned short int YID,
-                                      unsigned short int PORT_ID,
-                                      unsigned short int numberOfCredits) {
-        // Simcontext is needed because in shared library a
-        // new and different simcontext will be created if
-        // the main application simcontext is not passed to
-        // this shared library.
-        // IMPORTANT: The simcontext assignment shall be
-        // done before component instantiation.
-        sc_curr_simcontext = simcontext;
-        sc_default_global_context = simcontext;
-
-        return new OFC_CreditBased(moduleName,numberOfCredits,XID,YID,PORT_ID);
-    }
-    SS_EXP void delete_OFC(IOutputFlowControl* ofc) {
-        delete ofc;
-    }
-}
 
 #endif // FC_CREDITBASED_H

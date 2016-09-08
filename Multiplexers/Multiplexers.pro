@@ -4,8 +4,9 @@
 #
 #-------------------------------------------------
 TEMPLATE = aux
+
 include(../common.pri)
 
-SOURCES += Multiplexers.cpp
+SOURCES +=
 
 HEADERS += Multiplexers.h

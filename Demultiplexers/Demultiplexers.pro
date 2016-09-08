@@ -7,7 +7,6 @@
 TEMPLATE = aux
 include(../common.pri)
 
-SOURCES += \
-    Demultiplexers.cpp
+SOURCES +=
 
 HEADERS += Demultiplexers.h

@@ -17,7 +17,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef MEMORY_H
 #define MEMORY_H
 
-#include "../GlobalDefs.h"
+#include "../SoCINModule.h"
+#include "../SoCINDefines.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 

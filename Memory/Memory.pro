@@ -6,6 +6,7 @@
 
 TEMPLATE = aux
 include(../common.pri)
+include(../socindefines.pri)
 
 HEADERS += \
     Memory.h

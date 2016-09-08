@@ -18,7 +18,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef PRIORITYGENERATOR_H
 #define PRIORITYGENERATOR_H
 
-#include "../SoCINGlobal.h"
+#include "../SoCINModule.h"
 #include <ctime>
 
 /////////////////////////////////////////////////////////////

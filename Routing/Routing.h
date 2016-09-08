@@ -19,7 +19,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef ROUTING_H
 #define ROUTING_H
 
-#include "../GlobalDefs.h"
+#include "../SoCINModule.h"
+#include "../SoCINDefines.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -139,7 +140,6 @@ public:
             }
         }
     }
-
 
     ~IMesh2DRouting() = 0;
 };

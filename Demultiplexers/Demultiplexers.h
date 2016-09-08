@@ -17,7 +17,10 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef DEMULTIPLEXERS_H
 #define DEMULTIPLEXERS_H
 
-#include "../SoCINGlobal.h"
+//#include "../SoCINModule.h"
+#include <systemc>
+using namespace sc_core;
+
 /////////////////////////////////////////////////////////////
 /// Demultiplexer interface (abstract class)
 /////////////////////////////////////////////////////////////
@@ -26,7 +29,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
  * parameterizable multiplexeres of templated data
  */
 template<class DATA_TYPE>
-class IDemultiplexer : public SoCINModule {
+class IDemultiplexer : public sc_module {
 protected:
     unsigned short numPorts;
 public:
@@ -37,13 +40,13 @@ public:
     sc_vector<sc_out<DATA_TYPE> > o_DATA;     // Outputs
 
     IDemultiplexer(sc_module_name mn, unsigned short nPorts)
-        : SoCINModule(mn),
+        : sc_module(mn),
           numPorts(nPorts),
           i_SEL("IDemux_iSEL"),
           i_DATA("IDemux_iDATA"),
           o_DATA("IDemux_oDATA",nPorts) {}
 
-    inline ModuleType moduleType() const { return SoCINModule::Switch; }
+//    inline ModuleType moduleType() const { return SoCINModule::Switch; }
 
     ~IDemultiplexer() = 0;
 };
@@ -91,7 +94,7 @@ public:
         }
     }
 
-    const char* moduleName() const { return "OneHotDemux"; }
+//    const char* moduleName() const { return "OneHotDemux"; }
 
     ~OneHotDemux() {}
 };
@@ -146,7 +149,7 @@ public:
         }
     }
 
-    inline const char* moduleName() const { return "BinaryDemux"; }
+//    inline const char* moduleName() const { return "BinaryDemux"; }
 
     ~BinaryDemux() {}
 };
@@ -156,34 +159,6 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////////////////
-/// Demultiplexer Testbench
-/////////////////////////////////////////////////////////////
-template<class DATA_TYPE>
-class DemultiplexerTestbench : public sc_module {
-protected:
-    unsigned short numPorts;
-    unsigned short selSize;
-public:
-    sc_in<bool> i_CLK; // Clock
-
-    sc_vector<sc_signal<bool> >      w_SEL;      // Selector
-    sc_signal<DATA_TYPE>             w_DATA_IN;  // Input
-    sc_vector<sc_signal<DATA_TYPE> > w_DATA_OUT; // Outputs
-
-    // DUT - Design Under Test
-    IDemultiplexer<DATA_TYPE>* u_SWITCH;
-
-    // Trace file
-    sc_trace_file* tf;
-
-    void p_STIMULUS();
-
-    SC_HAS_PROCESS(DemultiplexerTestbench);
-    DemultiplexerTestbench(sc_module_name mn, IDemultiplexer<DATA_TYPE>* demux, unsigned short nPorts);
-
-    ~DemultiplexerTestbench();
-};
 
 // TODO: Factory Methods to Demuxes instantiation
 

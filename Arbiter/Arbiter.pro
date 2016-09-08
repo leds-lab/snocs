@@ -2,8 +2,7 @@ TEMPLATE = aux
 
 include(../common.pri)
 
-SOURCES += \
-    Arbiter.cpp
+SOURCES +=
 
 HEADERS += \
     Arbiter.h

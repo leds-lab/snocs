@@ -1,8 +1,8 @@
-#include "../SoCINGlobal.h"
 
-int sc_main(int , char **) {
+#include <iostream>
 
-    std::cout << "Hello World" << std::endl;
+int main(int , char **) {
+
 
     return 0;
 }

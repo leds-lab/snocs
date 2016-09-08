@@ -100,3 +100,27 @@ void Routing_XY::p_REQUEST() {
         o_REQUEST[i].write( v_REQUEST[i] );
     }
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+extern "C" {
+    SS_EXP IRouting* new_Routing(sc_simcontext* simcontext,
+                              sc_module_name moduleName,
+                              unsigned short int nPorts,
+                              unsigned short int XID,
+                              unsigned short int YID) {
+        // Simcontext is needed because in shared library a
+        // new and different simcontext will be created if
+        // the main application simcontext is not passed to
+        // this shared library.
+        // IMPORTANT: The simcontext assignment shall be
+        // done before component instantiation.
+        sc_curr_simcontext = simcontext;
+        sc_default_global_context = simcontext;
+
+        return new Routing_XY(moduleName,nPorts,XID,YID);
+    }
+    SS_EXP void delete_Routing(IRouting* routing) {
+        delete routing;
+    }
+}

@@ -1,4 +1,5 @@
-#include "../Arbiter/Arbiter.h"
+#include "../InputController/InputController.h"
+#include "../Routing/Routing.h"
 
 #include <dlfcn.h>
 #include <ctime>
@@ -15,15 +16,15 @@ int sc_main(int argc, char *argv[]) {
         std::cout << "Argv[" << i << "]: " << argv[i] << std::endl;
     }
     if( argc < 3 ) {
-        std::cerr << "Please specific the PG plugin filename and number of ports"
-                     "\nFormat: ./tst_Arbiter </dir/of/pg_plugin> NPORTS" << std::endl;
+        std::cerr << "Please specific the Routing plugin filename and number of ports"
+                     "\nFormat: ./tst_inputcontroller </dir/of/pg_plugin> NPORTS" << std::endl;
         return -1;
     }
 
     // Get plugin filename
     char* pluginFilename = argv[1];
     std::cout << "Plugin Filename: " << pluginFilename << std::endl;
-    ///// Loading library of PG plugin
+    ///// Loading library of Routing plugin
     void* lib_handle;
     lib_handle = dlopen(pluginFilename,RTLD_NOW);
     if( !lib_handle ) {
@@ -31,25 +32,27 @@ int sc_main(int argc, char *argv[]) {
         return -1;
     }
 
-    create_PriorityGenerator* new_PG_t = (create_PriorityGenerator*) dlsym(lib_handle,"new_PG");
+    create_Routing* new_Routing_t = (create_Routing*) dlsym(lib_handle,"new_Routing");
     const char* dlsym_error = dlerror();
     if( dlsym_error ) {
         std::cout << dlsym_error << std::endl;
-        std::cerr << "Error on load symbol of factory creator function - PG: " << pluginFilename << std::endl;
+        std::cerr << "Error on load symbol of factory creator function - Routing: " << pluginFilename << std::endl;
         return -1;
     }
 
-    destroy_PriorityGenerator* delete_PG_t = (destroy_PriorityGenerator*) dlsym(lib_handle,"delete_PG");
+    destroy_Routing* delete_Routing_t = (destroy_Routing*) dlsym(lib_handle,"delete_Routing");
     dlsym_error = dlerror();
     if( dlsym_error ) {
-        std::cerr << "Error on load symbol of factory destroy function - PG: " << pluginFilename << std::endl;
+        std::cerr << "Error on load symbol of factory destroy function - Routing: " << pluginFilename << std::endl;
         return -1;
     }
 
     unsigned short nPorts, XID, YID, PORT_ID;
     // Get number of ports
     nPorts = atoi(argv[2]);
-    XID = YID = PORT_ID = 0;
+    XID = 0;
+    YID = 0;
+    PORT_ID = 0; // LOCAL port
 
     printf("\nNumber of Ports: %u",nPorts);
 
@@ -57,15 +60,11 @@ int sc_main(int argc, char *argv[]) {
     sc_clock w_CLK("CLK",100,SC_NS);
 
     ////////////// Instantiate system components //////////////
-    // Priority Generator
-    IPriorityGenerator* pg = new_PG_t(sc_get_curr_simcontext(),"PG",nPorts,XID,YID,PORT_ID);
-    // Programmable Priority Encoder
-    ProgrammablePriorityEncoder* ppe = new ProgrammablePriorityEncoder("PPE",nPorts,XID,YID,PORT_ID);
-    // Design Under Test
-    IArbiter* arb = new DistributedArbiter("Arbiter",nPorts,pg,ppe,XID,YID,PORT_ID);
+    // Routing
+    IRouting* routing = new_Routing_t(sc_get_curr_simcontext(),"Routing",nPorts,XID,YID);
     // Tester (Driver) - testbench
-    tst_Arbiter* tb = new tst_Arbiter("Testbench",arb,nPorts);
-    tb->i_CLK(w_CLK);
+    tst_InputController* ic = new tst_InputController("Testbench",routing,nPorts,XID,YID,PORT_ID);
+    ic->i_CLK(w_CLK);
 
     clock_t t = clock();
     // Start simulation
@@ -73,8 +72,8 @@ int sc_main(int argc, char *argv[]) {
     t = clock() - t;
     printf("\n\nSimulated in %ld ms(%f secs)\n",t,((float)t)/CLOCKS_PER_SEC);
 
-    delete tb;
-    delete_PG_t(pg);
+    delete ic;
+    delete_Routing_t(routing);
     dlclose(lib_handle);
 
     return 0;

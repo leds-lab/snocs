@@ -5,7 +5,11 @@
 #-------------------------------------------------
 
 TEMPLATE = aux
+
 include(../common.pri)
+include(../socindefines.pri)
 
 HEADERS += Routing.h
+
+SOURCES +=
 

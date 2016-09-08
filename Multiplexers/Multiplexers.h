@@ -17,7 +17,9 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef MULTIPLEXERS_H
 #define MULTIPLEXERS_H
 
-#include "../SoCINGlobal.h"
+//#include "../SoCINModule.h"
+#include <systemc>
+using namespace sc_core;
 
 /////////////////////////////////////////////////////////////
 /// Multiplexer interface (abstract class)
@@ -27,7 +29,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
  * parameterizable multiplexeres of templated data
  */
 template<class DATA_TYPE>
-class IMultiplexer : public SoCINModule {
+class IMultiplexer : public sc_module {
 protected:
     unsigned short numPorts;
 public:
@@ -38,13 +40,13 @@ public:
     sc_out<DATA_TYPE>            o_DATA;     // Output
 
     IMultiplexer(sc_module_name mn, unsigned short nPorts)
-        : SoCINModule(mn),
+        : sc_module(mn),
           numPorts(nPorts),
           i_SEL("IMux_iSEL"),
           i_DATA("IMux_iDATA",nPorts),
           o_DATA("IMux_oDATA") {}
 
-    inline ModuleType moduleType() const { return SoCINModule::Switch; }
+//    inline ModuleType moduleType() const { return SoCINModule::Switch; }
 
     ~IMultiplexer() = 0;
 };
@@ -94,7 +96,7 @@ public:
         }
     }
 
-    const char* moduleName() const { return "OneHotMux"; }
+//    const char* moduleName() const { return "OneHotMux"; }
 
     ~OneHotMux() {}
 };
@@ -144,7 +146,7 @@ public:
         }
     }
 
-    inline const char* moduleName() const { return "BinaryMux"; }
+//    inline const char* moduleName() const { return "BinaryMux"; }
 
     ~BinaryMux() {}
 };
@@ -154,34 +156,6 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////////////////
-/// Testbench
-/////////////////////////////////////////////////////////////
-template<class DATA_TYPE>
-class MultiplexerTestbench : public sc_module {
-protected:
-    unsigned short numPorts;
-    unsigned short selSize;
-public:
-    sc_in<bool> i_CLK; // Clock
-
-    sc_vector<sc_signal<bool> >      w_SEL;      // Selector
-    sc_vector<sc_signal<DATA_TYPE> > w_DATA_IN;  // Inputs
-    sc_signal<DATA_TYPE>             w_DATA_OUT; // Output
-
-    // DUT - Design Under Test
-    IMultiplexer<DATA_TYPE>* u_SWITCH;
-
-    // Trace file
-    sc_trace_file* tf;
-
-    void p_STIMULUS();
-
-    SC_HAS_PROCESS(MultiplexerTestbench);
-    MultiplexerTestbench(sc_module_name mn, IMultiplexer<DATA_TYPE>* mux, unsigned short nPorts);
-
-    ~MultiplexerTestbench();
-};
 
 // TODO: Factory Methods to Muxes instantiation
 

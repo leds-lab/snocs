@@ -19,7 +19,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef FLOWCONTROL_H
 #define FLOWCONTROL_H
 
-#include "../SoCINGlobal.h"
+#include "../SoCINModule.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 

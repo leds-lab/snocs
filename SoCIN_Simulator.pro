@@ -2,8 +2,10 @@ TEMPLATE = subdirs
 
 # What subproject depends on others
 tst_Arbiter.depends = Arbiter ProgrammablePriorityEncoder
+#tst_InputController.depends = InputController RequestRegister
 
 SUBDIRS += \
+    Parameters \
     PriorityGenerator \
     PG_Static \
     PG_Rotative \
@@ -26,4 +28,5 @@ SUBDIRS += \
     Simulator \
     Routing_XY \
     RequestRegister \
-    InputController
+    InputController \
+    tst_InputController \
