@@ -75,7 +75,6 @@ public:
     DistributedArbiter(sc_module_name mn,
                        unsigned short nPorts,
                        IPriorityGenerator* pg,
-                       ProgrammablePriorityEncoder* ppe,
                        unsigned short XID,
                        unsigned short YID,
                        unsigned short PORT_ID);
@@ -131,15 +130,15 @@ public:
 inline DistributedArbiter::DistributedArbiter(sc_module_name mn,
                                        unsigned short nPorts,
                                        IPriorityGenerator *pg,
-                                       ProgrammablePriorityEncoder *ppe,
                                        unsigned short XID,
                                        unsigned short YID,
                                        unsigned short PORT_ID)
         : IArbiter(mn,nPorts,XID,YID,PORT_ID),
           w_PRIORITY("DistArb_wPRIOR",nPorts),
           u_PG(pg),
-          u_PPE(ppe)
+          u_PPE(NULL)
 {
+    u_PPE = new ProgrammablePriorityEncoder("PPE",nPorts,XID,YID,PORT_ID);
     // Binding ports
     // PPE
     u_PPE->i_CLK(i_CLK);

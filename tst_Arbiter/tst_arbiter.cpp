@@ -59,10 +59,8 @@ int sc_main(int argc, char *argv[]) {
     ////////////// Instantiate system components //////////////
     // Priority Generator
     IPriorityGenerator* pg = new_PG_t(sc_get_curr_simcontext(),"PG",nPorts,XID,YID,PORT_ID);
-    // Programmable Priority Encoder
-    ProgrammablePriorityEncoder* ppe = new ProgrammablePriorityEncoder("PPE",nPorts,XID,YID,PORT_ID);
     // Design Under Test
-    IArbiter* arb = new DistributedArbiter("Arbiter",nPorts,pg,ppe,XID,YID,PORT_ID);
+    IArbiter* arb = new DistributedArbiter("Arbiter",nPorts,pg,XID,YID,PORT_ID);
     // Tester (Driver) - testbench
     tst_Arbiter* tb = new tst_Arbiter("Testbench",arb,nPorts);
     tb->i_CLK(w_CLK);
