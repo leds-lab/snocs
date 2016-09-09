@@ -61,7 +61,7 @@ public:
     ModuleType moduleType() const { return SoCINModule::OC; }
     const char* moduleName() const { return "OutputController"; }
 
-    ~OutputController();
+    ~OutputController(){}
 };
 /////////////////////////////////////////////////////////////
 /// END Output Controller

@@ -24,6 +24,9 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #include "../SoCINModule.h"
 #include "../SoCINDefines.h"
 
+/////////////////////////////////////////////////////////////////////////////////
+/// Request Register
+/////////////////////////////////////////////////////////////////////////////////
 /*!
  * \brief The RequestRegister class implement the registers that
  * hold the requests until the trailer be received.
