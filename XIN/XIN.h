@@ -29,7 +29,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 /// Router input module
 /////////////////////////////////////////////////////////////
 /*!
- * \brief The XIN class contains the submodules of the input
+ * \brief The XIN class contains the sub-modules of the input
  * channel in the router.
  */
 class XIN : public SoCINModule {
@@ -105,7 +105,6 @@ public:
 //////////////////////////////////////////////////////////////////////////////////////
 /// Implementation
 //////////////////////////////////////////////////////////////////////////////////////
-
 inline XIN::XIN(sc_module_name mn,
                 IMemory *mem,
                 IRouting *routing,
@@ -143,7 +142,7 @@ inline XIN::XIN(sc_module_name mn,
     u_AND_READ_OK = new And("AND_READ_OK",2);
     u_IRS         = new OneHotMux<bool>("IRS",nPorts);
 
-    // Binding ports
+    // Port binding
     ////////////////////// Memory //////////////////////
     u_MEMORY->i_CLK(i_CLK);
     u_MEMORY->i_RST(i_RST);
@@ -188,6 +187,16 @@ inline XIN::XIN(sc_module_name mn,
     u_AND_READ->i_DATA[0](w_X_READ);
     u_AND_READ->i_DATA[1](w_REQUESTING);
     u_AND_READ->o_DATA(w_READ);
+}
+
+/*!
+ * \brief XIN::~XIN Module destructor
+ */
+inline XIN::~XIN() {
+    delete u_IC;
+    delete u_AND_READ;
+    delete u_AND_READ_OK;
+    delete u_IRS;
 }
 
 #endif // XIN_H

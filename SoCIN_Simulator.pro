@@ -29,7 +29,9 @@ SUBDIRS += \
     OutputController \
     XIN \
     AndParam \
-    tst_AndParam
+    tst_AndParam \
+    XOUT \
+    Router
 
 OTHER_FILES += \
     app.pri \
