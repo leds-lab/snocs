@@ -31,7 +31,8 @@ SUBDIRS += \
     AndParam \
     tst_AndParam \
     XOUT \
-    Router
+    Router \
+    ParIS
 
 OTHER_FILES += \
     app.pri \
