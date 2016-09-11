@@ -4,9 +4,6 @@
 #
 #-------------------------------------------------
 
-CONFIG -= qt
-CONFIG -= app_bundle
-
 include(../FlowControl/FlowControl.pro)
 include(../plugin.pri)
 

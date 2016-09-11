@@ -4,9 +4,6 @@
 #
 #-------------------------------------------------
 
-CONFIG -= qt
-CONFIG -= app_bundle
-
 include(../PriorityGenerator/PriorityGenerator.pro)
 include(../plugin.pri)
 
