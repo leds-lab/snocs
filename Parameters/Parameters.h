@@ -15,19 +15,34 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 --------------------------------------------------------------------------------
 */
 
-#ifndef PARAMETERS_H
-#define PARAMETERS_H
+#ifndef __PARAMETERS_H__
+#define __PARAMETERS_H__
 
 #include "../export.h"
+#include "../PluginManager/PluginManager.h"
 
 /////////////////////////////////////////////////////////////////////////
 /// Definitions
 /////////////////////////////////////////////////////////////////////////
+// Singleton instance
 #define PARAMS Parameters::instance() // Get instance of parameters
-#define FLIT_WIDTH PARAMS->wordWidth  // Width of the flit (dataWidth + framing)
-#define RIB_WIDTH PARAMS->ribWidth    // Width of the addressing field (RIB) in the header
-#define X_SIZE PARAMS->xSize          // Network X dimension
-#define Y_SIZE PARAMS->ySize          // Network Y dimension
+
+// Network info
+#define X_SIZE PARAMS->xSize                // Network X dimension
+#define Y_SIZE PARAMS->ySize                // Network Y dimension
+// Packet Format
+#define FLIT_WIDTH PARAMS->wordWidth        // Width of the flit (dataWidth + framing)
+#define RIB_WIDTH PARAMS->ribWidth          // Width of the addressing field (RIB) in the header
+
+// Buffering
+#define FIFO_IN_DEPTH PARAMS->fifoInDepth   // Input buffers depth
+#define FIFO_OUT_DEPTH PARAMS->fifoOutDepth // Output buffers depth
+
+// Flow Control
+#define CREDIT FIFO_IN_DEPTH                // Number of credits at power up
+
+// Plugin manager instance
+#define PLUGIN_MANAGER PARAMS->pm           // Plugin manager
 
 /////////////////////////////////////////////////////////////////////////
 /// Parameters of the system
@@ -35,11 +50,22 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 // Singleton
 class EXP_DEFINES Parameters {
 public:
+    // Plugin Manager - (de)allocate instances from plugins
+    PluginManager* pm;
+
     // Attributes
-    int wordWidth;
-    int ribWidth;
-    int xSize;
-    int ySize;
+    // Network info
+    unsigned short xSize;
+    unsigned short ySize;
+    // Packet Format
+    unsigned short wordWidth;
+    unsigned short ribWidth;
+
+    // Buffering
+    unsigned short fifoInDepth;
+    unsigned short fifoOutDepth;
+
+
 private:
     // Singleton
     static Parameters* params;
@@ -53,6 +79,7 @@ private:
 public:
     static Parameters* instance();
 };
+
 
 ///////////////////////////////////////////////////////////
 /// Global definitions
@@ -88,10 +115,10 @@ public:
 #define Y_DEST_MASK         0xF
 
 // BUFFERING
-#define FIFO_WIDTH          34 	// Width of the buffer words (= FLIT_WIDTH)
-#define FIFO_IN_DEPTH       4 	// Number of positions of the input buffers
+//#define FIFO_WIDTH          34 	// Width of the buffer words (= FLIT_WIDTH)
+//#define FIFO_IN_DEPTH       4 	// Number of positions of the input buffers
 #define FIFO_IN_LOG2_DEPTH  2 	// Log2 of INPUT_FIFO_DEPTH
-#define FIFO_OUT_DEPTH      0 	// Number of positions of the output buffers
+//#define FIFO_OUT_DEPTH      0 	// Number of positions of the output buffers
 #define FIFO_OUT_LOG2_DEPTH 0 	// Log2 of OUTPUT_FIFO_DEPTH
 
 // ARBITRATION
@@ -100,7 +127,7 @@ public:
 
 // FLOW CONTROL
 //enum fsm_state {S0,S1,S2};     	// States of the FSMs of handshake-type ifc and ofc
-#define CREDIT              4 	// Number of credits at power up
+//#define CREDIT              4 	// Number of credits at power up
 #define CREDIT_COUNTER_SIZE 3 	// Size of the credit counter
 
 // TRAFFIC CLASSES
