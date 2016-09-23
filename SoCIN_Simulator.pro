@@ -32,7 +32,9 @@ SUBDIRS += \
     tst_AndParam \
     XOUT \
     Router \
-    ParIS
+    ParIS \
+    PluginManager \
+    tst_PluginManager
 
 OTHER_FILES += \
     app.pri \
@@ -40,4 +42,5 @@ OTHER_FILES += \
     plugin.pri \
     export.h \
     SoCINModule.h \
-    SoCINDefines.h
+    SoCINDefines.h \
+    simconf.conf
