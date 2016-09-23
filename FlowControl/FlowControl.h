@@ -16,10 +16,11 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 24/08/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef FLOWCONTROL_H
-#define FLOWCONTROL_H
+#ifndef __FLOWCONTROL_H__
+#define __FLOWCONTROL_H__
 
 #include "../SoCINModule.h"
+#include "../SoCINDefines.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -77,7 +78,7 @@ public:
     sc_in<bool>  i_WRITE_OK;// FIFO has room to be written (not full)
     sc_in<bool>  i_READ;    // Command to read a data from the FIFO
     sc_in<bool>  i_READ_OK; // FIFO has a data to be read (not empty)
-    sc_in<bool>  i_DATA;    // FIFO data output
+    sc_in<Flit>  i_DATA;    // FIFO data output
 
     IInputFlowControl(sc_module_name mn,
                        unsigned short XID,
@@ -205,4 +206,4 @@ typedef void destroy_OutputFlowControl(IOutputFlowControl*);
 ///  Testbench Output Flow Control
 /////////////////////////////////////////////////////////////
 
-#endif // FLOWCONTROL_H
+#endif // __FLOWCONTROL_H__

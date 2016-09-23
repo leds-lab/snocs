@@ -18,8 +18,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 12/07/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef PG_ROTATIVE_H
-#define PG_ROTATIVE_H
+#ifndef __PG_ROTATIVE_H__
+#define __PG_ROTATIVE_H__
 
 #include "../PriorityGenerator/PriorityGenerator.h"
 /*!
@@ -65,4 +65,4 @@ public:
 };
 
 
-#endif // PG_ROTATIVE_H
+#endif // __PG_ROTATIVE_H__

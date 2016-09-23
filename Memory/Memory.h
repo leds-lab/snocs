@@ -14,8 +14,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 25/08/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef MEMORY_H
-#define MEMORY_H
+#ifndef __MEMORY_H__
+#define __MEMORY_H__
 
 #include "../SoCINModule.h"
 #include "../SoCINDefines.h"
@@ -102,4 +102,4 @@ typedef IMemory* create_Memory(sc_simcontext*,
 typedef void destroy_Memory(IMemory*);
 /////////////////////////////////////////////////////////////
 
-#endif // MEMORY_H
+#endif // __MEMORY_H__

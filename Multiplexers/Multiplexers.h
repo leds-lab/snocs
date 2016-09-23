@@ -14,8 +14,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 29/08/2016 - 1.0     - Eduardo Alves da Silva      | First implementation
 --------------------------------------------------------------------------------
 */
-#ifndef MULTIPLEXERS_H
-#define MULTIPLEXERS_H
+#ifndef __MULTIPLEXERS_H__
+#define __MULTIPLEXERS_H__
 
 //#include "../SoCINModule.h"
 #include <systemc>
@@ -72,6 +72,7 @@ class OneHotMux : public IMultiplexer<DATA_TYPE> {
 public:
     // Module's process
     void p_OUTPUT() {
+        DATA_TYPE dNull;
         unsigned short i;       // Loop iterator
         for( i = 0; i < this->numPorts; i++ ) {
             if( this->i_SEL[i].read() == 1 ) {
@@ -81,7 +82,7 @@ public:
         if( i < this->numPorts ) {
             this->o_DATA.write( this->i_DATA[i].read() );
         } else {
-            this->o_DATA.write( 0 );
+            this->o_DATA.write( dNull );
         }
     }
 
@@ -159,4 +160,4 @@ public:
 
 // TODO: Factory Methods to Muxes instantiation
 
-#endif // MULTIPLEXERS_H
+#endif // __MULTIPLEXERS_H__

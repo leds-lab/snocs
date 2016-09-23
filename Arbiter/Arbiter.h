@@ -1,5 +1,21 @@
-#ifndef ARBITER_H
-#define ARBITER_H
+/*
+--------------------------------------------------------------------------------
+PROJECT: SoCIN_Simulator
+MODULE : IArbiter
+FILE   : Arbiter.h
+--------------------------------------------------------------------------------
+DESCRIPTION: The Arbiter interface class
+--------------------------------------------------------------------------------
+AUTHORS: Laboratory of Embedded and Distributed Systems (LEDS - UNIVALI)
+CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
+-------------------------------- Reviews ---------------------------------------
+| Date       - Version - Author                      | Description
+--------------------------------------------------------------------------------
+| 12/08/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
+--------------------------------------------------------------------------------
+*/
+#ifndef __ARBITER_H__
+#define __ARBITER_H__
 
 #include "../PriorityGenerator/PriorityGenerator.h"
 #include "../ProgrammablePriorityEncoder/ProgrammablePriorityEncoder.h"

@@ -22,8 +22,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 --------------------------------------------------------------------------------
 */
 
-#ifndef PROGRAMMABLEPRIORITYENCODER_H
-#define PROGRAMMABLEPRIORITYENCODER_H
+#ifndef __PROGRAMMABLEPRIORITYENCODER_H__
+#define __PROGRAMMABLEPRIORITYENCODER_H__
 
 #include <ctime>
 
@@ -449,4 +449,4 @@ inline void tst_PPE::p_stimulus() {
 }
 
 
-#endif // PROGRAMMABLEPRIORITYENCODER_H
+#endif // __PROGRAMMABLEPRIORITYENCODER_H__

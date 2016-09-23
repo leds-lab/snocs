@@ -15,8 +15,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 12/07/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef PG_STATIC_H
-#define PG_STATIC_H
+#ifndef __PG_STATIC_H__
+#define __PG_STATIC_H__
 
 #include "../PriorityGenerator/PriorityGenerator.h"
 

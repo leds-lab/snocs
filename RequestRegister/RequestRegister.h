@@ -18,8 +18,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 10/08/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef REQUESTREGISTER_H
-#define REQUESTREGISTER_H
+#ifndef __REQUESTREGISTER_H__
+#define __REQUESTREGISTER_H__
 
 #include "../SoCINModule.h"
 #include "../SoCINDefines.h"
@@ -293,4 +293,4 @@ inline void RequestRegister::p_OUTPUTS() {
 
 
 
-#endif // REQUESTREGISTER_H
+#endif // __REQUESTREGISTER_H__

@@ -15,8 +15,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 08/09/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef XOUT_H
-#define XOUT_H
+#ifndef __XOUT_H__
+#define __XOUT_H__
 
 #include "../Memory/Memory.h"
 #include "../OutputController/OutputController.h"
@@ -190,4 +190,4 @@ inline XOUT::~XOUT() {
     delete u_ODS;
 }
 
-#endif // XOUT_H
+#endif // __XOUT_H__

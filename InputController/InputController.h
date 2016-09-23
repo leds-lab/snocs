@@ -16,8 +16,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 31/08/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef INPUTCONTROLLER_H
-#define INPUTCONTROLLER_H
+#ifndef __INPUTCONTROLLER_H__
+#define __INPUTCONTROLLER_H__
 
 #include "../Routing/Routing.h"
 #include "../RequestRegister/RequestRegister.h"

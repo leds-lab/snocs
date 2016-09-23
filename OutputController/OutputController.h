@@ -17,8 +17,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 31/08/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef OUTPUTCONTROLLER_H
-#define OUTPUTCONTROLLER_H
+#ifndef __OUTPUTCONTROLLER_H__
+#define __OUTPUTCONTROLLER_H__
 
 #include "../Arbiter/Arbiter.h"
 
@@ -61,7 +61,7 @@ public:
     ModuleType moduleType() const { return SoCINModule::OC; }
     const char* moduleName() const { return "OutputController"; }
 
-    ~OutputController(){}
+    ~OutputController();
 };
 /////////////////////////////////////////////////////////////
 /// END Output Controller
@@ -93,5 +93,8 @@ inline OutputController::OutputController(sc_module_name mn,
     u_ARBITER->o_IDLE(o_IDLE);
 }
 
+inline OutputController::~OutputController() {
+    delete u_ARBITER;
+}
 
-#endif // OUTPUTCONTROLLER_H
+#endif // __OUTPUTCONTROLLER_H__

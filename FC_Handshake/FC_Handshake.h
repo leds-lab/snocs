@@ -15,8 +15,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 25/08/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef FC_HANDSHAKE_H
-#define FC_HANDSHAKE_H
+#ifndef __FC_HANDSHAKE_H__
+#define __FC_HANDSHAKE_H__
 
 #include "../FlowControl/FlowControl.h"
 

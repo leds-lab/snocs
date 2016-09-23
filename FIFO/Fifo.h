@@ -17,8 +17,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 --------------------------------------------------------------------------------
 */
 
-#ifndef FIFO_H
-#define FIFO_H
+#ifndef __FIFO_H__
+#define __FIFO_H__
 
 #include "../Memory/Memory.h"
 

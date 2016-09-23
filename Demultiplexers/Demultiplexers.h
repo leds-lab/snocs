@@ -14,8 +14,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 31/08/2016 - 1.0     - Eduardo Alves da Silva      | First implementation
 --------------------------------------------------------------------------------
 */
-#ifndef DEMULTIPLEXERS_H
-#define DEMULTIPLEXERS_H
+#ifndef __DEMULTIPLEXERS_H__
+#define __DEMULTIPLEXERS_H__
 
 //#include "../SoCINModule.h"
 #include <systemc>
@@ -162,4 +162,4 @@ public:
 
 // TODO: Factory Methods to Demuxes instantiation
 
-#endif // DEMULTIPLEXERS_H
+#endif // __DEMULTIPLEXERS_H__

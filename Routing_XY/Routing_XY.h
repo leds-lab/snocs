@@ -16,8 +16,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 05/09/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef ROUTING_XY_H
-#define ROUTING_XY_H
+#ifndef __ROUTING_XY_H__
+#define __ROUTING_XY_H__
 
 #include "../Routing/Routing.h"
 
@@ -45,4 +45,4 @@ public:
 
 
 
-#endif // ROUTING_XY_H
+#endif // __ROUTING_XY_H__

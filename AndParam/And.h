@@ -14,8 +14,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 31/08/2016 - 1.0     - Eduardo Alves da Silva      | First implementation
 --------------------------------------------------------------------------------
 */
-#ifndef AND_H
-#define AND_H
+#ifndef __AND_H__
+#define __AND_H__
 
 #include <systemc>
 
@@ -53,4 +53,4 @@ public:
     }
 };
 
-#endif // AND_H
+#endif // __AND_H__

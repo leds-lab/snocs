@@ -16,8 +16,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 31/08/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef ROUTING_H
-#define ROUTING_H
+#ifndef __ROUTING_H__
+#define __ROUTING_H__
 
 #include "../SoCINModule.h"
 #include "../SoCINDefines.h"
@@ -182,4 +182,4 @@ typedef void destroy_Routing(IRouting*);
 /////////////////////////////////////////////////////////////
 // TODO: to implement
 
-#endif // ROUTING_H
+#endif // __ROUTING_H__

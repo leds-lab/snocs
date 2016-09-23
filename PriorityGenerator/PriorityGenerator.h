@@ -15,8 +15,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 10/08/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef PRIORITYGENERATOR_H
-#define PRIORITYGENERATOR_H
+#ifndef __PRIORITYGENERATOR_H__
+#define __PRIORITYGENERATOR_H__
 
 #include "../SoCINModule.h"
 #include <ctime>
@@ -212,4 +212,4 @@ public:
 /////////////////////////////////////////////////////////////
 
 
-#endif // PRIORITYGENERATOR_H
+#endif // __PRIORITYGENERATOR_H__

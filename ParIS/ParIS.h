@@ -14,8 +14,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 08/09/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef PARIS_H
-#define PARIS_H
+#ifndef __PARIS_H__
+#define __PARIS_H__
 
 #include "../Router/Router.h"
 
@@ -46,7 +46,9 @@ public:
           unsigned short XID,
           unsigned short YID);
 
-    const char* moduleName() const { return "R_Paris"; }
+    const char* moduleName() const { return "Router_Paris"; }
+
+    ~Paris();
 };
 
-#endif // PARIS_H
+#endif // __PARIS_H__

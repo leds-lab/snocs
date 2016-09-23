@@ -15,8 +15,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 | 08/09/2016 - 1.0     - Eduardo Alves da Silva      | Reuse from ParIS
 --------------------------------------------------------------------------------
 */
-#ifndef XIN_H
-#define XIN_H
+#ifndef __XIN_H__
+#define __XIN_H__
 
 #include "../Memory/Memory.h"
 #include "../InputController/InputController.h"
@@ -199,4 +199,4 @@ inline XIN::~XIN() {
     delete u_IRS;
 }
 
-#endif // XIN_H
+#endif // __XIN_H__

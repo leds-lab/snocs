@@ -15,8 +15,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 --------------------------------------------------------------------------------
 */
 
-#ifndef ROUTER_H
-#define ROUTER_H
+#ifndef __ROUTER_H__
+#define __ROUTER_H__
 
 #include "../XIN/XIN.h"
 #include "../XOUT/XOUT.h"
@@ -48,8 +48,10 @@ public:
     sc_vector<sc_in<bool> >  i_RETURN_OUT;  // Return of output channels
 
     // Internal Units - a router is composed by Input and Output modules
-    sc_vector<XIN>  u_XIN;
-    sc_vector<XOUT> u_XOUT;
+    std::vector<XIN*>  u_XIN;
+    std::vector<XOUT*> u_XOUT;
+//    sc_vector<XIN>  u_XIN;
+//    sc_vector<XOUT> u_XOUT;
 
     // Internal data structures
     unsigned short XID,YID;
@@ -78,8 +80,8 @@ inline IRouter::IRouter(sc_module_name mn,
       o_DATA_OUT("IRouter_oDATA_OUT",nPorts),
       o_VALID_OUT("IRouter_oVALID_OUT",nPorts),
       i_RETURN_OUT("IRouter_iRETURN_OUT",nPorts),
-      u_XIN("IRouter_XIN",nPorts),
-      u_XOUT("IRouter_XOUT",nPorts),
+      u_XIN(nPorts,NULL),
+      u_XOUT(nPorts,NULL),
       XID(XID),YID(YID) {}
 
 /////////////////////////////////////////////////////////////
@@ -106,4 +108,4 @@ typedef IRouter* create_Router(sc_simcontext*,
 typedef void destroy_Router(IRouter*);
 /////////////////////////////////////////////////////////////
 
-#endif // ROUTER_H
+#endif // __ROUTER_H__
