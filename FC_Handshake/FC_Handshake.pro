@@ -7,7 +7,7 @@
 include(../FlowControl/FlowControl.pro)
 include(../plugin.pri)
 
-TARGET = fchandshake
+TARGET = fc_handshake
 
 SOURCES += FC_Handshake.cpp
 

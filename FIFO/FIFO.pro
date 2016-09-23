@@ -7,7 +7,7 @@
 include(../Memory/Memory.pro)
 include(../plugin.pri)
 
-TARGET = memfifo
+TARGET = mem_fifo
 
 SOURCES += Fifo.cpp
 

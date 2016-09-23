@@ -7,7 +7,7 @@
 include(../PriorityGenerator/PriorityGenerator.pro)
 include(../plugin.pri)
 
-TARGET = pgrotative
+TARGET = pg_rotative
 
 HEADERS += PG_Rotative.h
 

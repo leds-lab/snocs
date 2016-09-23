@@ -7,7 +7,7 @@
 include(../PriorityGenerator/PriorityGenerator.pro)
 include(../plugin.pri)
 
-TARGET = pgstatic
+TARGET = pg_static
 
 HEADERS += PG_Static.h
 

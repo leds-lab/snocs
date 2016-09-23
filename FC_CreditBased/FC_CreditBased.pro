@@ -7,7 +7,7 @@
 include(../FlowControl/FlowControl.pro)
 include(../plugin.pri)
 
-TARGET = fccreditbased
+TARGET = fc_creditbased
 
 SOURCES += FC_CreditBased.cpp
 

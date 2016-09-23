@@ -7,7 +7,7 @@
 include(../PriorityGenerator/PriorityGenerator.pro)
 include(../plugin.pri)
 
-TARGET = pgroundrobin
+TARGET = pg_roundrobin
 
 HEADERS += PG_RoundRobin.h
 
