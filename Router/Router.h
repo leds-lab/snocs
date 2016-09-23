@@ -50,8 +50,6 @@ public:
     // Internal Units - a router is composed by Input and Output modules
     std::vector<XIN*>  u_XIN;
     std::vector<XOUT*> u_XOUT;
-//    sc_vector<XIN>  u_XIN;
-//    sc_vector<XOUT> u_XOUT;
 
     // Internal data structures
     unsigned short XID,YID;
