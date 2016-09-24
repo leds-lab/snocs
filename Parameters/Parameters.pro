@@ -11,6 +11,8 @@ DEFINES += GLOBAL_DEF
 
 TARGET = parameters
 
-HEADERS += Parameters.h
+HEADERS += Parameters.h \
+    ../PluginManager/PluginManager.h
 
-SOURCES += Parameters.cpp
+SOURCES += Parameters.cpp \
+    ../PluginManager/PluginManager.cpp

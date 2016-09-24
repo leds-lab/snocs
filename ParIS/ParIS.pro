@@ -10,7 +10,9 @@ include(../socindefines.pri)
 
 TARGET = router_paris
 
-SOURCES += ParIS.cpp
+SOURCES += ParIS.cpp \
+    ../PluginManager/PluginManager.cpp
 
-HEADERS += ParIS.h
+HEADERS += ParIS.h \
+    ../PluginManager/PluginManager.h
 
