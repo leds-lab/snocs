@@ -34,7 +34,8 @@ SUBDIRS += \
     Router \
     ParIS \
     PluginManager \
-    tst_PluginManager
+    tst_PluginManager \
+    NoC
 
 OTHER_FILES += \
     app.pri \
