@@ -48,7 +48,7 @@ public:
 
     const char* moduleName() const { return "Router_Paris"; }
 
-    ~Paris();
+    ~ParIS();
 };
 
 #endif // __PARIS_H__
