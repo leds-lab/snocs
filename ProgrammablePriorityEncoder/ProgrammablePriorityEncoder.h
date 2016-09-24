@@ -214,7 +214,7 @@ inline void ProgrammablePriorityEncoder::p_IMED_IN()
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProgrammablePriorityEncoder::p_GRANT()
+inline void ProgrammablePriorityEncoder::p_GRANT()
 ////////////////////////////////////////////////////////////////////////////////
 // Grant signal sent to the requesting block
 {
@@ -269,7 +269,7 @@ inline void ProgrammablePriorityEncoder::p_IMED_OUT()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void ProgrammablePriorityEncoder::p_GRANT_REG()
+inline void ProgrammablePriorityEncoder::p_GRANT_REG()
 ////////////////////////////////////////////////////////////////////////////////
 // Implements the register that stores the grant for a selected request
 {
