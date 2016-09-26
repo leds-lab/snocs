@@ -1,5 +1,6 @@
 CONFIG -= qt
 CONFIG -= app_bundle
+CONFIG += console
 
 SYSTEMC_PATH = C:/SystemC
 isEmpty(SYSTEMC_PATH) {
