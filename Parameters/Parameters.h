@@ -19,7 +19,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #define __PARAMETERS_H__
 
 #include "../export.h"
-#include "../PluginManager/PluginManager.h"
+
+class PluginManager;
 
 /////////////////////////////////////////////////////////////////////////
 /// Definitions
