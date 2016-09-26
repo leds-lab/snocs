@@ -23,6 +23,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #include <systemc>
 
 // Forward declarations - interfaces
+class INoC;
 class IRouter;
 class IRouting;
 class IInputFlowControl;
@@ -56,6 +57,7 @@ private:
     std::string pluginsDir;
     std::string confFile;
 
+    PluginLoader* noc;
     PluginLoader* router;
     PluginLoader* routing;
     PluginLoader* flowControl;
@@ -76,6 +78,8 @@ public:
 
     bool parseFile();
     bool loadPlugins();
+
+    INoC* nocInstance(sc_core::sc_module_name name);
 
     IRouter* routerInstance(sc_core::sc_module_name name,
                             unsigned short XID,
@@ -105,6 +109,7 @@ public:
                                                   unsigned short PORT_ID,
                                                   unsigned short nPorts);
 
+    void destroyNoC(INoC*);
     void destroyRouter(IRouter*);
     void destroyRouting(IRouting* );
     void destroyInputFlowControl(IInputFlowControl* );

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <dlfcn.h>
 
+#include "../NoC/NoC.h"
 #include "../Router/Router.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -18,6 +19,7 @@ std::string removeChar(std::string& str, char toRemove) {
 ///////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////// Plugin Loader ////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
+// TODO: Verificar necessidade de passar o contexto de simulação do SystemC sc_curr_simcontext
 PluginLoader::PluginLoader(const char *fileName, const char *pluginName)
     : libHandler(0),fileName(fileName),pluginName(pluginName),loaded(false)
 {}
@@ -69,15 +71,17 @@ void* PluginLoader::loadSymbol(std::string symbol) {
 ///////////////////////////////////////////////////////////////////////////////////////
 PluginManager::PluginManager(std::string conf,std::string pluginsDir)
     : pluginsDir(pluginsDir), confFile(conf),
+      noc(0),
       router(0),routing(0),
       flowControl(0), memory(0),
       priorityGenerator(0),
       pluginsLoaded(false)
-{ }
+{}
 
 PluginManager::~PluginManager() {
     if( pluginsLoaded ) {
         this->deallocateUnits();
+        delete noc;
         delete router;
         delete routing;
         delete flowControl;
@@ -128,10 +132,18 @@ bool PluginManager::loadPlugins() {
         std::cout << "Plugins already loaded." << std::endl;
         return true;
     } else {
+        // Loading NoC
+        this->noc = new PluginLoader( this->properties["noc"].c_str(), "NoC" );
+        if( !this->noc->load() ) {
+            std::cerr << "It was not possible load noc plugin: " << noc->error() << std::endl;
+            delete noc;
+            return false;
+        }
         // Loading router
         this->router = new PluginLoader( this->properties["router"].c_str(), "Router" );
         if( !this->router->load() ) {
             std::cerr << "It was not possible load router plugin: " << router->error() << std::endl;
+            delete noc;
             delete router;
             return false;
         }
@@ -139,6 +151,7 @@ bool PluginManager::loadPlugins() {
         this->routing = new PluginLoader( this->properties["routing"].c_str(), "Routing" );
         if( !this->routing->load() ) {
             std::cerr << "It was not possible load routing plugin: " << routing->error() << std::endl;
+            delete noc;
             delete router;
             delete routing;
             return false;
@@ -147,6 +160,7 @@ bool PluginManager::loadPlugins() {
         this->flowControl = new PluginLoader( this->properties["flowcontrol"].c_str(), "FlowControl");
         if( !this->flowControl->load() ) {
             std::cerr << "It was not possible load flow control plugin: " << flowControl->error() << std::endl;
+            delete noc;
             delete router;
             delete routing;
             delete flowControl;
@@ -156,6 +170,7 @@ bool PluginManager::loadPlugins() {
         this->memory = new PluginLoader( this->properties["memory"].c_str(), "Memory" );
         if( !this->memory->load() ) {
             std::cerr << "It was not possible load memory plugin: " << memory->error() << std::endl;
+            delete noc;
             delete router;
             delete routing;
             delete flowControl;
@@ -166,6 +181,7 @@ bool PluginManager::loadPlugins() {
         this->priorityGenerator = new PluginLoader(this->properties["prioritygenerator"].c_str(),"PG");
         if( !this->priorityGenerator->load() ) {
             std::cerr << "It was not possible load priority generator plugin: " << priorityGenerator->error() << std::endl;
+            delete noc;
             delete router;
             delete routing;
             delete flowControl;
@@ -194,6 +210,14 @@ void PluginManager::deallocateUnits() {
     for( unsigned int i = 0; i < allocatedUnits.size(); i++ ) {
         SoCINModule* module = allocatedUnits[i];
         switch( module->moduleType() ) {
+            case SoCINModule::NoC: {
+                INoC* n = dynamic_cast<INoC* >(module);
+                if( n != NULL) {
+                    std::cout << "Free - NoC" << std::endl;
+                    this->destroyNoC(n);
+                }
+                break;
+            }
             case SoCINModule::Router: {
                 IRouter* r = dynamic_cast<IRouter*>(module);
                 if( r != NULL ) {
@@ -248,6 +272,23 @@ void PluginManager::deallocateUnits() {
         }
     }
     this->allocatedUnits.clear();
+}
+
+INoC* PluginManager::nocInstance(sc_module_name name) {
+    if( !pluginsLoaded ) {
+        std::cout << "Plugins not loaded to instantiate a noc" << std::endl;
+        return NULL;
+    }
+
+    create_NoC* new_NoC = (create_NoC*) this->noc->loadSymbol("new_NoC");
+    const char* dlsym_error = this->noc->error();
+    if( dlsym_error ) {
+        std::cerr << "Erro on load symbom of factory creator function - NoC: " << dlsym_error << std::endl;
+        return NULL;
+    }
+    INoC* n = new_NoC(sc_get_curr_simcontext(),name);
+    this->allocatedUnits.push_back(n);
+    return n;
 }
 
 IRouter* PluginManager::routerInstance(sc_module_name name,
@@ -371,6 +412,20 @@ IPriorityGenerator* PluginManager::priorityGeneratorInstance(sc_core::sc_module_
     IPriorityGenerator* pg = new_PG(sc_get_curr_simcontext(),name,nPorts,XID,YID,PORT_ID);
     this->allocatedUnits.push_back(pg);
     return pg;
+}
+
+void PluginManager::destroyNoC(INoC *n) {
+    if( !pluginsLoaded ) {
+        return;
+    }
+
+    destroy_NoC* delete_NoC = (destroy_NoC* ) this->noc->loadSymbol("delete_NoC");
+    const char* dlsym_error = this->noc->error();
+    if( dlsym_error ) {
+        std::cerr << "Error on load symbol of factory destroy function - NoC: " << dlsym_error << std::endl;
+        return;
+    }
+    delete_NoC(n);
 }
 
 void PluginManager::destroyRouter(IRouter *rout) {

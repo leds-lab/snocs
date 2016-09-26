@@ -119,7 +119,7 @@ public:
                       ReqRegister,
                       InputModule,
                       OutputModule,
-                      Network,
+                      NoC,
                       Other
                     };
 

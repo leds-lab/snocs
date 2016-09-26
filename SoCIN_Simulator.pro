@@ -35,7 +35,8 @@ SUBDIRS += \
     ParIS \
     PluginManager \
     tst_PluginManager \
-    NoC
+    NoC \
+    SoCIN
 
 OTHER_FILES += \
     app.pri \
