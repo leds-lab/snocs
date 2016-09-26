@@ -20,6 +20,9 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #include "../SoCINModule.h"
 #include "../SoCINDefines.h"
 
+// Forward declaration
+class IRouter;
+
 /////////////////////////////////////////////////////////////////////////////////
 /// NoC interface
 /////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +53,7 @@ public:
     sc_in<bool> i_CLK;
     sc_in<bool> i_RST;
 
-    // Routers interface - Communication ports
+    // Routers interface - Local communication ports
     sc_vector<sc_in<Flit> >  i_DATA_IN;
     sc_vector<sc_in<bool> >  i_VALID_IN;
     sc_vector<sc_out<bool> > o_RETURN_IN;
@@ -61,26 +64,26 @@ public:
     // Internal units
     std::vector<IRouter *> u_ROUTER;
 
-    INoC(sc_module_name mn);
+    INoC(sc_module_name mn,unsigned short nRouters);
 
-    ModuleType moduleType() const { return SoCINModule::Network; }
+    ModuleType moduleType() const { return SoCINModule::NoC; }
 
     ~INoC() = 0;
 };
 
 inline INoC::~INoC(){}
 
-inline INoC::INoC(sc_module_name mn)
-    : SoCINModule(mn),
+inline INoC::INoC(sc_module_name mn,unsigned short nRouters)
+    : SoCINModule(mn), numRouters(nRouters),
       i_CLK("INoC_iCLK"),
       i_RST("INoC_iRST"),
-      i_DATA_IN("INoC_iDATA_IN"),
-      i_VALID_IN("INoC_iVALID_IN"),
-      o_RETURN_IN("INoC_oRETURN_IN"),
-      o_DATA_OUT("INoC_oDATA_OUT"),
-      o_VALID_OUT("INoC_oVALID_OUT"),
-      i_RETURN_OUT("INoC_iRETURN_OUT") {}
-
+      i_DATA_IN("INoC_iDATA_IN",nRouters),
+      i_VALID_IN("INoC_iVALID_IN",nRouters),
+      o_RETURN_IN("INoC_oRETURN_IN",nRouters),
+      o_DATA_OUT("INoC_oDATA_OUT",nRouters),
+      o_VALID_OUT("INoC_oVALID_OUT",nRouters),
+      i_RETURN_OUT("INoC_iRETURN_OUT",nRouters),
+      u_ROUTER(nRouters,NULL) {}
 
 /////////////////////////////////////////////////////////////
 /// Typedefs for Factory Methods of concrete NoCs
