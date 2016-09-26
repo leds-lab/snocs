@@ -56,8 +56,7 @@ void Routing_XY::p_REQUEST() {
     if (v_HEADER_PRESENT) {
         v_X = (int) v_XDEST.to_int() - (int) XID;
         v_Y = (int) v_YDEST.to_int() - (int) YID;
-        // TODO: Continuar daqui
-        // TODO: Mapear requisições
+        // TODO: Verificar requisições
         if (v_X != 0) {
             if (v_X > 0) {
                 v_REQUEST = REQ_E;

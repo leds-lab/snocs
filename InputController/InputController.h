@@ -182,7 +182,6 @@ inline InputController::InputController(sc_module_name mn,
  * \brief InputController::~InputController Input controller destructor
  */
 inline InputController::~InputController() {
-    // TODO:  Verificar desalocação
     delete u_REQ_REG;
 }
 

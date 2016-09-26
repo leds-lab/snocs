@@ -92,13 +92,15 @@ public:
              unsigned short XID,
              unsigned short YID)
         : IRouting(mn,nPorts,XID,YID),
-          REQ_L(1),     // Local port always is the first requisition - 0b00001
+          REQ_L(1),     // Local port is always the first requisition - 0b00001
           REQ_N(0),     // Initialize ALL communication requests on 0
           REQ_E(0),     // Initialize ALL communication requests on 0
           REQ_S(0),     // Initialize ALL communication requests on 0
           REQ_W(0),     // Initialize ALL communication requests on 0
-          REQ_NONE(0)   // None request always 0
+          REQ_NONE(0)   // None request - always 0
     {
+
+        //  TODO: Melhorar - useNorth, useEast ...
         if( XID == 0 ) { // First column
             if( YID == 0 ) {// First line (Corner Left-Bottom) (X == 0 && Y == 0) -> REQ0 = LOCAL | REQ1 = NORTH | REQ2 = EAST
                 REQ_N = 2;  // NORTH: 0b00010
