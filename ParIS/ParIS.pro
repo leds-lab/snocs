@@ -8,7 +8,7 @@ include(../Router/Router.pro)
 include(../plugin.pri)
 include(../socindefines.pri)
 
-TARGET = router_paris
+TARGET = router_ParIS
 
 SOURCES += ParIS.cpp \
     ../PluginManager/PluginManager.cpp
