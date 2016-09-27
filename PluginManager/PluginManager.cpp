@@ -69,8 +69,8 @@ void* PluginLoader::loadSymbol(std::string symbol) {
 ///////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////// Plugin Manager ////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
-PluginManager::PluginManager(std::string conf,std::string pluginsDir)
-    : pluginsDir(pluginsDir), confFile(conf),
+PluginManager::PluginManager()
+    : // pluginsDir(pluginsDir), confFile(conf),
       noc(0),
       router(0),routing(0),
       flowControl(0), memory(0),
@@ -106,7 +106,10 @@ std::pair<std::string,std::string> PluginManager::parseProperty(std::string line
     return std::pair<std::string,std::string>(key,filename);
 }
 
-bool PluginManager::parseFile() {
+bool PluginManager::parseFile(std::string filename,std::string pluginsDir) {
+    this->confFile = filename;
+    this->pluginsDir = pluginsDir;
+
     std::string line;
 
     FILE* file;

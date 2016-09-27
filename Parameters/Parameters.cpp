@@ -4,7 +4,7 @@
 Parameters* Parameters::params = 0; // Defining and initializing
 
 Parameters::Parameters() {
-    pm = new PluginManager("simconf.conf");
+    pm = new PluginManager();
 // Default values
     xSize = 3;
     ySize = 3;

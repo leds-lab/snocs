@@ -73,10 +73,10 @@ private:
 
 
 public:
-    PluginManager(std::string conf, std::string pluginsDir = "./plugins");
+    PluginManager();
     ~PluginManager();
 
-    bool parseFile();
+    bool parseFile(std::string filename, std::string pluginsDir);
     bool loadPlugins();
 
     INoC* nocInstance(sc_core::sc_module_name name);
