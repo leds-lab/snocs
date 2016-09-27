@@ -166,6 +166,7 @@ inline XIN::XIN(sc_module_name mn,
     ////////////////////// AND READ OK //////////////////////
     u_AND_READ_OK->i_DATA[0](w_READ_OK);
     u_AND_READ_OK->i_DATA[1](w_REQUESTING);
+    u_AND_READ_OK->o_DATA(o_X_READ_OK);
 
     ////////////////////// IFC //////////////////////
     u_IFC->i_CLK(i_CLK);
