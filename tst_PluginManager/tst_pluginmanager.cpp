@@ -13,9 +13,9 @@ int main(int argc, char *argv[]) {
 
     std::cout << "Plugins folder: " << argv[1] << std::endl;
 
-    PluginManager* pm = new PluginManager("simconf.conf",argv[1]);
+    PluginManager* pm = new PluginManager();
 
-    if( pm->parseFile() ) {
+    if( pm->parseFile("simconf.conf",argv[1]) ) {
         if( pm->loadPlugins() ) {
             std::cout << "Plugins carregados!" << std::endl;
             IMemory* mem = pm->memoryInstance("FIFO",0,0,0,4);

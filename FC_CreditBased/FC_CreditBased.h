@@ -35,6 +35,9 @@ public:
     void p_RETURN();
     void p_VALID();
 
+    // Debug
+    void p_DEBUG();
+
     SC_HAS_PROCESS(IFC_CreditBased);
     IFC_CreditBased(sc_module_name mn,
                     unsigned short XID,
@@ -70,6 +73,9 @@ public:
     // Module's processes
     void p_COUNTER();
     void p_OUTPUTS();
+
+    // Debug
+    void p_DEBUG();
 
     SC_HAS_PROCESS(OFC_CreditBased);
     OFC_CreditBased(sc_module_name mn,

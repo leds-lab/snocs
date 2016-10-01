@@ -30,7 +30,6 @@ ParIS::ParIS(sc_module_name mn,
         char strXOUT[13];
         sprintf(strXOUT,"XOUT(%u)",i);
 
-        // TODO: Verificar ambiguidades nos nomes dos modulos
         // Getting input units
         char strMemIn[20];
         sprintf(strMemIn,"%s_MEM_IN",strXIN);
@@ -108,9 +107,78 @@ ParIS::ParIS(sc_module_name mn,
     SC_METHOD(p_GND);
     sensitive << i_RST;
 
+#ifdef DEBUG_PARIS
+    SC_METHOD(p_DEBUG);
+    sensitive << i_CLK.pos();
+#endif
+#ifdef WAVEFORM_PARIS
+    char waveName[15];
+    sprintf(waveName,"ParIS_%u_%u_%u",XID,YID,nPorts);
+    tf = sc_create_vcd_trace_file(waveName);
+
+    sc_trace(tf,i_CLK,"CLK");
+    sc_trace(tf,i_RST,"RST");
+
+    for( i = 0; i < nPorts; i++ ) {
+        char strI[5];
+        sprintf(strI,"(%u)",i);
+        char strDataIn[15];
+        sprintf(strDataIn,"DATA_IN%s",strI);
+        sc_trace(tf, i_DATA_IN[i],strDataIn);
+        char strValidIn[15];
+        sprintf(strValidIn,"VALID_IN%s",strI);
+        sc_trace(tf, i_VALID_IN[i],strValidIn);
+        char strRetIn[15];
+        sprintf(strRetIn,"RET_IN%s",strI);
+        sc_trace(tf, o_RETURN_IN[i],strRetIn);
+
+        char strDataOut[15];
+        sprintf(strDataOut,"DATA_OUT%s",strI);
+        sc_trace(tf, o_DATA_OUT[i],strDataOut);
+        char strValidOut[15];
+        sprintf(strValidOut,"VALID_OUT%s",strI);
+        sc_trace(tf, o_VALID_OUT[i],strValidOut);
+        char strRetOut[15];
+        sprintf(strRetOut,"RET_OUT%s",strI);
+        sc_trace(tf, i_RETURN_OUT[i],strRetOut);
+
+        for( j = 0; j < nPorts; j++ ) {
+            char strIJ[10];
+            sprintf(strIJ,"%s(%u)",strI,j);
+
+            char strReq[16];
+            sprintf(strReq,"wREQ%s",strIJ);
+            sc_trace(tf,w_REQUEST[i][j],strReq);
+
+            char strGrant[18];
+            sprintf(strGrant,"wGRANT%s",strIJ);
+            sc_trace(tf,w_GRANT[i][j],strGrant);
+        }
+
+        char strRok[10];
+        sprintf(strRok,"wROK%s",strI);
+        sc_trace(tf,w_READ_OK[i],strRok);
+
+        char strRd[9];
+        sprintf(strRd,"wRD%s",strI);
+        sc_trace(tf,w_READ[i],strRd);
+
+        char strIdle[11];
+        sprintf(strIdle,"wIDLE%s",strI);
+        sc_trace(tf,w_IDLE[i],strIdle);
+
+        char strData[11];
+        sprintf(strData,"wDATA%s",strI);
+        sc_trace(tf,w_DATA[i],strData);
+    }
+
+#endif
 }
 
 ParIS::~ParIS() {
+#ifdef WAVEFORM_PARIS
+    sc_close_vcd_trace_file(tf);
+#endif
     for(unsigned short i = 0; i < numPorts; i++) {
         XIN* xin = u_XIN[i];
         if(xin) {
@@ -123,6 +191,34 @@ ParIS::~ParIS() {
     }
     u_XIN.clear();
     u_XOUT.clear();
+}
+
+void ParIS::p_DEBUG() {
+
+    std::string str = sc_time_stamp().to_string();
+
+    for( unsigned short i = 0; i < numPorts; i++ ) {
+        for( unsigned short x = 0; x < numPorts; x++ ) {
+            bool req = w_REQUEST[i][x].read();
+            bool grant = w_GRANT[i][x].read();
+            if(req) {
+                printf("\n[Router] [%u][%u] - time: %s, Req[%u][%u]",XID,YID,str.c_str(),i,x);
+            }
+            if(grant) {
+                printf("\n[Router] [%u][%u] - time: %s, Grant[%u][%u]",XID,YID,str.c_str(),i,x);
+            }
+
+        }
+    }
+
+    for( unsigned short i = 0; i < numPorts; i++ ) {
+        if( XID == 0 && YID == 0 ) {
+            Flit d = w_DATA[i].read();
+            printf("\n[ParIS] PORT[%u] IDLE: %d- RD: %d- ROK: %d- DATA: %s",
+                   i,w_IDLE[i].read(),w_READ[i].read(),w_READ_OK[i].read(),d.data.to_string(SC_HEX_US).c_str());
+        }
+    }
+
 }
 
 extern "C" {

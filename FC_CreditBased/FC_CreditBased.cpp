@@ -16,6 +16,11 @@ IFC_CreditBased::IFC_CreditBased(sc_module_name mn,unsigned short XID, unsigned 
 
     SC_METHOD(p_VALID);
     sensitive << i_VALID;
+
+#ifdef DEBUG_IFC
+    SC_METHOD(p_DEBUG);
+    sensitive << i_CLK.pos();
+#endif
 }
 
 /*!
@@ -36,6 +41,17 @@ void IFC_CreditBased::p_VALID() {
     o_WRITE.write( i_VALID.read() );
 }
 
+void IFC_CreditBased::p_DEBUG() {
+
+    if( XID == 1 && YID == 0 && PORT_ID == 2) {
+        printf("\n[IFC_Credit][%u][%u][%u] ",XID, YID,PORT_ID);
+        std::cout  << ", VALID =" << i_VALID.read() \
+                   << ", RETURN =" << o_RETURN.read() \
+                   << ", WRITE ="  << o_WRITE.read() \
+                   << ", READ ="  << i_READ.read();
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -47,7 +63,11 @@ void IFC_CreditBased::p_VALID() {
 /// \param XID X identifier of router in the network
 /// \param YID Y identifier of router in the network
 /// \param PORT_ID Port identifier in the router
-OFC_CreditBased::OFC_CreditBased(sc_module_name mn, unsigned short numCredits, unsigned short XID, unsigned short YID, unsigned short PORT_ID)
+OFC_CreditBased::OFC_CreditBased(sc_module_name mn,
+                                 unsigned short numCredits,
+                                 unsigned short XID,
+                                 unsigned short YID,
+                                 unsigned short PORT_ID)
     : IOutputFlowControl(mn,XID,YID,PORT_ID),
       numCredits(numCredits),
       r_COUNTER("OFC_CreditBased_rCOUNTER")
@@ -57,6 +77,11 @@ OFC_CreditBased::OFC_CreditBased(sc_module_name mn, unsigned short numCredits, u
 
     SC_METHOD(p_OUTPUTS);
     sensitive << i_READ_OK << r_COUNTER << i_RETURN;
+
+#ifdef DEBUG_OFC
+    SC_METHOD(p_DEBUG);
+    sensitive << i_CLK.pos();
+#endif
 }
 
 /*!
@@ -108,6 +133,17 @@ void OFC_CreditBased::p_OUTPUTS() {
 
     o_VALID.write(p_MOVE);
     o_READ.write(p_MOVE);
+}
+
+void OFC_CreditBased::p_DEBUG() {
+    if( XID == 0 && YID == 0 && PORT_ID == 0) {
+        printf("\n[OFC_Credit][%u][%u][%u] ",XID, YID,PORT_ID);
+        std::cout  << ", COUNTER=" << r_COUNTER.read() \
+                   << ", ROK =" << i_READ_OK.read() \
+                   << ", RETURN =" << i_RETURN.read() \
+                   << ", VALID =" << o_VALID.read() \
+                   << ", READ =" << o_READ.read();
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////

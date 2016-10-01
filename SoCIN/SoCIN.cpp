@@ -12,37 +12,37 @@
 ///
 SoCIN::SoCIN(sc_module_name mn)
     : INoC(mn,(X_SIZE * Y_SIZE)),
-      w_X_DATA_IN("w_X_DATA_IN"),
-      w_X_VALID_IN("w_X_VALID_IN"),
-      w_X_RETURN_IN("w_X_RETURN_IN"),
-      w_X_DATA_OUT("w_X_DATA_OUT"),
-      w_X_VALID_OUT("w_X_VALID_OUT"),
-      w_X_RETURN_OUT("w_X_RETURN_OUT"),
-      w_Y_DATA_IN("w_Y_DATA_IN"),
-      w_Y_VALID_IN("w_Y_VALID_IN"),
-      w_Y_RETURN_IN("w_Y_RETURN_IN"),
-      w_Y_DATA_OUT("w_Y_DATA_OUT"),
-      w_Y_VALID_OUT("w_Y_VALID_OUT"),
-      w_Y_RETURN_OUT("w_Y_RETURN_OUT")
+      w_X_DATA_TO_LEFT("w_X_DATA_IN"),
+      w_X_VALID_TO_LEFT("w_X_VALID_IN"),
+      w_X_RETURN_TO_LEFT("w_X_RETURN_IN"),
+      w_X_DATA_TO_RIGHT("w_X_DATA_OUT"),
+      w_X_VALID_TO_RIGHT("w_X_VALID_OUT"),
+      w_X_RETURN_TO_RIGHT("w_X_RETURN_OUT"),
+      w_Y_DATA_TO_SOUTH("w_Y_DATA_IN"),
+      w_Y_VALID_TO_SOUTH("w_Y_VALID_IN"),
+      w_Y_RETURN_TO_SOUTH("w_Y_RETURN_IN"),
+      w_Y_DATA_TO_NORTH("w_Y_DATA_OUT"),
+      w_Y_VALID_TO_NORTH("w_Y_VALID_OUT"),
+      w_Y_RETURN_TO_NORTH("w_Y_RETURN_OUT")
 {
     unsigned short numberOfXWires = (X_SIZE-1) * Y_SIZE;
     unsigned short numberOfYWires = (Y_SIZE-1) * X_SIZE;
 
     // Allocating wires
     // X direction
-    w_X_DATA_IN.init(numberOfXWires);
-    w_X_VALID_IN.init(numberOfXWires);
-    w_X_RETURN_IN.init(numberOfXWires);
-    w_X_DATA_OUT.init(numberOfXWires);
-    w_X_VALID_OUT.init(numberOfXWires);
-    w_X_RETURN_OUT.init(numberOfXWires);
+    w_X_DATA_TO_LEFT.init(numberOfXWires);
+    w_X_VALID_TO_LEFT.init(numberOfXWires);
+    w_X_RETURN_TO_LEFT.init(numberOfXWires);
+    w_X_DATA_TO_RIGHT.init(numberOfXWires);
+    w_X_VALID_TO_RIGHT.init(numberOfXWires);
+    w_X_RETURN_TO_RIGHT.init(numberOfXWires);
     // Y direction
-    w_Y_DATA_IN.init(numberOfYWires);
-    w_Y_VALID_IN.init(numberOfYWires);
-    w_Y_RETURN_IN.init(numberOfYWires);
-    w_Y_DATA_OUT.init(numberOfYWires);
-    w_Y_VALID_OUT.init(numberOfYWires);
-    w_Y_RETURN_OUT.init(numberOfYWires);
+    w_Y_DATA_TO_SOUTH.init(numberOfYWires);
+    w_Y_VALID_TO_SOUTH.init(numberOfYWires);
+    w_Y_RETURN_TO_SOUTH.init(numberOfYWires);
+    w_Y_DATA_TO_NORTH.init(numberOfYWires);
+    w_Y_VALID_TO_NORTH.init(numberOfYWires);
+    w_Y_RETURN_TO_NORTH.init(numberOfYWires);
 
     unsigned short x,y, // Aux. to identify the router id in cartesian coordinates
         nPorts,         // Aux. to calculate the number of ports
@@ -66,13 +66,11 @@ SoCIN::SoCIN(sc_module_name mn)
 
             routerId = COORDINATE_TO_ID(x,y);
 
-            std::string rName = "ParIS";
-            char buff[15];
-            sprintf(buff,"[%u][%u]",x,y);
-            rName.append(buff);
+            char rName[15];
+            sprintf(rName,"ParIS[%u][%u]",x,y);
 
             // Instantiating a router
-            IRouter* router = PLUGIN_MANAGER->routerInstance(rName.c_str(),x,y,nPorts);
+            IRouter* router = PLUGIN_MANAGER->routerInstance(rName,x,y,nPorts);
 
             // Binding ports of the router
             // System signals
@@ -92,12 +90,12 @@ SoCIN::SoCIN(sc_module_name mn)
             if( useNorth ) {
                 yWireId = routerId; // Always the same id of the router
                 rPortId = useNorth;
-                router->i_DATA_IN[rPortId](w_Y_DATA_IN[yWireId]);
-                router->i_VALID_IN[rPortId](w_Y_VALID_IN[yWireId]);
-                router->o_RETURN_IN[rPortId](w_Y_RETURN_IN[yWireId]);
-                router->o_DATA_OUT[rPortId](w_Y_DATA_OUT[yWireId]);
-                router->o_VALID_OUT[rPortId](w_Y_VALID_OUT[yWireId]);
-                router->i_RETURN_OUT[rPortId](w_Y_RETURN_OUT[yWireId]);
+                router->i_DATA_IN[rPortId](w_Y_DATA_TO_SOUTH[yWireId]);
+                router->i_VALID_IN[rPortId](w_Y_VALID_TO_SOUTH[yWireId]);
+                router->o_RETURN_IN[rPortId](w_Y_RETURN_TO_SOUTH[yWireId]);
+                router->o_DATA_OUT[rPortId](w_Y_DATA_TO_NORTH[yWireId]);
+                router->o_VALID_OUT[rPortId](w_Y_VALID_TO_NORTH[yWireId]);
+                router->i_RETURN_OUT[rPortId](w_Y_RETURN_TO_NORTH[yWireId]);
             }
             // If EAST is used, it is the port 2 in the router,
             // except in the top border routers that is the port 1,
@@ -106,44 +104,164 @@ SoCIN::SoCIN(sc_module_name mn)
             if( useEast ) {
                 xWireId = routerId - y;
                 rPortId = useNorth + useEast;
-                router->i_DATA_IN[rPortId](w_X_DATA_IN[xWireId]);
-                router->i_VALID_IN[rPortId](w_X_VALID_IN[xWireId]);
-                router->o_RETURN_IN[rPortId](w_X_RETURN_IN[xWireId]);
-                router->o_DATA_OUT[rPortId](w_X_DATA_OUT[xWireId]);
-                router->o_VALID_OUT[rPortId](w_X_VALID_OUT[xWireId]);
-                router->i_RETURN_OUT[rPortId](w_X_RETURN_OUT[xWireId]);
+                router->i_DATA_IN[rPortId](w_X_DATA_TO_LEFT[xWireId]);
+                router->i_VALID_IN[rPortId](w_X_VALID_TO_LEFT[xWireId]);
+                router->o_RETURN_IN[rPortId](w_X_RETURN_TO_LEFT[xWireId]);
+                router->o_DATA_OUT[rPortId](w_X_DATA_TO_RIGHT[xWireId]);
+                router->o_VALID_OUT[rPortId](w_X_VALID_TO_RIGHT[xWireId]);
+                router->i_RETURN_OUT[rPortId](w_X_RETURN_TO_RIGHT[xWireId]);
             }
 
             if( useSouth ) {
                 yWireId = routerId - X_SIZE;
                 rPortId = useNorth + useEast + useSouth;
-                router->i_DATA_IN[rPortId](w_Y_DATA_IN[yWireId]);
-                router->i_VALID_IN[rPortId](w_Y_VALID_IN[yWireId]);
-                router->o_RETURN_IN[rPortId](w_Y_RETURN_IN[yWireId]);
-                router->o_DATA_OUT[rPortId](w_Y_DATA_OUT[yWireId]);
-                router->o_VALID_OUT[rPortId](w_Y_VALID_OUT[yWireId]);
-                router->i_RETURN_OUT[rPortId](w_Y_RETURN_OUT[yWireId]);
+                router->i_DATA_IN[rPortId](w_Y_DATA_TO_NORTH[yWireId]);
+                router->i_VALID_IN[rPortId](w_Y_VALID_TO_NORTH[yWireId]);
+                router->o_RETURN_IN[rPortId](w_Y_RETURN_TO_NORTH[yWireId]);
+                router->o_DATA_OUT[rPortId](w_Y_DATA_TO_SOUTH[yWireId]);
+                router->o_VALID_OUT[rPortId](w_Y_VALID_TO_SOUTH[yWireId]);
+                router->i_RETURN_OUT[rPortId](w_Y_RETURN_TO_SOUTH[yWireId]);
             }
 
             if( useWest ) {
                 xWireId = routerId - y - 1;
                 rPortId = useNorth + useEast + useSouth + useWest;
-                router->i_DATA_IN[rPortId](w_X_DATA_IN[xWireId]);
-                router->i_VALID_IN[rPortId](w_X_VALID_IN[xWireId]);
-                router->o_RETURN_IN[rPortId](w_X_RETURN_IN[xWireId]);
-                router->o_DATA_OUT[rPortId](w_X_DATA_OUT[xWireId]);
-                router->o_VALID_OUT[rPortId](w_X_VALID_OUT[xWireId]);
-                router->i_RETURN_OUT[rPortId](w_X_RETURN_OUT[xWireId]);
+                router->i_DATA_IN[rPortId](w_X_DATA_TO_RIGHT[xWireId]);
+                router->i_VALID_IN[rPortId](w_X_VALID_TO_RIGHT[xWireId]);
+                router->o_RETURN_IN[rPortId](w_X_RETURN_TO_RIGHT[xWireId]);
+                router->o_DATA_OUT[rPortId](w_X_DATA_TO_LEFT[xWireId]);
+                router->o_VALID_OUT[rPortId](w_X_VALID_TO_LEFT[xWireId]);
+                router->i_RETURN_OUT[rPortId](w_X_RETURN_TO_LEFT[xWireId]);
             }
 
             u_ROUTER[routerId] = router;
         }
     }
 
+#ifdef DEBUG_SOCIN
+    SC_METHOD(p_DEBUG);
+    sensitive << i_CLK.pos();
+#endif
+
+#ifdef WAVEFORM_SOCIN
+    tf = sc_create_vcd_trace_file("socin");
+    sc_trace(tf,i_CLK,"CLK");
+    sc_trace(tf,i_RST,"RST");
+    unsigned short i;
+    // Interfaces - routers
+    for( i = 0; i < numRouters; i++ ) {
+        char strI[5];
+        sprintf(strI,"(%u)",i);
+        char strDataIn[15];
+        sprintf(strDataIn,"DATA_IN%s",strI);
+        sc_trace(tf, i_DATA_IN[i],strDataIn);
+        char strValidIn[15];
+        sprintf(strValidIn,"VALID_IN%s",strI);
+        sc_trace(tf, i_VALID_IN[i],strValidIn);
+        char strRetIn[15];
+        sprintf(strRetIn,"RET_IN%s",strI);
+        sc_trace(tf, o_RETURN_IN[i],strRetIn);
+
+        char strDataOut[15];
+        sprintf(strDataOut,"DATA_OUT%s",strI);
+        sc_trace(tf, o_DATA_OUT[i],strDataOut);
+        char strValidOut[15];
+        sprintf(strValidOut,"VALID_OUT%s",strI);
+        sc_trace(tf, o_VALID_OUT[i],strValidOut);
+        char strRetOut[15];
+        sprintf(strRetOut,"RET_OUT%s",strI);
+        sc_trace(tf, i_RETURN_OUT[i],strRetOut);
+    }
+
+    // X wires
+    for( i = 0; i < numberOfXWires; i++) {
+        char strI[5];
+        sprintf(strI,"(%u)",i);
+
+        char wXDataLeft[20];
+        sprintf(wXDataLeft,"X-Data-to-Left%s",strI);
+        sc_trace(tf,w_X_DATA_TO_LEFT[i],wXDataLeft);
+
+        char wXValidLeft[21];
+        sprintf(wXValidLeft,"X-Valid-to-Left%s",strI);
+        sc_trace(tf,w_X_VALID_TO_LEFT[i],wXValidLeft);
+
+        char wXRetLeft[21];
+        sprintf(wXRetLeft,"X-Ret-to-Left%s",strI);
+        sc_trace(tf,w_X_RETURN_TO_LEFT[i],wXRetLeft);
+
+        char wXDataRight[21];
+        sprintf(wXDataRight,"X-Data-to-Right%s",strI);
+        sc_trace(tf,w_X_DATA_TO_RIGHT[i],wXDataRight);
+
+        char wXValidRight[22];
+        sprintf(wXValidRight,"X-Valid-to-Right%s",strI);
+        sc_trace(tf,w_X_VALID_TO_RIGHT[i],wXValidRight);
+
+        char wXRetRight[22];
+        sprintf(wXRetRight,"X-Ret-to-Right%s",strI);
+        sc_trace(tf,w_X_RETURN_TO_RIGHT[i],wXRetRight);
+    }
+    // Y wires
+    for( i = 0; i < numberOfYWires; i++) {
+        char strI[5];
+        sprintf(strI,"(%u)",i);
+
+        char wYDataSouth[21];
+        sprintf(wYDataSouth,"Y-Data-to-South%s",strI);
+        sc_trace(tf,w_Y_DATA_TO_SOUTH[i],wYDataSouth);
+
+        char wYValidSouth[22];
+        sprintf(wYValidSouth,"Y-Valid-to-South%s",strI);
+        sc_trace(tf,w_Y_VALID_TO_SOUTH[i],wYValidSouth);
+
+        char wYRetSouth[22];
+        sprintf(wYRetSouth,"Y-Ret-to-South%s",strI);
+        sc_trace(tf,w_Y_RETURN_TO_SOUTH[i],wYRetSouth);
+
+        char wYDataNorth[21];
+        sprintf(wYDataNorth,"Y-Data-to-North%s",strI);
+        sc_trace(tf,w_Y_DATA_TO_NORTH[i],wYDataNorth);
+
+        char wYValidNorth[22];
+        sprintf(wYValidNorth,"Y-Valid-to-North%s",strI);
+        sc_trace(tf,w_Y_VALID_TO_NORTH[i],wYValidNorth);
+
+        char wYRetNorth[22];
+        sprintf(wYRetNorth,"Y-Ret-to-North%s",strI);
+        sc_trace(tf,w_Y_RETURN_TO_NORTH[i],wYRetNorth);
+    }
+
+#endif
 }
 
 SoCIN::~SoCIN() {
+#ifdef WAVEFORM_SOCIN
+    sc_close_vcd_trace_file(tf);
+#endif
     u_ROUTER.clear();
+}
+
+void SoCIN::p_DEBUG() {
+
+    // Wire[0] R[0][0] - [1][0]
+    unsigned short wireId = 0;
+
+    Flit dataToRight = w_X_DATA_TO_RIGHT[wireId].read();
+    bool retToRight = w_X_RETURN_TO_RIGHT[wireId].read();
+    bool valToRight = w_X_VALID_TO_RIGHT[wireId].read();
+
+    Flit dataToLeft = w_X_DATA_TO_LEFT[wireId].read();
+    bool retToLeft = w_X_RETURN_TO_LEFT[wireId].read();
+    bool valToLeft = w_X_VALID_TO_LEFT[wireId].read();
+
+    printf("\n-->[SoCIN] @ %s wX_ID[%u] Data->: %s, Ret->: %d, Val->: %d, Data<-: %s, Ret<-: %d, Val<-: %d",
+           sc_time_stamp().to_string().c_str(),wireId,
+           dataToRight.data.to_string(SC_HEX_US).c_str(),
+           retToRight,valToRight,
+           dataToLeft.data.to_string(SC_HEX_US).c_str(),
+           retToLeft,valToLeft);
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////

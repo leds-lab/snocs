@@ -127,7 +127,7 @@ public:
 #define LOG2_N              2  	// Log2 of N
 
 // FLOW CONTROL
-//enum fsm_state {S0,S1,S2};     	// States of the FSMs of handshake-type ifc and ofc
+enum fsm_state {S0,S1,S2};     	// States of the FSMs of handshake-type ifc and ofc
 //#define CREDIT              4 	// Number of credits at power up
 #define CREDIT_COUNTER_SIZE 3 	// Size of the credit counter
 
@@ -175,6 +175,20 @@ enum stampler_fsm_state {STAMPLER_S0, STAMPLER_S1};
 ///////////////////////////// DEBUG CONTROL ////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+// NEW
+//#define DEBUG_FIFO_CONTROL
+//#define DEBUG_FIFO_DATAPATH
+//#define DEBUG_SOCIN
+//#define DEBUG_IFC
+//#define DEBUG_OFC
+//#define DEBUG_PARIS
+//#define WAVEFORM_PARIS
+//#define DEBUG_SOCIN
+//#define WAVEFORM_SOCIN
+
+
+
+// OLD
 //#define DEBUG_REQ_REG
 //#define DEBUG_FIFO_IN_DATAPATH
 //#define DEBUG_FIFO_IN_CONTROLLER

@@ -40,6 +40,10 @@ public:
         w_GND.write(0);
     }
 
+    sc_trace_file* tf;
+
+    void p_DEBUG();
+
     SC_HAS_PROCESS(ParIS);
     ParIS(sc_module_name mn,
           unsigned short nPorts,

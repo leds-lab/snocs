@@ -59,6 +59,10 @@ public:
     // No FIFO
     void p_NULL();
 
+    // Debug
+    void p_DEBUG_CONTROL();
+    void p_DEBUG_DATAPATH();
+
     SC_HAS_PROCESS(FIFO);
     FIFO(sc_module_name mn,
          unsigned short memSize,

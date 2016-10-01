@@ -38,13 +38,6 @@ void Routing_XY::p_REQUEST() {
     v_YDEST = v_DATA.range(RIB_WIDTH/2-1,0);
     v_BOP   = v_DATA[FLIT_WIDTH-2];
 
-    std::cout << "XY - Data: " << v_DATA.to_string(SC_HEX_US,false)
-              << ", F.data: " << f.data.to_string(SC_HEX_US,false)
-              << ", F.data.length: " << f.data.length()
-              << ", XYD: " << XID << ", YID: " << YID
-              << ", Xdest: " << v_XDEST << ", Ydest: " << v_YDEST << ", BOP: " << v_BOP
-              << ", v_REQ.length: " << v_REQUEST.length() << std::endl;
-
     // It determines if a header is present
     if ((v_BOP==1) && (i_READ_OK.read()==1)) {
         v_HEADER_PRESENT = 1;
@@ -56,42 +49,23 @@ void Routing_XY::p_REQUEST() {
     if (v_HEADER_PRESENT) {
         v_X = (int) v_XDEST.to_int() - (int) XID;
         v_Y = (int) v_YDEST.to_int() - (int) YID;
-        // TODO: Verificar requisições
         if (v_X != 0) {
             if (v_X > 0) {
                 v_REQUEST = REQ_E;
-                std::cout << "XY - XID: " << XID << ", YID: " << YID
-                          << ", v_REQ: " << v_REQUEST.to_string(SC_BIN_US,false)
-                          << " - EAST" << std::endl;
             } else {
                 v_REQUEST = REQ_W;
-                std::cout << "XY - XID: " << XID << ", YID: " << YID
-                          << ", v_REQ: " << v_REQUEST.to_string(SC_BIN_US,false)
-                          << " - WEST" << std::endl;
             }
         } else if (v_Y != 0) {
             if (v_Y > 0) {
                 v_REQUEST = REQ_N;
-                std::cout << "XY - XID: " << XID << ", YID: " << YID
-                          << ", v_REQ: " << v_REQUEST.to_string(SC_BIN_US,false)
-                          << " - NORTH" << std::endl;
             } else {
                 v_REQUEST = REQ_S;
-                std::cout << "XY - XID: " << XID << ", YID: " << YID
-                          << ", v_REQ: " << v_REQUEST.to_string(SC_BIN_US,false)
-                          << " - SOUTH" << std::endl;
             }
         } else { // X == Y == 0
             v_REQUEST = REQ_L;
-            std::cout << "XY - XID: " << XID << ", YID: " << YID
-                      << ", v_REQ: " << v_REQUEST.to_string(SC_BIN_US,false)
-                      << " - LOCAL" << std::endl;
         }
     } else {
         v_REQUEST = REQ_NONE;
-        std::cout << "XY - XID: " << XID << ", YID: " << YID
-                  << ", v_REQ: " << v_REQUEST.to_string(SC_BIN_US,false)
-                  << " - NONE" << std::endl;
     }
 
     // Outputs

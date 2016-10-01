@@ -47,10 +47,19 @@ FIFO::FIFO(sc_module_name mn,
 
         SC_METHOD(p_OUTPUTS);
         sensitive << r_CUR_STATE << r_READ_POINTER;
+
     } else { // No FIFO
         SC_METHOD(p_NULL);
         sensitive << i_WRITE << i_READ << i_DATA;
     }
+#ifdef DEBUG_FIFO_CONTROL
+        SC_METHOD(p_DEBUG_CONTROL);
+        sensitive << i_CLK.pos();
+#endif
+#ifdef DEBUG_FIFO_DATAPATH
+        SC_METHOD(p_DEBUG_DATAPATH);
+        sensitive << i_CLK.pos();
+#endif
 }
 /*!
  * \brief FIFO::~FIFO Default destructor
@@ -208,11 +217,42 @@ void FIFO::p_OUTPUTS() {
  * \brief FIFO::p_NULL Without fifo - direct connection
  */
 void FIFO::p_NULL() {
+
     o_READ_OK.write( i_WRITE.read() );
     o_WRITE_OK.write( i_READ.read() );
     o_DATA.write( i_DATA.read() );
 }
 
+////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////// DEBUG //////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+void FIFO::p_DEBUG_CONTROL() {
+
+    printf("\n[FIFO] - Router[%u][%u]-Port[%u] @ %s",XID,YID,PORT_ID,sc_time_stamp().to_string().c_str());
+    std::cout << " NEXT_STATE= " << w_NEXT_STATE.read() \
+              << " CURRENT_STATE= " << r_CUR_STATE.read();
+
+}
+
+void FIFO::p_DEBUG_DATAPATH() {
+    printf("\n[FIFO] - Router[%u][%u]-Port[%u] @ %s",XID,YID,PORT_ID,sc_time_stamp().to_string().c_str());
+    std::cout << " CURRENT_STATE= "<< r_CUR_STATE.read();
+
+    std::cout << " FIFO[" << (memSize-1) << "..0]=";
+    Flit f;
+    for( unsigned int i = 0; i < memSize; i++ ) {
+        f = r_FIFO[i].read();
+        printf(" Data[%u]: %s",i,f.data.to_string(SC_HEX_US).c_str());
+    }
+
+    f = r_FIFO[r_READ_POINTER.read()].read();
+    printf("  OUTPUT: %s",f.data.to_string(SC_HEX_US).c_str());
+
+    std::cout << "  WRITE= " << i_WRITE.read();
+    std::cout << "  READ= " << i_READ.read();
+    std::cout << "  READ_POINTER= " << r_READ_POINTER.read();
+    std::cout << "  WRITE_POINTER= " << r_WRITE_POINTER.read();
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
