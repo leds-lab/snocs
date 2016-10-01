@@ -120,6 +120,7 @@ public:
                       InputModule,
                       OutputModule,
                       NoC,
+                      StopSim,
                       Other
                     };
 

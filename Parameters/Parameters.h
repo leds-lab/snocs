@@ -28,6 +28,8 @@ class PluginManager;
 // Singleton instance
 #define PARAMS Parameters::instance() // Get instance of parameters
 
+// System info
+#define CLK_PERIOD PARAMS->clkPeriod        // Clock period
 // Network info
 #define X_SIZE PARAMS->xSize                // Network X dimension
 #define Y_SIZE PARAMS->ySize                // Network Y dimension
@@ -55,6 +57,8 @@ public:
     PluginManager* pm;
 
     // Attributes
+    // System info
+    float clkPeriod;
     // Network info
     unsigned short xSize;
     unsigned short ySize;

@@ -36,7 +36,9 @@ SUBDIRS += \
     PluginManager \
     tst_PluginManager \
     NoC \
-    SoCIN
+    SoCIN \
+    StopSim \
+    SystemSignals
 
 OTHER_FILES += \
     app.pri \
