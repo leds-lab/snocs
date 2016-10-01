@@ -35,12 +35,12 @@ class SoCINModule;
 class PluginLoader {
 private:
     void* libHandler;
-    const char* fileName;
-    const char* pluginName;
+    std::string fileName;
+    std::string pluginName;
     bool loaded;
 
 public:
-    PluginLoader(const char *fileName, const char *pluginName);
+    PluginLoader(std::string fileName, std::string pluginName);
     ~PluginLoader();
 
     bool load();
@@ -54,8 +54,8 @@ public:
 
 class PluginManager {
 private:
-    std::string pluginsDir;
-    std::string confFile;
+    char* pluginsDir;
+    char* confFile;
 
     PluginLoader* noc;
     PluginLoader* router;
@@ -69,14 +69,13 @@ private:
     std::map<std::string, std::string> properties;
     bool pluginsLoaded;
 
-    std::pair<std::string,std::string> parseProperty(std::string line);
-
+    void parseProperty(char *line);
 
 public:
     PluginManager();
     ~PluginManager();
 
-    bool parseFile(std::string filename, std::string pluginsDir);
+    bool parseFile(char* filename, char* pluginsDir);
     bool loadPlugins();
 
     INoC* nocInstance(sc_core::sc_module_name name);

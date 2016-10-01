@@ -1,6 +1,7 @@
 #include "PluginManager.h"
 
 #include <iostream>
+#include <cstdio>
 #include <cstring>
 #include <algorithm>
 #include <dlfcn.h>
@@ -20,7 +21,7 @@ std::string removeChar(std::string& str, char toRemove) {
 //////////////////////////////////// Plugin Loader ////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 // TODO: Verificar necessidade de passar o contexto de simulação do SystemC sc_curr_simcontext
-PluginLoader::PluginLoader(const char *fileName, const char *pluginName)
+PluginLoader::PluginLoader(std::string fileName, std::string pluginName)
     : libHandler(0),fileName(fileName),pluginName(pluginName),loaded(false)
 {}
 
@@ -35,7 +36,8 @@ bool PluginLoader::load() {
         std::cout << "Plugin " << pluginName << " already loaded." << std::endl;
         return true;
     }
-    libHandler = dlopen(fileName,RTLD_NOW);
+
+    libHandler = dlopen(fileName.c_str(),RTLD_NOW);
     if( !libHandler ) {
         loaded = false;
     } else {
@@ -76,7 +78,14 @@ PluginManager::PluginManager()
       flowControl(0), memory(0),
       priorityGenerator(0),
       pluginsLoaded(false)
-{}
+{
+    properties["noc"] = "";
+    properties["router"] = "";
+    properties["routing"] = "";
+    properties["flowcontrol"] = "";
+    properties["memory"] = "";
+    properties["prioritygenerator"] = "";
+}
 
 PluginManager::~PluginManager() {
     if( pluginsLoaded ) {
@@ -90,35 +99,30 @@ PluginManager::~PluginManager() {
     }
 }
 
+void PluginManager::parseProperty(char* line) {
 
-std::pair<std::string,std::string> PluginManager::parseProperty(std::string line) {
+    char key[30];
+    char value[30];
+    sscanf(line,"%s = %s",key,value);
 
-    std::size_t pos = line.find("=");
-    std::string key = line.substr(0,pos-1);
-    std::string value = line.substr(pos+1);
+    char filename[256];
+    sprintf(filename,"%s/%s",pluginsDir,value);
 
-    key = removeChar(key,' ');
-    value = removeChar(value,' ');
-    value = removeChar(value,'\n');
-
-    std::string filename = pluginsDir + "/" + value;
-
-    return std::pair<std::string,std::string>(key,filename);
+    if( properties.find(key) != properties.end() ) {
+        properties[key] = filename;
+    }
 }
 
-bool PluginManager::parseFile(std::string filename,std::string pluginsDir) {
-    this->confFile = filename;
+bool PluginManager::parseFile(char *filename, char *pluginsDir) {
     this->pluginsDir = pluginsDir;
-
-    std::string line;
+    this->confFile = filename;
 
     FILE* file;
 
-    if( (file = fopen(confFile.c_str(),"r")) ) {
+    if( (file = fopen(confFile,"r")) ) {
         char buff[256];
-        while ( std::fgets(buff,sizeof buff,file) != NULL ) {
-            line = buff;
-            properties.insert( parseProperty(line) );
+        while ( fgets(buff,sizeof buff,file) != NULL ) {
+            parseProperty(buff);
         }
         fclose(file);
     } else {
@@ -136,14 +140,14 @@ bool PluginManager::loadPlugins() {
         return true;
     } else {
         // Loading NoC
-        this->noc = new PluginLoader( this->properties["noc"].c_str(), "NoC" );
+        this->noc = new PluginLoader( this->properties["noc"], "NoC" );
         if( !this->noc->load() ) {
             std::cerr << "It was not possible load noc plugin: " << noc->error() << std::endl;
             delete noc;
             return false;
         }
         // Loading router
-        this->router = new PluginLoader( this->properties["router"].c_str(), "Router" );
+        this->router = new PluginLoader( this->properties["router"], "Router" );
         if( !this->router->load() ) {
             std::cerr << "It was not possible load router plugin: " << router->error() << std::endl;
             delete noc;
@@ -151,7 +155,7 @@ bool PluginManager::loadPlugins() {
             return false;
         }
         // Loading routing
-        this->routing = new PluginLoader( this->properties["routing"].c_str(), "Routing" );
+        this->routing = new PluginLoader( this->properties["routing"], "Routing" );
         if( !this->routing->load() ) {
             std::cerr << "It was not possible load routing plugin: " << routing->error() << std::endl;
             delete noc;
@@ -160,7 +164,7 @@ bool PluginManager::loadPlugins() {
             return false;
         }
         // Loading Flow Control
-        this->flowControl = new PluginLoader( this->properties["flowcontrol"].c_str(), "FlowControl");
+        this->flowControl = new PluginLoader( this->properties["flowcontrol"], "FlowControl");
         if( !this->flowControl->load() ) {
             std::cerr << "It was not possible load flow control plugin: " << flowControl->error() << std::endl;
             delete noc;
@@ -170,7 +174,7 @@ bool PluginManager::loadPlugins() {
             return false;
         }
         // Loading memory
-        this->memory = new PluginLoader( this->properties["memory"].c_str(), "Memory" );
+        this->memory = new PluginLoader( this->properties["memory"], "Memory" );
         if( !this->memory->load() ) {
             std::cerr << "It was not possible load memory plugin: " << memory->error() << std::endl;
             delete noc;
@@ -181,7 +185,7 @@ bool PluginManager::loadPlugins() {
             return false;
         }
         // Loading Priority Generator
-        this->priorityGenerator = new PluginLoader(this->properties["prioritygenerator"].c_str(),"PG");
+        this->priorityGenerator = new PluginLoader(this->properties["prioritygenerator"],"PG");
         if( !this->priorityGenerator->load() ) {
             std::cerr << "It was not possible load priority generator plugin: " << priorityGenerator->error() << std::endl;
             delete noc;
