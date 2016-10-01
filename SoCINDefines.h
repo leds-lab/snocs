@@ -170,9 +170,13 @@ public:
     Flit(UIntVar value, Packet* packet) : data(value), packet_ptr(packet) {}     // Auxiliar
     Flit(const Flit& f) { this->data = f.data; this->packet_ptr = f.packet_ptr;} // Copy
     Flit(Flit& f)       { this->data = f.data; this->packet_ptr = f.packet_ptr;} // Copy
+    Flit(int data)      { this->data = data; this->packet_ptr = NULL;}
 
     Flit& operator= (const Flit& flit)
     { this->data = flit.data; this->packet_ptr = flit.packet_ptr; return *this;}
+
+    Flit& operator = (int data)
+    { this->data  = data; this->packet_ptr = NULL; return *this;}
 
     bool operator== (const Flit& flit) const
     { return ( this->data == flit.data && this->packet_ptr == flit.packet_ptr ); }

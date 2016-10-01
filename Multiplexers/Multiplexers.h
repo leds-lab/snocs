@@ -17,7 +17,6 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __MULTIPLEXERS_H__
 #define __MULTIPLEXERS_H__
 
-//#include "../SoCINModule.h"
 #include <systemc>
 using namespace sc_core;
 
@@ -72,7 +71,7 @@ class OneHotMux : public IMultiplexer<DATA_TYPE> {
 public:
     // Module's process
     void p_OUTPUT() {
-        DATA_TYPE dNull;
+        DATA_TYPE dNull = 0;
         unsigned short i;       // Loop iterator
         for( i = 0; i < this->numPorts; i++ ) {
             if( this->i_SEL[i].read() == 1 ) {
@@ -97,10 +96,9 @@ public:
         }
     }
 
-//    const char* moduleName() const { return "OneHotMux"; }
-
     ~OneHotMux() {}
 };
+
 /////////////////////////////////////////////////////////////
 /// END Multiplexer one-hot
 /////////////////////////////////////////////////////////////
@@ -146,8 +144,6 @@ public:
             this->sensitive << this->i_DATA[i];
         }
     }
-
-//    inline const char* moduleName() const { return "BinaryMux"; }
 
     ~BinaryMux() {}
 };
