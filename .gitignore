@@ -62,6 +62,7 @@ Thumbs.db
 # MinGW generated files
 *.Debug
 *.Release
+*object_script.*
 
 # Python byte code
 *.pyc
@@ -74,3 +75,8 @@ Thumbs.db
 # Waveforms
 *.vcd
 *.sav
+
+# Simulator
+*.par
+*.tcf
+*work*
