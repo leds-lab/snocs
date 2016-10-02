@@ -8,6 +8,9 @@ Parameters::Parameters() {
 // Default values
     clkPeriod = 1;
     traceSystem = true;
+    workDir = const_cast<char*>("work");
+    pluginsDir = const_cast<char*>("./plugins");
+    confFile = const_cast<char*>("simconf.conf");
 
     xSize = 3;
     ySize = 3;
@@ -22,6 +25,9 @@ Parameters::Parameters(const Parameters &c) {
 
     this->clkPeriod = c.clkPeriod;
     this->traceSystem = c.traceSystem;
+    this->workDir = c.workDir;
+    this->pluginsDir = c.pluginsDir;
+    this->confFile = c.confFile;
 
     this->xSize = c.xSize;
     this->ySize = c.ySize;
@@ -36,6 +42,9 @@ Parameters& Parameters::operator = (const Parameters& c) {
 
     this->clkPeriod = c.clkPeriod;
     this->traceSystem = c.traceSystem;
+    this->workDir = c.workDir;
+    this->pluginsDir = c.pluginsDir;
+    this->confFile = c.confFile;
 
     this->xSize = c.xSize;
     this->ySize = c.ySize;

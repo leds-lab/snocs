@@ -54,9 +54,6 @@ public:
 
 class PluginManager {
 private:
-    char* pluginsDir;
-    char* confFile;
-
     PluginLoader* noc;
     PluginLoader* router;
     PluginLoader* routing;
@@ -75,7 +72,7 @@ public:
     PluginManager();
     ~PluginManager();
 
-    bool parseFile(char* filename, char* pluginsDir);
+    bool parseFile();
     bool loadPlugins();
 
     INoC* nocInstance(sc_core::sc_module_name name);

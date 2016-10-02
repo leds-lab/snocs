@@ -72,8 +72,7 @@ void* PluginLoader::loadSymbol(std::string symbol) {
 /////////////////////////////////// Plugin Manager ////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 PluginManager::PluginManager()
-    : // pluginsDir(pluginsDir), confFile(conf),
-      noc(0),
+    : noc(0),
       router(0),routing(0),
       flowControl(0), memory(0),
       priorityGenerator(0),
@@ -106,20 +105,18 @@ void PluginManager::parseProperty(char* line) {
     sscanf(line,"%s = %s",key,value);
 
     char filename[256];
-    sprintf(filename,"%s/%s",pluginsDir,value);
+    sprintf(filename,"%s/%s",PLUGINS_DIR,value);
 
     if( properties.find(key) != properties.end() ) {
         properties[key] = filename;
     }
 }
 
-bool PluginManager::parseFile(char *filename, char *pluginsDir) {
-    this->pluginsDir = pluginsDir;
-    this->confFile = filename;
+bool PluginManager::parseFile() {
 
     FILE* file;
 
-    if( (file = fopen(confFile,"r")) ) {
+    if( (file = fopen(CONF_FILE,"r")) ) {
         char buff[256];
         while ( fgets(buff,sizeof buff,file) != NULL ) {
             parseProperty(buff);

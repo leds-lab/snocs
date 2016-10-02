@@ -31,6 +31,9 @@ class PluginManager;
 // System info
 #define CLK_PERIOD PARAMS->clkPeriod        // Clock period
 #define TRACE PARAMS->traceSystem           // Generate system waveform
+#define WORK_DIR PARAMS->workDir            // Work folder
+#define PLUGINS_DIR PARAMS->pluginsDir      // Plugins folder
+#define CONF_FILE PARAMS->confFile          // File with simulator definitions
 // Network info
 #define X_SIZE PARAMS->xSize                // Network X dimension
 #define Y_SIZE PARAMS->ySize                // Network Y dimension
@@ -61,13 +64,15 @@ public:
     // System info
     float clkPeriod;
     bool traceSystem;
+    char* workDir;
+    char* pluginsDir;
+    char* confFile;
     // Network info
     unsigned short xSize;
     unsigned short ySize;
     // Packet Format
     unsigned short wordWidth;
     unsigned short ribWidth;
-
     // Buffering
     unsigned short fifoInDepth;
     unsigned short fifoOutDepth;
