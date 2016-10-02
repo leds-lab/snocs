@@ -155,9 +155,7 @@ void tm_single::p_stop()
 {
     if (eos.read()==1) {
         fprintf(fp_out,"\n#");
-        char buff[20];
-        lltoa(clock_cycles.read(),buff,10);
-        fprintf(fp_out," %s", buff);
+        fprintf(fp_out," %llu", clock_cycles.read());
         fclose(fp_out);
     }
 }
