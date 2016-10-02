@@ -27,7 +27,7 @@ private:
     unsigned short numPorts;
 public:
     // Interface
-    ::sc_core::sc_vector<::sc_core::sc_in<bool> > i_DATA;
+    ::sc_core::sc_vector< ::sc_core::sc_in<bool> > i_DATA;
     ::sc_core::sc_out<bool> o_DATA;
 
     // Module's process

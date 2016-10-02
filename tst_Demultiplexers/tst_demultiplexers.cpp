@@ -107,7 +107,7 @@ inline void DemultiplexerTestbench<DATA_TYPE>::p_STIMULUS() {
     // Binary test
     for( i = 0; i < numPorts; i++ ) {
         for(  x = 0; x < selSize; x++ ) {
-            unsigned short mask = (unsigned short) pow(2,x);
+            unsigned short mask = (unsigned short) pow(2.f,x);
             unsigned index = i & mask;
             if( index ) {
                 w_SEL[x].write(true);
