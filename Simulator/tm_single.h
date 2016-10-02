@@ -87,9 +87,12 @@ SC_MODULE(tm_single)
         SC_CTHREAD(p_probe, clk.pos());
         sensitive << clk.pos() << rst.pos();
 
-        SC_CTHREAD(p_stop, clk.pos());
-        sensitive << clk.pos() << rst.pos();
+        SC_METHOD(p_stop);
+        sensitive << eos.pos();
+    }
 
+    ~tm_single() {
+        delete[] FILENAME;
     }
 
 };

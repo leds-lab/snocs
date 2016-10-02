@@ -13,16 +13,17 @@
 using namespace sc_core;
 using namespace sc_dt;
 
-int sc_main(int argc, char* argv[]) {
-
-//    std::cout << " >>> Main - SimContext: " << static_cast<void*>(sc_curr_simcontext)
-//              << ", pAddr: " << &sc_curr_simcontext << std::endl;
-
-    // Defining dimension
+void setupSimulator() {
     X_SIZE = 2;
     Y_SIZE = 2;
 
     FLIT_WIDTH = 34;
+    TRACE = true;
+}
+
+int sc_main(int argc, char* argv[]) {
+
+    setupSimulator();
 
     INoC* u_NETWORK = NULL;
 
@@ -31,6 +32,7 @@ int sc_main(int argc, char* argv[]) {
     char* pluginsDir = argv[1];
     char* workDir = argv[2];
 
+    // Trying parsing configuration file and load plugins
     if( PLUGIN_MANAGER->parseFile(confFile,pluginsDir) ) {
         if( PLUGIN_MANAGER->loadPlugins() ) {
             std::cout << "Plugins loaded!" << std::endl;
@@ -59,55 +61,24 @@ int sc_main(int argc, char* argv[]) {
         CLK_PERIOD = 1;
     }
     // System signals
-    sc_clock                 w_CLK("clk", CLK_PERIOD, SC_NS); // System clock | Tclk=1 ns
-    sc_signal<bool>          w_RST;                           // Reset
+    sc_clock                      w_CLK("CLK", CLK_PERIOD, SC_NS); // System clock | Tclk=1 ns
+    sc_signal<bool>               w_RST;                           // Reset
     sc_signal<unsigned long long> w_GLOBAL_CLOCK;                  // Number of cycles
 
-    // NoC terminal (0,0)
-    sc_signal<Flit> L_0_0_in_data_wire;
-    sc_signal<bool> L_0_0_in_val_wire;
-    sc_signal<bool> L_0_0_in_ret_wire;
-    sc_signal<Flit> L_0_0_out_data_wire;
-    sc_signal<bool> L_0_0_out_val_wire;
-    sc_signal<bool> L_0_0_out_ret_wire;
+    unsigned short nRouters = X_SIZE*Y_SIZE;
 
-    // NoC terminal (0,1)
-    sc_signal<Flit> L_0_1_in_data_wire;
-    sc_signal<bool> L_0_1_in_val_wire;
-    sc_signal<bool> L_0_1_in_ret_wire;
-    sc_signal<Flit> L_0_1_out_data_wire;
-    sc_signal<bool> L_0_1_out_val_wire;
-    sc_signal<bool> L_0_1_out_ret_wire;
-
-    // NoC terminal (1,0)
-    sc_signal<Flit> L_1_0_in_data_wire;
-    sc_signal<bool> L_1_0_in_val_wire;
-    sc_signal<bool> L_1_0_in_ret_wire;
-    sc_signal<Flit> L_1_0_out_data_wire;
-    sc_signal<bool> L_1_0_out_val_wire;
-    sc_signal<bool> L_1_0_out_ret_wire;
-
-    // NoC terminal (1,1)
-    sc_signal<Flit> L_1_1_in_data_wire;
-    sc_signal<bool> L_1_1_in_val_wire;
-    sc_signal<bool> L_1_1_in_ret_wire;
-    sc_signal<Flit> L_1_1_out_data_wire;
-    sc_signal<bool> L_1_1_out_val_wire;
-    sc_signal<bool> L_1_1_out_ret_wire;
+    // Wires to connect System Components to the network - Transmission interface
+    sc_vector<sc_signal<Flit> > w_IN_DATA("w_IN_DATA",nRouters);
+    sc_vector<sc_signal<bool> > w_IN_VALID("w_IN_VALID",nRouters);
+    sc_vector<sc_signal<bool> > w_IN_RETURN("w_IN_RETURN",nRouters);
+    sc_vector<sc_signal<Flit> > w_OUT_DATA("w_OUT_DATA",nRouters);
+    sc_vector<sc_signal<bool> > w_OUT_VALID("w_OUT_VALID",nRouters);
+    sc_vector<sc_signal<bool> > w_OUT_RETURN("w_OUT_RETURN",nRouters);
 
     // Status signals of the traffic generators attached to the terminals of the NoC
-    sc_signal<bool>         TG_0_0_eot_wire;
-    sc_signal<bool>         TG_0_1_eot_wire;
-    sc_signal<bool>         TG_1_0_eot_wire;
-    sc_signal<bool>         TG_1_1_eot_wire;
-    sc_signal<unsigned int> TG_0_0_number_of_packets_sent_wire;
-    sc_signal<unsigned int> TG_0_1_number_of_packets_sent_wire;
-    sc_signal<unsigned int> TG_1_0_number_of_packets_sent_wire;
-    sc_signal<unsigned int> TG_1_1_number_of_packets_sent_wire;
-    sc_signal<unsigned int> TG_0_0_number_of_packets_received_wire;
-    sc_signal<unsigned int> TG_0_1_number_of_packets_received_wire;
-    sc_signal<unsigned int> TG_1_0_number_of_packets_received_wire;
-    sc_signal<unsigned int> TG_1_1_number_of_packets_received_wire;
+    sc_vector<sc_signal<bool> >         w_TG_EOT("w_TG_EOT",nRouters);
+    sc_vector<sc_signal<unsigned int> > w_TG_NUM_PACKETS_SENT("w_TG_NUM_PACKETS_SENT",nRouters);
+    sc_vector<sc_signal<unsigned int> > w_TG_NUM_PACKETS_RECEIVED("w_TG_NUM_PACKETS_RECEIVED",nRouters);
 
     // Status signal saying that stopsim is ready to stop simulation
     sc_signal<bool> w_EOS;
@@ -127,127 +98,6 @@ int sc_main(int argc, char* argv[]) {
     u_STOP->o_EOS(w_EOS);
     u_STOP->i_CLK_CYCLES(w_GLOBAL_CLOCK);
 
-    u_STOP->i_TG_NUM_PACKETS_SENT[0](TG_0_0_number_of_packets_sent_wire);
-    u_STOP->i_TG_NUM_PACKETS_SENT[1](TG_1_0_number_of_packets_sent_wire);
-    u_STOP->i_TG_NUM_PACKETS_SENT[2](TG_0_1_number_of_packets_sent_wire);
-    u_STOP->i_TG_NUM_PACKETS_SENT[3](TG_1_1_number_of_packets_sent_wire);
-    u_STOP->i_TG_NUM_PACKETS_RECEIVED[0](TG_0_0_number_of_packets_received_wire);
-    u_STOP->i_TG_NUM_PACKETS_RECEIVED[1](TG_1_0_number_of_packets_received_wire);
-    u_STOP->i_TG_NUM_PACKETS_RECEIVED[2](TG_0_1_number_of_packets_received_wire);
-    u_STOP->i_TG_NUM_PACKETS_RECEIVED[3](TG_1_1_number_of_packets_received_wire);
-    u_STOP->i_TG_EOT[0](TG_0_0_eot_wire);
-    u_STOP->i_TG_EOT[1](TG_1_0_eot_wire);
-    u_STOP->i_TG_EOT[2](TG_0_1_eot_wire);
-    u_STOP->i_TG_EOT[3](TG_1_1_eot_wire);
-
-    //////////////////////////////////////////////////////////////////////////////
-    tg *tg_0_0 = new tg("tg_0_0", 0, 0);
-    //////////////////////////////////////////////////////////////////////////////
-    tg_0_0->clk(w_CLK);
-    tg_0_0->rst(w_RST);
-    tg_0_0->clock_cycles(w_GLOBAL_CLOCK);
-    tg_0_0->out_data  (L_0_0_in_data_wire );
-    tg_0_0->out_val   (L_0_0_in_val_wire  );
-    tg_0_0->out_ret   (L_0_0_in_ret_wire  );
-    tg_0_0->in_data   (L_0_0_out_data_wire);
-    tg_0_0->in_val    (L_0_0_out_val_wire );
-    tg_0_0->in_ret    (L_0_0_out_ret_wire );
-    tg_0_0->eot(TG_0_0_eot_wire);
-    tg_0_0->number_of_packets_sent(TG_0_0_number_of_packets_sent_wire);
-    tg_0_0->number_of_packets_received(TG_0_0_number_of_packets_received_wire);
-
-    //////////////////////////////////////////////////////////////////////////////
-    tg *tg_0_1 = new tg("tg_0_1", 0, 1);
-    //////////////////////////////////////////////////////////////////////////////
-    tg_0_1->clk(w_CLK);
-    tg_0_1->rst(w_RST);
-    tg_0_1->clock_cycles(w_GLOBAL_CLOCK);
-    tg_0_1->out_data  (L_0_1_in_data_wire );
-    tg_0_1->out_val   (L_0_1_in_val_wire  );
-    tg_0_1->out_ret   (L_0_1_in_ret_wire  );
-    tg_0_1->in_data   (L_0_1_out_data_wire);
-    tg_0_1->in_val    (L_0_1_out_val_wire );
-    tg_0_1->in_ret    (L_0_1_out_ret_wire );
-    tg_0_1->eot(TG_0_1_eot_wire);
-    tg_0_1->number_of_packets_sent(TG_0_1_number_of_packets_sent_wire);
-    tg_0_1->number_of_packets_received(TG_0_1_number_of_packets_received_wire);
-
-    //////////////////////////////////////////////////////////////////////////////
-    tg *tg_1_0 = new tg("tg_1_0", 1, 0);
-    //////////////////////////////////////////////////////////////////////////////
-    tg_1_0->clk(w_CLK);
-    tg_1_0->rst(w_RST);
-    tg_1_0->clock_cycles(w_GLOBAL_CLOCK);
-    tg_1_0->out_data  (L_1_0_in_data_wire );
-    tg_1_0->out_val   (L_1_0_in_val_wire  );
-    tg_1_0->out_ret   (L_1_0_in_ret_wire  );
-    tg_1_0->in_data   (L_1_0_out_data_wire);
-    tg_1_0->in_val    (L_1_0_out_val_wire );
-    tg_1_0->in_ret    (L_1_0_out_ret_wire );
-    tg_1_0->eot(TG_1_0_eot_wire);
-    tg_1_0->number_of_packets_sent(TG_1_0_number_of_packets_sent_wire);
-    tg_1_0->number_of_packets_received(TG_1_0_number_of_packets_received_wire);
-
-    //////////////////////////////////////////////////////////////////////////////
-    tg *tg_1_1 = new tg("tg_1_1", 1, 1);
-    //////////////////////////////////////////////////////////////////////////////
-    tg_1_1->clk(w_CLK);
-    tg_1_1->rst(w_RST);
-    tg_1_1->clock_cycles(w_GLOBAL_CLOCK);
-    tg_1_1->out_data  (L_1_1_in_data_wire );
-    tg_1_1->out_val   (L_1_1_in_val_wire  );
-    tg_1_1->out_ret   (L_1_1_in_ret_wire  );
-    tg_1_1->in_data   (L_1_1_out_data_wire);
-    tg_1_1->in_val    (L_1_1_out_val_wire );
-    tg_1_1->in_ret    (L_1_1_out_ret_wire );
-    tg_1_1->eot(TG_1_1_eot_wire);
-    tg_1_1->number_of_packets_sent(TG_1_1_number_of_packets_sent_wire);
-    tg_1_1->number_of_packets_received(TG_1_1_number_of_packets_received_wire);
-
-    //////////////////////////////////////////////////////////////////////////////
-    tm_single *tm_0_0_out = new tm_single("tm_0_0_out", 0, 0,(char *) workDir, (char*)"ext_0_0_out");
-    //////////////////////////////////////////////////////////////////////////////
-    tm_0_0_out->clk(w_CLK);
-    tm_0_0_out->rst(w_RST);
-    tm_0_0_out->eos(w_EOS);
-    tm_0_0_out->clock_cycles(w_GLOBAL_CLOCK);
-    tm_0_0_out->data(L_0_0_out_data_wire );
-    tm_0_0_out->val (L_0_0_out_val_wire  );
-    tm_0_0_out->ret (L_0_0_out_ret_wire  );
-
-    //////////////////////////////////////////////////////////////////////////////
-    tm_single *tm_0_1_out = new tm_single("tm_0_1_out", 0, 1,(char *) workDir, (char*)"ext_0_1_out");
-    //////////////////////////////////////////////////////////////////////////////
-    tm_0_1_out->clk(w_CLK);
-    tm_0_1_out->rst(w_RST);
-    tm_0_1_out->eos(w_EOS);
-    tm_0_1_out->clock_cycles(w_GLOBAL_CLOCK);
-    tm_0_1_out->data(L_0_1_out_data_wire );
-    tm_0_1_out->val (L_0_1_out_val_wire  );
-    tm_0_1_out->ret (L_0_1_out_ret_wire  );
-
-    //////////////////////////////////////////////////////////////////////////////
-    tm_single *tm_1_0_out = new tm_single("tm_1_0_out", 1, 0,(char *) workDir, (char*)"ext_1_0_out");
-    //////////////////////////////////////////////////////////////////////////////
-    tm_1_0_out->clk(w_CLK);
-    tm_1_0_out->rst(w_RST);
-    tm_1_0_out->eos(w_EOS);
-    tm_1_0_out->clock_cycles(w_GLOBAL_CLOCK);
-    tm_1_0_out->data(L_1_0_out_data_wire );
-    tm_1_0_out->val (L_1_0_out_val_wire  );
-    tm_1_0_out->ret (L_1_0_out_ret_wire  );
-
-    //////////////////////////////////////////////////////////////////////////////
-    tm_single *tm_1_1_out = new tm_single("tm_1_1_out", 1, 1,(char *) workDir, (char*)"ext_1_1_out");
-    //////////////////////////////////////////////////////////////////////////////
-    tm_1_1_out->clk(w_CLK);
-    tm_1_1_out->rst(w_RST);
-    tm_1_1_out->eos(w_EOS);
-    tm_1_1_out->clock_cycles(w_GLOBAL_CLOCK);
-    tm_1_1_out->data(L_1_1_out_data_wire );
-    tm_1_1_out->val (L_1_1_out_val_wire  );
-    tm_1_1_out->ret (L_1_1_out_ret_wire  );
-
     //////////////////////////////////////////////////////////////////////////////
     INoC *u_NOC = u_NETWORK;
     //////////////////////////////////////////////////////////////////////////////
@@ -255,77 +105,111 @@ int sc_main(int argc, char* argv[]) {
     u_NOC->i_CLK(w_CLK);
     u_NOC->i_RST(w_RST);
 
-    // NoC terminal 0 0
-    u_NOC->i_DATA_IN   [0](L_0_0_in_data_wire );
-    u_NOC->i_VALID_IN  [0](L_0_0_in_val_wire  );
-    u_NOC->o_RETURN_IN [0](L_0_0_in_ret_wire  );
-    u_NOC->o_DATA_OUT  [0](L_0_0_out_data_wire);
-    u_NOC->o_VALID_OUT [0](L_0_0_out_val_wire );
-    u_NOC->i_RETURN_OUT[0](L_0_0_out_ret_wire );
+    // Instantiating System Components (TGs, TMs) & binding dynamic ports
+    for( unsigned short x = 0; x < X_SIZE; x++ ) {
+        for( unsigned short y = 0; y < Y_SIZE; y++ ) {
+            // Get the router ID according X and Y network position to configure the system
+            unsigned short rId = COORDINATE_TO_ID(x,y);
 
-    // NoC terminal 1 0
-    u_NOC->i_DATA_IN   [1](L_1_0_in_data_wire );
-    u_NOC->i_VALID_IN  [1](L_1_0_in_val_wire  );
-    u_NOC->o_RETURN_IN [1](L_1_0_in_ret_wire  );
-    u_NOC->o_DATA_OUT  [1](L_1_0_out_data_wire);
-    u_NOC->o_VALID_OUT [1](L_1_0_out_val_wire );
-    u_NOC->i_RETURN_OUT[1](L_1_0_out_ret_wire );
+            // Assembling TG name
+            char strTgName[10];
+            sprintf(strTgName,"TG_%u_%u",x,y);
+            // Instantiate TG
+            tg* u_TG = new tg(strTgName,x,y);
 
-    // NoC terminal 0 1
-    u_NOC->i_DATA_IN   [2](L_0_1_in_data_wire );
-    u_NOC->i_VALID_IN  [2](L_0_1_in_val_wire  );
-    u_NOC->o_RETURN_IN [2](L_0_1_in_ret_wire  );
-    u_NOC->o_DATA_OUT  [2](L_0_1_out_data_wire);
-    u_NOC->o_VALID_OUT [2](L_0_1_out_val_wire );
-    u_NOC->i_RETURN_OUT[2](L_0_1_out_ret_wire );
+            // Assembling TM name
+            char strTmName[10];
+            sprintf(strTmName,"TM_%u_%u",x,y);
+            // Assembling out filename
+            char* outFilename = new char[20];
+            sprintf(outFilename,"ext_%u_%u_out",x,y);
+            // Instantiate TM
+            tm_single* u_TM = new tm_single(strTmName,x,y,workDir,outFilename);
 
-    // NoC terminal 1 1
-    u_NOC->i_DATA_IN   [3](L_1_1_in_data_wire );
-    u_NOC->i_VALID_IN  [3](L_1_1_in_val_wire  );
-    u_NOC->o_RETURN_IN [3](L_1_1_in_ret_wire  );
-    u_NOC->o_DATA_OUT  [3](L_1_1_out_data_wire);
-    u_NOC->o_VALID_OUT [3](L_1_1_out_val_wire );
-    u_NOC->i_RETURN_OUT[3](L_1_1_out_ret_wire );
+            //------------- Binding signals -------------//
 
-    // Signal tracing
-    sc_trace_file *tf=sc_create_vcd_trace_file("system");
-    sc_trace(tf, w_CLK           , "clk");
-    sc_trace(tf, w_EOS           , "eos");
-    sc_trace(tf, w_RST           , "rst");
-    sc_trace(tf, w_GLOBAL_CLOCK  , "global_clock");
+            //------------- Binding TG -------------//
+            // System signals
+            u_TG->clk(w_CLK);
+            u_TG->rst(w_RST);
+            u_TG->clock_cycles(w_GLOBAL_CLOCK);
+            // Connections with routers
+            // The data that outgoing of the network, incoming in the traffic generator and vice-versa
+            u_TG->in_data(w_OUT_DATA[rId]);
+            u_TG->in_val(w_OUT_VALID[rId]);
+            u_TG->in_ret(w_OUT_RETURN[rId]);
+            u_TG->out_data(w_IN_DATA[rId]);
+            u_TG->out_val(w_IN_VALID[rId]);
+            u_TG->out_ret(w_IN_RETURN[rId]);
+            // Status signals to simulation control
+            u_TG->eot(w_TG_EOT[rId]);
+            u_TG->number_of_packets_sent(w_TG_NUM_PACKETS_SENT[rId]);
+            u_TG->number_of_packets_received(w_TG_NUM_PACKETS_RECEIVED[rId]);
 
-    sc_trace(tf, L_0_0_in_data_wire , "L_0_0_in_data");
-    sc_trace(tf, L_0_0_in_val_wire  , "L_0_0_in_val");
-    sc_trace(tf, L_0_0_in_ret_wire  , "L_0_0_in_ret");
-    sc_trace(tf, L_0_0_out_data_wire, "L_0_0_out_data");
-    sc_trace(tf, L_0_0_out_val_wire , "L_0_0_out_val");
-    sc_trace(tf, L_0_0_out_ret_wire , "L_0_0_out_ret");
+            //------------- Binding TM -------------//
+            u_TM->clk(w_CLK);
+            u_TM->rst(w_RST);
+            u_TM->eos(w_EOS);
+            u_TM->clock_cycles(w_GLOBAL_CLOCK);
+            u_TM->data(w_OUT_DATA[rId]);
+            u_TM->val(w_OUT_VALID[rId]);
+            u_TM->ret(w_OUT_RETURN[rId]);
 
-    sc_trace(tf, L_0_1_in_data_wire , "L_0_1_in_data");
-    sc_trace(tf, L_0_1_in_val_wire  , "L_0_1_in_val");
-    sc_trace(tf, L_0_1_in_ret_wire  , "L_0_1_in_ret");
-    sc_trace(tf, L_0_1_out_data_wire, "L_0_1_out_data");
-    sc_trace(tf, L_0_1_out_val_wire , "L_0_1_out_val");
-    sc_trace(tf, L_0_1_out_ret_wire , "L_0_1_out_ret");
+            //------------- Binding NoC -------------//
+            u_NOC->i_DATA_IN   [rId](w_IN_DATA[rId]);
+            u_NOC->i_VALID_IN  [rId](w_IN_VALID[rId]);
+            u_NOC->o_RETURN_IN [rId](w_IN_RETURN[rId]);
+            u_NOC->o_DATA_OUT  [rId](w_OUT_DATA[rId]);
+            u_NOC->o_VALID_OUT [rId](w_OUT_VALID[rId]);
+            u_NOC->i_RETURN_OUT[rId](w_OUT_RETURN[rId]);
 
-    sc_trace(tf, L_1_0_in_data_wire , "L_1_0_in_data");
-    sc_trace(tf, L_1_0_in_val_wire  , "L_1_0_in_val");
-    sc_trace(tf, L_1_0_in_ret_wire  , "L_1_0_in_ret");
-    sc_trace(tf, L_1_0_out_data_wire, "L_1_0_out_data");
-    sc_trace(tf, L_1_0_out_val_wire , "L_1_0_out_val");
-    sc_trace(tf, L_1_0_out_ret_wire , "L_1_0_out_ret");
+            //------------- Binding StopSim -------------//
+            u_STOP->i_TG_NUM_PACKETS_SENT[rId](w_TG_NUM_PACKETS_SENT[rId]);
+            u_STOP->i_TG_NUM_PACKETS_RECEIVED[rId](w_TG_NUM_PACKETS_RECEIVED[rId]);
+            u_STOP->i_TG_EOT[rId](w_TG_EOT[rId]);
 
-    sc_trace(tf, L_1_1_in_data_wire , "L_1_1_in_data");
-    sc_trace(tf, L_1_1_in_val_wire  , "L_1_1_in_val");
-    sc_trace(tf, L_1_1_in_ret_wire  , "L_1_1_in_ret");
-    sc_trace(tf, L_1_1_out_data_wire, "L_1_1_out_data");
-    sc_trace(tf, L_1_1_out_val_wire , "L_1_1_out_val");
-    sc_trace(tf, L_1_1_out_ret_wire , "L_1_1_out_ret");
+        }
+    }
 
-    sc_trace(tf, TG_0_0_eot_wire    , "TG_0_0_eot");
-    sc_trace(tf, TG_0_1_eot_wire    , "TG_0_1_eot");
-    sc_trace(tf, TG_1_0_eot_wire    , "TG_1_0_eot");
-    sc_trace(tf, TG_1_1_eot_wire    , "TG_1_1_eot");
+    sc_trace_file *tf = NULL;
+    if( TRACE ) {
+        tf=sc_create_vcd_trace_file("system");
+        // Signal tracing
+        sc_trace(tf, w_CLK, "CLK");
+        sc_trace(tf, w_RST, "RST");
+        sc_trace(tf, w_EOS, "EOS");
+        sc_trace(tf, w_GLOBAL_CLOCK, "GLOBAL_CLK");
+        for( unsigned short x = 0; x < X_SIZE; x++ ) {
+            for( unsigned short y = 0; y < Y_SIZE; y++ ) {
+                // Get the router ID according X and Y network position to configure the system
+                unsigned short rId = COORDINATE_TO_ID(x,y);
+                // Assembling signal names to trace
+                char strDataIn[20];
+                sprintf(strDataIn,"L_DATA_IN_%u_%u",x,y);
+                char strValIn[20];
+                sprintf(strValIn,"L_VAL_IN_%u_%u",x,y);
+                char strRetIn[20];
+                sprintf(strRetIn,"L_RET_IN_%u_%u",x,y);
+                char strDataOut[20];
+                sprintf(strDataOut,"L_DATA_OUT_%u_%u",x,y);
+                char strValOut[20];
+                sprintf(strValOut,"L_VAL_OUT_%u_%u",x,y);
+                char strRetOut[20];
+                sprintf(strRetOut,"L_RET_OUT_%u_%u",x,y);
+                char strTgEOT[15];
+                sprintf(strTgEOT,"TG_%u_%u_EOT",x,y);
+
+                // Add to trace
+                sc_trace(tf,w_IN_DATA[rId],strDataIn);
+                sc_trace(tf,w_IN_VALID[rId],strValIn);
+                sc_trace(tf,w_IN_RETURN[rId],strRetIn);
+                sc_trace(tf,w_OUT_DATA[rId],strDataOut);
+                sc_trace(tf,w_OUT_VALID[rId],strValOut);
+                sc_trace(tf,w_OUT_RETURN[rId],strRetOut);
+                sc_trace(tf,w_TG_EOT[rId],strTgEOT);
+            }
+        }
+    }
 
     std::cout << "\n\n\n//////////////////////////////////////////////" << std::endl;
     std::cout << "////////////// SoCIN Simulator  //////////////" << std::endl;
@@ -335,7 +219,9 @@ int sc_main(int argc, char* argv[]) {
     // Start the simulation (the testbench will stop it)
     sc_start();
 
-    sc_close_vcd_trace_file(tf);
+    if(TRACE) {
+        sc_close_vcd_trace_file(tf);
+    }
 
     delete PLUGIN_MANAGER;
 

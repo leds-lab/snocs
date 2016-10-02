@@ -2,8 +2,6 @@
 #include "../Router/Router.h"
 #include "../PluginManager/PluginManager.h"
 
-#define COORDINATE_TO_ID(x,y) (y * X_SIZE + x)
-
 ///////////////////////////////////////////////////////////////
 /// \brief SoCIN::SoCIN Constructor that instantiate the routers
 /// and made the connections between the routers in a Mesh 2D

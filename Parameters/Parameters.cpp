@@ -6,6 +6,9 @@ Parameters* Parameters::params = 0; // Defining and initializing
 Parameters::Parameters() {
     pm = new PluginManager();
 // Default values
+    clkPeriod = 1;
+    traceSystem = true;
+
     xSize = 3;
     ySize = 3;
     wordWidth = 34;
@@ -17,6 +20,9 @@ Parameters::Parameters() {
 Parameters::Parameters(const Parameters &c) {
     this->pm = c.pm;
 
+    this->clkPeriod = c.clkPeriod;
+    this->traceSystem = c.traceSystem;
+
     this->xSize = c.xSize;
     this->ySize = c.ySize;
     this->wordWidth = c.wordWidth;
@@ -26,8 +32,10 @@ Parameters::Parameters(const Parameters &c) {
 }
 
 Parameters& Parameters::operator = (const Parameters& c) {
-
     this->pm = c.pm;
+
+    this->clkPeriod = c.clkPeriod;
+    this->traceSystem = c.traceSystem;
 
     this->xSize = c.xSize;
     this->ySize = c.ySize;

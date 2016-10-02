@@ -30,6 +30,7 @@ class PluginManager;
 
 // System info
 #define CLK_PERIOD PARAMS->clkPeriod        // Clock period
+#define TRACE PARAMS->traceSystem           // Generate system waveform
 // Network info
 #define X_SIZE PARAMS->xSize                // Network X dimension
 #define Y_SIZE PARAMS->ySize                // Network Y dimension
@@ -59,6 +60,7 @@ public:
     // Attributes
     // System info
     float clkPeriod;
+    bool traceSystem;
     // Network info
     unsigned short xSize;
     unsigned short ySize;

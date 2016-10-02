@@ -153,12 +153,11 @@ void tm_single::p_probe()
 void tm_single::p_stop()
 ////////////////////////////////////////////////////////////////////////////////
 {
-    while (1) {
-        if (eos.read()==1) {
-            fprintf(fp_out,"\n#");
-            fprintf(fp_out," %lu", (unsigned long int) clock_cycles.read());
-            fclose(fp_out);
-        }
-        wait();
+    if (eos.read()==1) {
+        fprintf(fp_out,"\n#");
+        char buff[20];
+        lltoa(clock_cycles.read(),buff,10);
+        fprintf(fp_out," %s", buff);
+        fclose(fp_out);
     }
 }
