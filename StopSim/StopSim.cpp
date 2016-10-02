@@ -94,11 +94,13 @@ void StopSim::p_STOP() {
         std::cout << ")" << std::endl;
 #endif // DEBUG_STOPSIM
 
-//        wait();
         if (stopTime_cycles == 0) {
             if (w_EOT.read() == 1) {
                 if (r_TOTAL_PACKETS_SENT.read()==r_TOTAL_PACKETS_RECEIVED.read()) {
-                    fprintf(fp_out,"%lu", i_CLK_CYCLES.read());
+                    // lltoa is used only to not generate warning on fprintf format to long long
+                    char buff[20];
+                    lltoa(i_CLK_CYCLES.read(),buff,10);
+                    fprintf(fp_out,"%s", buff);
                     fclose(fp_out);
                     o_EOS.write(1);
                     wait();
@@ -107,7 +109,10 @@ void StopSim::p_STOP() {
             }
         } else {
             if (i_CLK_CYCLES.read() >= stopTime_cycles) {
-                fprintf(fp_out,"%lu", i_CLK_CYCLES.read());
+                // lltoa is used only to not generate warning on fprintf format to long long
+                char buff[20];
+                lltoa(i_CLK_CYCLES.read(),buff,10);
+                fprintf(fp_out,"%s", buff);
                 fclose(fp_out);
                 o_EOS.write(1);
                 wait();
