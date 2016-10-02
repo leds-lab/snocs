@@ -8,7 +8,10 @@ DESTDIR = ../plugins
 QMAKE_LFLAGS += -fPIC
 DEFINES += PLUGIN
 
+include(resources.pri)
+
 unix {
     target.path = /usr/lib/socin
     INSTALLS += target
 }
+

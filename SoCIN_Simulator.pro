@@ -44,6 +44,7 @@ OTHER_FILES += \
     app.pri \
     common.pri \
     plugin.pri \
+    resources.pri \
     export.h \
     SoCINModule.h \
     SoCINDefines.h \

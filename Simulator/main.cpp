@@ -38,7 +38,7 @@ const char* SETUP_MESSAGES[] =
  * \return Zero if all configurations successfully performed. A positive number with the index of message error.
  */
 unsigned int setupSimulator(int argc, char* argv[]) {
-    // TODO: Fazer parse para obter configurações do sistema
+    // TODO: Fazer parse para obter configurações do sistema (X_SIZE, Y_SIZE, FLIT_WIDTH, TRACE...)
     X_SIZE = 2;
     Y_SIZE = 2;
 
