@@ -97,10 +97,7 @@ void StopSim::p_STOP() {
         if (stopTime_cycles == 0) {
             if (w_EOT.read() == 1) {
                 if (r_TOTAL_PACKETS_SENT.read()==r_TOTAL_PACKETS_RECEIVED.read()) {
-                    // lltoa is used only to not generate warning on fprintf format to long long
-                    char buff[20];
-                    lltoa(i_CLK_CYCLES.read(),buff,10);
-                    fprintf(fp_out,"%s", buff);
+                    fprintf(fp_out,"%llu", i_CLK_CYCLES.read());
                     fclose(fp_out);
                     o_EOS.write(1);
                     wait();
@@ -110,9 +107,7 @@ void StopSim::p_STOP() {
         } else {
             if (i_CLK_CYCLES.read() >= stopTime_cycles) {
                 // lltoa is used only to not generate warning on fprintf format to long long
-                char buff[20];
-                lltoa(i_CLK_CYCLES.read(),buff,10);
-                fprintf(fp_out,"%s", buff);
+                fprintf(fp_out,"%%llu", i_CLK_CYCLES.read());
                 fclose(fp_out);
                 o_EOS.write(1);
                 wait();
