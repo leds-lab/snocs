@@ -57,13 +57,13 @@ ParIS::ParIS(sc_module_name mn,
         IOutputFlowControl* u_OFC = PLUGIN_MANAGER->outputFlowControlInstance(strOFC,XID,YID,i,CREDIT);
 
         // Instantiate internal units
-        u_XIN[i] = new XIN(strXIN,u_i_MEM,u_ROUTING,u_IFC,nPorts,XID,YID,i);
-        u_XOUT[i] = new XOUT(strXOUT,u_o_MEM,u_ARBITER,u_OFC,nPorts,XID,YID,i);
+        u_XIN[i] = new XIN_none_VC(strXIN,u_i_MEM,u_ROUTING,u_IFC,nPorts,XID,YID,i);
+        u_XOUT[i] = new XOUT_none_VC(strXOUT,u_o_MEM,u_ARBITER,u_OFC,nPorts,XID,YID,i);
     }
 
     // Binding ports
     for( i = 0; i < nPorts; i++ ) {
-        XIN* xin = u_XIN[i];
+        XIN_none_VC* xin = u_XIN[i];
         // Binding XIN
         // System signals
         xin->i_CLK(i_CLK);
@@ -82,7 +82,7 @@ ParIS::ParIS(sc_module_name mn,
         xin->i_X_IDLE(w_IDLE);
         xin->o_X_DATA(w_DATA[i]);
 
-        XOUT* xout = u_XOUT[i];
+        XOUT_none_VC* xout = u_XOUT[i];
         // Bindig XOUT
         // System signals
         xout->i_CLK(i_CLK);
@@ -180,11 +180,11 @@ ParIS::~ParIS() {
     sc_close_vcd_trace_file(tf);
 #endif
     for(unsigned short i = 0; i < numPorts; i++) {
-        XIN* xin = u_XIN[i];
+        XIN_none_VC* xin = u_XIN[i];
         if(xin) {
             delete xin;
         }
-        XOUT* xout = u_XOUT[i];
+        XOUT_none_VC* xout = u_XOUT[i];
         if(xout) {
             delete xout;
         }

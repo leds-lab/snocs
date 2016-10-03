@@ -48,8 +48,8 @@ public:
     sc_vector<sc_in<bool> >  i_RETURN_OUT;  // Return of output channels
 
     // Internal Units - a router is composed by Input and Output modules
-    std::vector<XIN*>  u_XIN;
-    std::vector<XOUT*> u_XOUT;
+    std::vector<XIN_none_VC*>  u_XIN;
+    std::vector<XOUT_none_VC*> u_XOUT;
 
     // Internal data structures
     unsigned short XID,YID;

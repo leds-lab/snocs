@@ -42,7 +42,7 @@ inline MultiplexerTestbench<DATA_TYPE>::MultiplexerTestbench(sc_module_name mn,
     : sc_module(mn) , numPorts(nPorts) {
 
     if( BinaryMux<DATA_TYPE>* m = dynamic_cast<BinaryMux<DATA_TYPE>*>(mux) ) {
-        selSize = (unsigned short) log2(nPorts);
+        selSize = (unsigned short) ceil(log2(nPorts));
     } else {
         selSize = nPorts;
     }

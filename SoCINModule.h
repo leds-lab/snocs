@@ -111,7 +111,7 @@ public:
                       Arbiter,
                       Memory,
                       PriorityGenerator,
-                      PriorityEncoder,
+                      PriEncoder,
                       NetworkInterface,
                       Switch,
                       IC,

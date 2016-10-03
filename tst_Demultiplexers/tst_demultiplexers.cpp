@@ -39,7 +39,7 @@ inline DemultiplexerTestbench<DATA_TYPE>::DemultiplexerTestbench(sc_module_name 
     : sc_module(mn) , numPorts(nPorts) {
 
     if( BinaryDemux<DATA_TYPE>* dem = dynamic_cast<BinaryDemux<DATA_TYPE>*>(demux) ) {
-        selSize = (unsigned short) log2(nPorts);
+        selSize = (unsigned short) ceil(log2(nPorts));
     } else {
         selSize = nPorts;
     }

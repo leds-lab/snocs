@@ -137,7 +137,7 @@ public:
     BinaryDemux(sc_module_name mn, unsigned short numPorts)
         : IDemultiplexer<DATA_TYPE>(mn,numPorts)
     {
-        selSize = (unsigned short) log2(numPorts);
+        selSize = (unsigned short) ceil(log2(numPorts));
         this->i_SEL.init( selSize );
         SC_METHOD(p_OUTPUTS);
         this->sensitive << this->i_DATA;

@@ -132,7 +132,7 @@ public:
     BinaryMux(sc_module_name mn, unsigned short numPorts)
         : IMultiplexer<DATA_TYPE>(mn,numPorts)
     {
-        selSize = (unsigned short) log2(numPorts);
+        selSize = (unsigned short) ceil(log2(numPorts));
         this->i_SEL.init( selSize );
         SC_METHOD(p_OUTPUT);
         for( unsigned short i = 0; i < selSize; i++ ) {
