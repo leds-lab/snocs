@@ -45,8 +45,6 @@ public:
           i_DATA("IMux_iDATA",nPorts),
           o_DATA("IMux_oDATA") {}
 
-//    inline ModuleType moduleType() const { return SoCINModule::Switch; }
-
     ~IMultiplexer() = 0;
 };
 template<class DATA_TYPE>

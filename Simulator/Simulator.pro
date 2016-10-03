@@ -36,3 +36,5 @@ HEADERS += \
     ofc_handshake.h \
     tg.h \
     tm_single.h
+
+OTHER_FILES += simconf.conf

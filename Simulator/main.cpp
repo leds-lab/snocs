@@ -189,6 +189,8 @@ int sc_main(int argc, char* argv[]) {
 
     // ------------------- Establishing system -------------------
 
+    printf("\nTclk = %.0f ns", CLK_PERIOD);
+
     // System signals
     sc_clock                      w_CLK("CLK", CLK_PERIOD, SC_NS); // System clock | Tclk=1 ns
     sc_signal<bool>               w_RST;                           // Reset

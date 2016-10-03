@@ -17,7 +17,6 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __DEMULTIPLEXERS_H__
 #define __DEMULTIPLEXERS_H__
 
-//#include "../SoCINModule.h"
 #include <systemc>
 using namespace sc_core;
 
@@ -46,8 +45,6 @@ public:
           i_DATA("IDemux_iDATA"),
           o_DATA("IDemux_oDATA",nPorts) {}
 
-//    inline ModuleType moduleType() const { return SoCINModule::Switch; }
-
     ~IDemultiplexer() = 0;
 };
 template<class DATA_TYPE>
@@ -72,12 +69,13 @@ class OneHotDemux : public IDemultiplexer<DATA_TYPE> {
 public:
     // Module's process
     void p_OUTPUTS() {
+        DATA_TYPE dNull = 0;
         unsigned short i;       // Loop iterator
         for( i = 0; i < this->numPorts; i++ ) {
             if( this->i_SEL[i].read() == 1 ) {
                 this->o_DATA[i].write(this->i_DATA.read());
             } else {
-                this->o_DATA[i].write(0);
+                this->o_DATA[i].write(dNull);
             }
         }
     }
@@ -93,8 +91,6 @@ public:
             this->sensitive << this->i_SEL[i];
         }
     }
-
-//    const char* moduleName() const { return "OneHotDemux"; }
 
     ~OneHotDemux() {}
 };
@@ -120,6 +116,7 @@ public:
 
     // Module's process
     void p_OUTPUTS() {
+        DATA_TYPE dNull = 0;
         unsigned short i;       // Loop iterator
         unsigned short sel = 0; // Output selected
         for( i = this->selSize-1; i != 0; i-- ) {
@@ -131,7 +128,7 @@ public:
             if( i == sel ) {
                 this->o_DATA[i].write(this->i_DATA.read());
             } else {
-                this->o_DATA[i].write(0);
+                this->o_DATA[i].write(dNull);
             }
         }
     }
@@ -148,8 +145,6 @@ public:
             this->sensitive << this->i_SEL[i];
         }
     }
-
-//    inline const char* moduleName() const { return "BinaryDemux"; }
 
     ~BinaryDemux() {}
 };
