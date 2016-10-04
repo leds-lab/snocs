@@ -42,7 +42,7 @@ unsigned int setupSimulator(int argc, char* argv[]) {
     X_SIZE = 2;
     Y_SIZE = 2;
 
-    NUM_VC = 3;
+    NUM_VC = 0;
 
     if( NUM_VC == 1 ) NUM_VC = 2; // 1 VC is not accepted by the model because vcWidth = ceil(log2(NUM_VC)) == 0
 
@@ -325,7 +325,8 @@ int sc_main(int argc, char* argv[]) {
             u_TG->eot(w_TG_EOT[rId]);
             u_TG->number_of_packets_sent(w_TG_NUM_PACKETS_SENT[rId]);
             u_TG->number_of_packets_received(w_TG_NUM_PACKETS_RECEIVED[rId]);
-            u_TG->o_VC(w_IN_VC_SEL[rId]);
+            if(NUM_VC>0)
+                u_TG->o_VC(w_IN_VC_SEL[rId]);
 
             //------------- Binding TM -------------//
             u_TM->clk(w_CLK);
@@ -335,7 +336,8 @@ int sc_main(int argc, char* argv[]) {
             u_TM->data(w_OUT_DATA[rId]);
             u_TM->val(w_OUT_VALID[rId]);
             u_TM->ret(w_OUT_RETURN[rId]);
-            u_TM->i_VC_SEL(w_OUT_VC_SEL[rId]);
+            if(NUM_VC>0)
+                u_TM->i_VC_SEL(w_OUT_VC_SEL[rId]);
 
             //------------- Binding NoC -------------//
             u_NOC->i_DATA_IN   [rId](w_IN_DATA[rId]);

@@ -83,8 +83,10 @@ SC_MODULE(tg) {
     {
 //        SC_METHOD(p_debug);
 //        sensitive << clk.pos();
+        if(NUM_VC>0) {
+            o_VC.init( ceil(log2(NUM_VC)) );
+        }
 
-        o_VC.init( ceil(log2(NUM_VC)) );
         //////////////////////////////////
         fg *fg0 = new fg("fg0", XID, YID);
         //////////////////////////////////
@@ -100,7 +102,8 @@ SC_MODULE(tg) {
         fg0->eot(eot);
         fg0->number_of_packets_sent(number_of_packets_sent);
         fg0->number_of_packets_received(number_of_packets_received);
-        fg0->o_VC(o_VC);
+        if(NUM_VC>0)
+            fg0->o_VC(o_VC);
 
 #ifndef USE_UNBOUNDED_FIFO
         ///////////////////////////////////////////////////////////

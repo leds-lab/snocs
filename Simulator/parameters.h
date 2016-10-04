@@ -26,8 +26,8 @@ Last update on: October 29th, 2006.
 ////////////////////////////// ROUTER PARAMETERS ///////////////////////////////
 // MECHANISMS TYPES
 #define ROUTING_TYPE        0
-#define FC_TYPE             1
-#define ARBITER_TYPE        2 // 0: RR | 1: Static | 2: Rotative | 3,4,5,6: Random - Don't use randoms to bus
+#define FC_TYPE             1 // 0: Handshake | 1: Credit-based
+#define ARBITER_TYPE        0 // 0: RR | 1: Static | 2: Rotative | 3,4,5,6: Random - Don't use randoms to bus
 #define SWITCH_TYPE         0
 
 // PACKET FORMAT

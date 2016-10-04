@@ -85,7 +85,9 @@ SC_MODULE(fg)
     //////////////////////////////////////////////////////////////////////////////
     {
         vcWidth = (unsigned short) ceil(log2(NUM_VC));
-        o_VC.init( vcWidth );
+        if(vcWidth>0) {
+            o_VC.init( vcWidth );
+        }
         SC_CTHREAD(p_send, clk.pos());
         sensitive << clk.pos() << rst.pos();
 

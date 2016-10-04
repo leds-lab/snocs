@@ -89,7 +89,9 @@ SC_MODULE(tm_single)
       //////////////////////////////////////////////////////////////////////////////
     {
         vcWidth = (unsigned short) ceil(log2(NUM_VC));
-        i_VC_SEL.init(vcWidth);
+        if(vcWidth > 0) {
+            i_VC_SEL.init(vcWidth);
+        }
 
         SC_CTHREAD(p_probe, clk.pos());
         sensitive << clk.pos() << rst.pos();
