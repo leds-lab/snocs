@@ -10,6 +10,8 @@
 
 #include <systemc>
 
+#include <ctime>
+
 using namespace sc_core;
 using namespace sc_dt;
 
@@ -170,6 +172,30 @@ void generateListNodesGtkwave() {
 
 }
 
+////////////////////////////////////////////////////////////////////////////////
+char *print_time(unsigned long long total_sec)
+////////////////////////////////////////////////////////////////////////////////
+{
+    char* str = new char[256];
+    unsigned int hours, mins, secs;
+
+    hours = (unsigned int)( total_sec/3600);
+    mins  = (unsigned int)((total_sec - hours*3600)/60);
+    secs  = (unsigned int)( total_sec - hours*3600 - mins*60);
+
+    if (hours) {
+//		sprintf(str," %d hour, %d min and %d sec (i.e. %llu seconds) ",hours, mins, secs, total_sec);
+        sprintf(str," %d hour, %d min and %d sec ",hours, mins, secs);
+    } else {
+        if (mins) {
+            sprintf(str," %d min and %d sec ",mins, secs);
+        } else {
+            sprintf(str," %d sec",secs);
+        }
+    }
+    return str;
+}
+
 int sc_main(int argc, char* argv[]) {
 
     if(argc < 2) {
@@ -243,6 +269,12 @@ int sc_main(int argc, char* argv[]) {
     sc_vector<sc_vector<sc_signal<bool> > > w_IN_VC_SEL("w_IN_VC_SEL");
     sc_vector<sc_vector<sc_signal<bool> > > w_OUT_VC_SEL("w_OUT_VC_SEL");
 
+    // Status signals of the traffic generators attached to the terminals of the NoC
+    sc_vector<sc_signal<bool> >         w_TG_EOT("w_TG_EOT",nRouters);
+    sc_vector<sc_signal<unsigned int> > w_TG_NUM_PACKETS_SENT("w_TG_NUM_PACKETS_SENT",nRouters);
+    sc_vector<sc_signal<unsigned int> > w_TG_NUM_PACKETS_RECEIVED("w_TG_NUM_PACKETS_RECEIVED",nRouters);
+
+    // Configuring wires to virtual channels
     unsigned short vcWidth = 0;
     if( NUM_VC > 0) {
         vcWidth = ceil(log2(NUM_VC));
@@ -253,11 +285,6 @@ int sc_main(int argc, char* argv[]) {
             w_OUT_VC_SEL[r].init(vcWidth);
         }
     }
-
-    // Status signals of the traffic generators attached to the terminals of the NoC
-    sc_vector<sc_signal<bool> >         w_TG_EOT("w_TG_EOT",nRouters);
-    sc_vector<sc_signal<unsigned int> > w_TG_NUM_PACKETS_SENT("w_TG_NUM_PACKETS_SENT",nRouters);
-    sc_vector<sc_signal<unsigned int> > w_TG_NUM_PACKETS_RECEIVED("w_TG_NUM_PACKETS_RECEIVED",nRouters);
 
     // Status signal saying that stopsim is ready to stop simulation
     sc_signal<bool> w_EOS;
@@ -421,7 +448,18 @@ int sc_main(int argc, char* argv[]) {
     std::cout << "//////////////////////////////////////////////" << std::endl << std::endl << std::endl;
 
     // Start the simulation (the StopSim will stop it with sc_stop())
+    time_t start;
+    time_t finish;
+    time(&start);
     sc_start();
+    time(&finish);
+
+    double execTime = difftime(finish,start);
+    char* formattedTime = print_time((unsigned long long) execTime);
+
+    printf("\n\nExecuted in: %s\n\n",formattedTime);
+
+    delete[] formattedTime;
 
     if(TRACE) {
         sc_close_vcd_trace_file(tf);
