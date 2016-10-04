@@ -18,11 +18,13 @@
 
 SC_MODULE(fg)
 {
+    unsigned short vcWidth;
+
     // INTERFACE
     // System signals
-    sc_in_clk                     clk;
-    sc_in<bool>                   rst;
-    sc_in<unsigned long long>          clock_cycles;
+    sc_in<bool>               clk;
+    sc_in<bool>               rst;
+    sc_in<unsigned long long> clock_cycles;
 
     // Interface to the VCs of the communication port (its is done by means of FIFOs)
     sc_out<Flit>  snd_data;	// I/F with the output FIFO
@@ -31,6 +33,7 @@ SC_MODULE(fg)
     sc_in<Flit>   rcv_data; // I/F with the input FIFO
     sc_in<bool>   rcv_rok;
     sc_out<bool>  rcv_rd;
+    sc_vector<sc_out<bool> > o_VC; // Virtual channel
 
     // Status signals
     sc_out<bool>                  eot;
@@ -67,8 +70,8 @@ SC_MODULE(fg)
 
     // Member functions
     void f_send_flit(Flit , unsigned int);
-    void f_send_packet(sc_uint<RIB_WIDTH>, unsigned long long, FLOW_TYPE,unsigned long long, unsigned int);
-//    void f_send_burst_of_packets(sc_biguint<FLIT_WIDTH>, unsigned long long, FLOW_TYPE);
+    void f_send_packet(sc_uint<RIB_WIDTH> , unsigned long long, FLOW_TYPE, unsigned long long, unsigned int);
+    void f_send_burst_of_packets(sc_uint<RIB_WIDTH> , unsigned long long, FLOW_TYPE);
 
     SC_HAS_PROCESS(fg);
 
@@ -81,6 +84,8 @@ SC_MODULE(fg)
         YID(YID)
     //////////////////////////////////////////////////////////////////////////////
     {
+        vcWidth = (unsigned short) ceil(log2(NUM_VC));
+        o_VC.init( vcWidth );
         SC_CTHREAD(p_send, clk.pos());
         sensitive << clk.pos() << rst.pos();
 

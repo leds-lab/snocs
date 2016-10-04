@@ -7,10 +7,10 @@
 
 #include "tm_single.h"
 
-#define REQUIRED_BW_POSITION    22
+//#define REQUIRED_BW_POSITION    22
 #define TRAFFIC_CLASS_POSITION	18
 //#define FLOW_ID_POSITION        DATA_WIDTH-2
-#define MIN_PAYLOAD_LENGTH      3
+//#define MIN_PAYLOAD_LENGTH      3
 
 //#define CALC_PERFORMANCE_PARAMETERS
 
@@ -21,16 +21,8 @@ void tm_single::f_write_received_flit(FILE *fp_out)
 //    float               offered_load;
 //    float               accepted_traffic;
     UIntVar	data_tmp;   // Used to extract fields from din
-    bool                bop;        // packet framing bit: begin of packet
-    bool                eop;        // packet framing bit: end of packet
-
-
-    switch (FC_TYPE) {
-        case 0  : nb_of_cycles_per_flit = 4; break;
-        case 1  : nb_of_cycles_per_flit = 1; break;
-        case 2  : nb_of_cycles_per_flit = 1; break;
-        default : break;
-    }
+    bool    bop;        // packet framing bit: begin of packet
+    bool    eop;        // packet framing bit: end of packet
 
     // It extracts the the framing bits
     Flit dF = data.read();
@@ -44,12 +36,12 @@ void tm_single::f_write_received_flit(FILE *fp_out)
 
     if (bop == 1) {
         // It gets the header and extracts the address fields
-        header 			  = (unsigned long long) (data_tmp.to_ulong() & (unsigned long long)(pow(2,FLIT_WIDTH-2)-1));
+        header 			  = (unsigned long long) (data_tmp.to_uint64() & (unsigned long long)(pow(2,FLIT_WIDTH-2)-1));
         x_src  			  = (unsigned int) ((header & X_SRC_MASK ) >> RIB_WIDTH) >> RIB_WIDTH/2;
         y_src             = (unsigned int) ((header & Y_SRC_MASK ) >> RIB_WIDTH);
         x_dest 			  = (unsigned int) ((header & X_DEST_MASK) >> RIB_WIDTH/2);
         y_dest            = (unsigned int) ((header & Y_DEST_MASK));
-        traffic_class 	  = (unsigned int) ((header >> TRAFFIC_CLASS_POSITION)) & 0x3;
+        traffic_class 	  = (unsigned int) ((header >> TRAFFIC_CLASS_POSITION)) & 0x7;
         flow_id           = (unsigned int) ((header >> (FLIT_WIDTH-4) ) & 0x3);
         cycle_of_arriving = (unsigned long long) clock_cycles.read();
     }
@@ -57,22 +49,17 @@ void tm_single::f_write_received_flit(FILE *fp_out)
     if (eop==1) {
         Packet* p = dF.packet_ptr;
         pck_received++;
-            fprintf(fp_out,"%10u\t"  , pck_received);
-        //	scanf(fp_in,"%u",&pck_received)
-//        fprintf(fp_out,"%2u\t"   , x_dest);
-//        fprintf(fp_out,"%2u\t"   , y_dest);
+        fprintf(fp_out,"%10u\t"  , pck_received);
         fprintf(fp_out,"%2u\t"   , x_src);
         fprintf(fp_out,"%2u\t"   , y_src);
         fprintf(fp_out,"%2u\t"   , flow_id);
         fprintf(fp_out,"%2u\t"   , traffic_class);
-        fprintf(fp_out,"%10llu\t" , p->deadline);
-        fprintf(fp_out,"%10llu\t" , p->cycleToSend);
-        fprintf(fp_out,"%10llu\t" , cycle_of_arriving);
-        fprintf(fp_out,"%10llu\t" , (unsigned long long) clock_cycles.read());
+        fprintf(fp_out,"%10llu\t", p->deadline);
+        fprintf(fp_out,"%10llu\t", p->cycleToSend);
+        fprintf(fp_out,"%10llu\t", cycle_of_arriving);
+        fprintf(fp_out,"%10llu\t", (unsigned long long) clock_cycles.read());
         fprintf(fp_out,"%7u\t"   , pck_size-1);  // IT DOES NOT TAKE INTO ACCOUNT THE HEADER
-        //    fprintf(fp_out,"  %.2f\t" ,(round(((float) required_bw) * 100.0)/100.0));
-        //    fprintf(fp_out,"  %.2f\t" ,(round(((float) required_bw) * 100.0)/10000.0));
-        fprintf(fp_out,"  %.0f\t" ,round(((float) p->requiredBW)));
+        fprintf(fp_out,"  %.2f\t" ,round(((float) p->requiredBW)));
         fprintf(fp_out,"\n");
         pck_size = 0;
         delete p;

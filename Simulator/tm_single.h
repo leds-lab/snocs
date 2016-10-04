@@ -12,17 +12,21 @@
 
 SC_MODULE(tm_single)
 {
+
+    unsigned short vcWidth;
     // INTERFACE
     // System signals
-    sc_in_clk           clk;
-    sc_in<bool>         rst;
-    sc_in<bool>         eos;
+    sc_in_clk                 clk;
+    sc_in<bool>               rst;
+    sc_in<bool>               eos;
     sc_in<unsigned long long> clock_cycles;
+
+    sc_vector<sc_in<bool> > i_VC_SEL;
 
     // Communication Port
     sc_in<Flit> data;
-    sc_in<bool>  				val;
-    sc_in<bool>  				ret;
+    sc_in<bool> val;
+    sc_in<bool> ret;
 
     // Internal data structures
     unsigned short int XID, YID;
@@ -84,6 +88,9 @@ SC_MODULE(tm_single)
         FILENAME(FILENAME)
       //////////////////////////////////////////////////////////////////////////////
     {
+        vcWidth = (unsigned short) ceil(log2(NUM_VC));
+        i_VC_SEL.init(vcWidth);
+
         SC_CTHREAD(p_probe, clk.pos());
         sensitive << clk.pos() << rst.pos();
 

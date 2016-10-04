@@ -15,7 +15,7 @@
 #define REQUIRED_BW_POSITION    22
 #define TRAFFIC_CLASS_POSITION  18
 #define PACKET_TYPE_POSITION    16
-//#define FLOW_ID_POSITION        DATA_WIDTH-2
+#define FLOW_ID_POSITION        FLIT_WIDTH-4
 #define MIN_PAYLOAD_LENGTH      4
 
 // Switching types
@@ -31,9 +31,18 @@
 //#define DEBUG
 
 ////////////////////////////////////////////////////////////////////////////////
-void fg::f_send_flit(Flit flit, unsigned int /*traffic_class*/)
+void fg::f_send_flit(Flit flit, unsigned int traffic_class)
 ////////////////////////////////////////////////////////////////////////////////
 {
+    UIntVar v_VC = traffic_class;
+    bool    v_BOP= flit.data[FLIT_WIDTH-2];
+
+    if(v_BOP) {
+        for(unsigned short i = 0; i < vcWidth; i++) {
+            o_VC[i].write(v_VC[i]);
+        }
+    }
+
     snd_wr.write(0);
     snd_data.write(flit);
     snd_wr.write(1);
@@ -48,7 +57,7 @@ void fg::f_send_flit(Flit flit, unsigned int /*traffic_class*/)
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void fg::f_send_packet(sc_uint<RIB_WIDTH> id, unsigned long long cycle_to_send, FLOW_TYPE flow,
+void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send, FLOW_TYPE flow,
                        unsigned long long payload_length, unsigned int packet_type)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 {
@@ -71,16 +80,16 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> id, unsigned long long cycle_to_send, 
     // It calculates the address of the destination node
     dest = (sc_uint<RIB_WIDTH>)(flow.x_dest << (RIB_WIDTH/2) | flow.y_dest);
 
-    UIntVar framing;
+    UIntVar framing = 0;
     framing[ FLIT_WIDTH-2 ] = 1;
 
     // It sends the header
 //    flit = ( sc_biguint<FLIT_WIDTH> ) ( (unsigned long long) ( (((unsigned long long)HEADER_FRAME)<<(FLIT_WIDTH-2))
     flit =  ( (framing)
-              | ((flow.flow_id &0x3) << (FLIT_WIDTH - 4) )
-              | ((flow.traffic_class & 0x3) << TRAFFIC_CLASS_POSITION)
+              | ((flow.flow_id &0x3) << (FLOW_ID_POSITION) )
+              | ((flow.traffic_class & 0x7) << TRAFFIC_CLASS_POSITION)
               | ((packet_type & 0x3) << PACKET_TYPE_POSITION)
-              | (id << RIB_WIDTH)
+              | (rib << RIB_WIDTH)
               | dest );
 
     Flit headerFlit;
@@ -88,27 +97,12 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> id, unsigned long long cycle_to_send, 
     headerFlit.packet_ptr = packet;
     f_send_flit(headerFlit, flow.traffic_class); // Send header
 
-//    std::cout << "FG(send) - Header - Framing: " << framing.to_string(SC_HEX_US,false)
-//              << ", F.data: " << headerFlit.data.to_string(SC_HEX_US,false)
-//              << ", GLOBAL_WIDTH: " << FLIT_WIDTH << std::endl;
-
-//    FlitExtra extra;
-//    extra.data = 0xFFFF;
-//    extra.p_packet = packet;
-//    extra.dataExtra = 0xAAAA;
-//    f_send_flit(extra, flow.traffic_class);
-
     // It sends the trailer flit: the lowest word with "Ola" string
     char msg[4] = "Ola"; // 4 bytes -> [0]: O , [1]: l, [2]: a, [3]: \0
     framing = 0;
     framing[FLIT_WIDTH-1] = 1;
-
-//    flit = (sc_biguint<FLIT_WIDTH>) (((unsigned long long)TRAILER_FRAME<<(FLIT_WIDTH-2))
-    flit = ( framing
-            | (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
-
-//    std::cout << "FG(send) - Trailer - Framing: " << framing.to_string(SC_HEX_US,false)
-//              << ", Flit: " << flit.to_string(SC_HEX_US,false) << std::endl;
+    //   =   Trailer | ASCI:  O       |        L       |       A       |   \0
+    flit = ( framing | (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
 
     Flit trailer;
     trailer.data = flit;
@@ -118,9 +112,8 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> id, unsigned long long cycle_to_send, 
     pck_id++;
 }
 
-/*
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void fg::f_send_burst_of_packets(sc_biguint<FLIT_WIDTH> header, unsigned long long cycle_to_send, FLOW_TYPE flow)
+void fg::f_send_burst_of_packets(sc_uint<RIB_WIDTH> header, unsigned long long cycle_to_send, FLOW_TYPE flow)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 {
     unsigned int i;
@@ -139,7 +132,7 @@ void fg::f_send_burst_of_packets(sc_biguint<FLIT_WIDTH> header, unsigned long lo
     if (flow.last_payload_length!=0)
         f_send_packet(header, cycle_to_send, flow, flow.last_payload_length, NORMAL);
 }
-*/
+
 ////////////////////////////////////////////////////////////////////////////////
 void fg::p_send()
 ////////////////////////////////////////////////////////////////////////////////
@@ -390,7 +383,7 @@ void fg::p_send()
             // SENDING PACKETS IN A BURST
             if (flow[flow_index].burst_size != 0) {
                 // It sends a burst of packets
-//                f_send_burst_of_packets(id, cycle_to_send_next_pck, flow[flow_index]);
+                f_send_burst_of_packets(id, cycle_to_send_next_pck, flow[flow_index]);
                 snd_wr.write(0);
                 snd_data.write(fNull);
 

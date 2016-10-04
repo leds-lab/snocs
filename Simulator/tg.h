@@ -39,6 +39,7 @@ SC_MODULE(tg) {
     sc_out<unsigned int>    number_of_packets_sent;
     sc_out<unsigned int>    number_of_packets_received;
 
+    sc_vector<sc_out<bool> > o_VC;
 
     // Internal signals
     sc_signal<Flit> snd_data_wire;
@@ -83,6 +84,7 @@ SC_MODULE(tg) {
 //        SC_METHOD(p_debug);
 //        sensitive << clk.pos();
 
+        o_VC.init( ceil(log2(NUM_VC)) );
         //////////////////////////////////
         fg *fg0 = new fg("fg0", XID, YID);
         //////////////////////////////////
@@ -98,6 +100,7 @@ SC_MODULE(tg) {
         fg0->eot(eot);
         fg0->number_of_packets_sent(number_of_packets_sent);
         fg0->number_of_packets_received(number_of_packets_received);
+        fg0->o_VC(o_VC);
 
 #ifndef USE_UNBOUNDED_FIFO
         ///////////////////////////////////////////////////////////

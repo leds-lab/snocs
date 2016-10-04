@@ -77,31 +77,7 @@ inline void VcPriorityEncoder::p_PRIORITY() {
         v_REQUEST[i] = v_TMP;
     }
     v_REQUEST[0] = i_REQUEST[0].read();
-/* // Original code to priority encoder of 8 virtual channels - 8 requests 1-bit -> grant 3-bit
-    sc_uint<3> t_sel;
-    bool t_REQ1;
-    bool t_REQ2;
-    bool t_REQ3;
-    bool t_REQ4;
-    bool t_REQ5;
-    bool t_REQ6;
-    bool t_REQ7;
 
-    t_REQ1=( not i_REQ0.read()  and i_REQ1.read());
-    t_REQ2=((not i_REQ0.read()) and (not i_REQ1.read()) and i_REQ2.read());
-    t_REQ3=((not i_REQ0.read()) and (not i_REQ1.read()) and (not i_REQ2.read()) and i_REQ3.read());
-    t_REQ4=((not i_REQ0.read()) and (not i_REQ1.read()) and (not i_REQ2.read()) and (not i_REQ3.read()) and i_REQ4.read());
-    t_REQ5=((not i_REQ0.read()) and (not i_REQ1.read()) and (not i_REQ2.read()) and (not i_REQ3.read()) and (not i_REQ4.read()) and i_REQ5.read());
-    t_REQ6=((not i_REQ0.read()) and (not i_REQ1.read()) and (not i_REQ2.read()) and (not i_REQ3.read()) and (not i_REQ4.read()) and (not i_REQ5.read()) and i_REQ6.read());
-    t_REQ7=((not i_REQ0.read()) and (not i_REQ1.read()) and (not i_REQ2.read()) and (not i_REQ3.read()) and (not i_REQ4.read()) and (not i_REQ5.read()) and (not i_REQ6.read()) and i_REQ7.read());
-
-    t_sel[0] = (t_REQ1 | t_REQ3 | t_REQ5 | t_REQ7);
-    t_sel[1] = (t_REQ2 | t_REQ3 | t_REQ6 | t_REQ7);
-    t_sel[2] = (t_REQ4 | t_REQ5 | t_REQ6 | t_REQ7);
-
-    o_GNT.write(t_sel);
-*/
-    // WARNING: Verificar como escalar a solução para outras dimensões
     // RT solution - exclusive for 8 virtual channels | 8 requests
     if(numPorts==8) {
         v_GRANT[0] = v_REQUEST[1] | v_REQUEST[3] | v_REQUEST[5] | v_REQUEST[7];
@@ -117,9 +93,6 @@ inline void VcPriorityEncoder::p_PRIORITY() {
         }
     }
 
-    std::cout << "\n[Pri_Encoder] - Req:  "
-              << v_REQUEST.to_string(SC_BIN_US)
-              << " | Grant: " << v_GRANT.to_string(SC_BIN_US);
     for(i = 0; i < widthVcSelector; i++) {
         o_GRANT[i].write(v_GRANT[i]);
     }

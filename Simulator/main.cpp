@@ -42,7 +42,7 @@ unsigned int setupSimulator(int argc, char* argv[]) {
     X_SIZE = 2;
     Y_SIZE = 2;
 
-    NUM_VC = 1;
+    NUM_VC = 3;
 
     if( NUM_VC == 1 ) NUM_VC = 2; // 1 VC is not accepted by the model because vcWidth = ceil(log2(NUM_VC)) == 0
 
@@ -94,16 +94,16 @@ void generateListNodesGtkwave() {
     unsigned short x_size = X_SIZE;
     unsigned short y_size = Y_SIZE;
     unsigned short flit_width = FLIT_WIDTH;
-    unsigned short x,y;   // Loop counters
+    unsigned short vcWidth = ceil(log2(NUM_VC));
+    unsigned short x,y,vcBit;   // Loop counters
 
     fprintf(out,"[timestart] 0");
     fprintf(out,"\n@200");
     fprintf(out,"\n-System-Signals");
     fprintf(out,"\n@22");
     fprintf(out,"\nSystemC.GLOBAL_CLK[63:0]");
-    fprintf(out,"\n@29");
-    fprintf(out,"\nSystemC.CLK");
     fprintf(out,"\n@28");
+    fprintf(out,"\nSystemC.CLK");
     fprintf(out,"\nSystemC.RST");
     fprintf(out,"\n@200");
     fprintf(out,"\n-Core-Connections");
@@ -111,12 +111,41 @@ void generateListNodesGtkwave() {
     for( x = 0; x < x_size; x++) {
         for( y = 0; y < y_size; y++) {
             fprintf(out,"\n-Core_%u_%u",x,y);
+            // For virtual channel in selector
+            if(NUM_VC > 0) {
+                fprintf(out,"\n@c00028");
+                fprintf(out,"\n#{SystemC.L_VC_SEL_IN_%u_%u([%u:0])}",x,y,vcWidth-1);
+                for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
+                    fprintf(out," SystemC.L_VC_SEL_IN_%u_%u(%u)",x,y,vcBit);
+                }
+                fprintf(out,"\n@28");
+                for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
+                    fprintf(out,"\nSystemC.L_VC_SEL_IN_%u_%u(%u)",x,y,vcBit);
+                }
+                fprintf(out,"\n@1401200");
+                fprintf(out,"\n-group_end");
+            }
 
             fprintf(out,"\n@28");
             fprintf(out,"\nSystemC.L_VAL_IN_%u_%u",x,y);
             fprintf(out,"\nSystemC.L_RET_IN_%u_%u",x,y);
             fprintf(out,"\n@22");
             fprintf(out,"\nSystemC.L_DATA_IN_%u_%u[%u:0]",x,y,flit_width-1);
+
+            // For virtual channel out selector
+            if(NUM_VC > 0) {
+                fprintf(out,"\n@c00028");
+                fprintf(out,"\n#{SystemC.L_VC_SEL_OUT_%u_%u([%u:0])}",x,y,vcWidth-1);
+                for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
+                    fprintf(out," SystemC.L_VC_SEL_OUT_%u_%u(%u)",x,y,vcBit);
+                }
+                fprintf(out,"\n@28");
+                for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
+                    fprintf(out,"\nSystemC.L_VC_SEL_OUT_%u_%u(%u)",x,y,vcBit);
+                }
+                fprintf(out,"\n@1401200");
+                fprintf(out,"\n-group_end");
+            }
 
             fprintf(out,"\n@28");
             fprintf(out,"\nSystemC.L_VAL_OUT_%u_%u",x,y);
@@ -214,10 +243,11 @@ int sc_main(int argc, char* argv[]) {
     sc_vector<sc_vector<sc_signal<bool> > > w_IN_VC_SEL("w_IN_VC_SEL");
     sc_vector<sc_vector<sc_signal<bool> > > w_OUT_VC_SEL("w_OUT_VC_SEL");
 
+    unsigned short vcWidth = 0;
     if( NUM_VC > 0) {
+        vcWidth = ceil(log2(NUM_VC));
         w_IN_VC_SEL.init(nRouters);
         w_OUT_VC_SEL.init(nRouters);
-        unsigned short vcWidth = ceil(log2(NUM_VC));
         for( unsigned int r = 0; r < nRouters; r++ ) {
             w_IN_VC_SEL[r].init(vcWidth);
             w_OUT_VC_SEL[r].init(vcWidth);
@@ -295,6 +325,7 @@ int sc_main(int argc, char* argv[]) {
             u_TG->eot(w_TG_EOT[rId]);
             u_TG->number_of_packets_sent(w_TG_NUM_PACKETS_SENT[rId]);
             u_TG->number_of_packets_received(w_TG_NUM_PACKETS_RECEIVED[rId]);
+            u_TG->o_VC(w_IN_VC_SEL[rId]);
 
             //------------- Binding TM -------------//
             u_TM->clk(w_CLK);
@@ -304,6 +335,7 @@ int sc_main(int argc, char* argv[]) {
             u_TM->data(w_OUT_DATA[rId]);
             u_TM->val(w_OUT_VALID[rId]);
             u_TM->ret(w_OUT_RETURN[rId]);
+            u_TM->i_VC_SEL(w_OUT_VC_SEL[rId]);
 
             //------------- Binding NoC -------------//
             u_NOC->i_DATA_IN   [rId](w_IN_DATA[rId]);
@@ -312,6 +344,10 @@ int sc_main(int argc, char* argv[]) {
             u_NOC->o_DATA_OUT  [rId](w_OUT_DATA[rId]);
             u_NOC->o_VALID_OUT [rId](w_OUT_VALID[rId]);
             u_NOC->i_RETURN_OUT[rId](w_OUT_RETURN[rId]);
+            if( u_NOC_VC ) {
+                u_NOC_VC->i_VC_SELECTOR[rId](w_IN_VC_SEL[rId]);
+                u_NOC_VC->o_VC_SELECTOR[rId](w_OUT_VC_SEL[rId]);
+            }
 
             //------------- Binding StopSim -------------//
             u_STOP->i_TG_NUM_PACKETS_SENT[rId](w_TG_NUM_PACKETS_SENT[rId]);
@@ -333,6 +369,7 @@ int sc_main(int argc, char* argv[]) {
             for( unsigned short y = 0; y < Y_SIZE; y++ ) {
                 // Get the router ID according X and Y network position to configure the system
                 unsigned short rId = COORDINATE_TO_ID(x,y);
+
                 // Assembling signal names to trace
                 char strDataIn[20];
                 sprintf(strDataIn,"L_DATA_IN_%u_%u",x,y);
@@ -348,6 +385,21 @@ int sc_main(int argc, char* argv[]) {
                 sprintf(strRetOut,"L_RET_OUT_%u_%u",x,y);
                 char strTgEOT[15];
                 sprintf(strTgEOT,"TG_%u_%u_EOT",x,y);
+                if(NUM_VC > 0) {
+                    char strVcSelIn[25];
+                    sprintf(strVcSelIn,"L_VC_SEL_IN_%u_%u",x,y);
+                    char strVcSelOut[26];
+                    sprintf(strVcSelOut,"L_VC_SEL_OUT_%u_%u",x,y);
+                    for(unsigned short vcBit = 0; vcBit < vcWidth; vcBit++) {
+                        char strVcSelInBit[29];
+                        sprintf(strVcSelInBit,"%s(%u)",strVcSelIn,vcBit);
+                        char strVcSelOutBit[30];
+                        sprintf(strVcSelOutBit,"%s(%u)",strVcSelOut,vcBit);
+
+                        sc_trace(tf,w_IN_VC_SEL[rId][vcBit],strVcSelInBit);
+                        sc_trace(tf,w_OUT_VC_SEL[rId][vcBit],strVcSelOutBit);
+                    }
+                }
 
                 // Add to trace
                 sc_trace(tf,w_IN_DATA[rId],strDataIn);
