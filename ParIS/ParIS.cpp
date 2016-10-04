@@ -1,6 +1,245 @@
 #include "ParIS.h"
 #include "../PluginManager/PluginManager.h"
 
+//#define WAVEFORM_PARIS
+
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// ParIS with N virtual channels /////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+ParIS_N_VC::ParIS_N_VC(sc_module_name mn,
+             unsigned short nPorts,
+             unsigned short nVirtualChannels,
+             unsigned short XID,
+             unsigned short YID)
+    : IRouter_VC(mn,nPorts,nVirtualChannels,XID,YID),
+      w_REQUEST("ParIS_N_VC_wREQUEST",nVirtualChannels),
+      w_GRANT("ParIS_N_VC_wGRANT",nVirtualChannels),
+      w_READ_OK("ParIS_wREAD_OK",nVirtualChannels),
+      w_READ("ParIS_wREAD",nVirtualChannels),
+      w_IDLE("ParIS_wIDLE",nVirtualChannels),
+      w_DATA("ParIS_wDATA",nVirtualChannels),
+      w_GND("ParIS_wGND"),
+      u_XIN(nPorts,NULL),
+      u_XOUT(nPorts,NULL)
+{
+    unsigned short i,o,vc;
+
+    // Configuring channels according the number of ports and virtual channels
+    for( vc = 0; vc < nVirtualChannels; vc++ ) {
+        w_REQUEST[vc].init(nPorts);
+        w_GRANT[vc].init(nPorts);
+        w_READ_OK[vc].init(nPorts);
+        w_READ[vc].init(nPorts);
+        w_IDLE[vc].init(nPorts);
+        w_DATA[vc].init(nPorts);
+        for(i = 0; i < nPorts; i++) {
+            w_REQUEST[vc][i].init(nPorts);
+            w_GRANT[vc][i].init(nPorts);
+        }
+    }
+
+    // Instantiating internal modules
+    for( i = 0; i < nPorts; i++) {
+        // Assembling internal module names
+        // XIN(i)
+        char strXIN[12];
+        sprintf(strXIN,"XIN(%u)",i);
+        // XOUT(i)
+        char strXOUT[13];
+        sprintf(strXOUT,"XOUT(%u)",i);
+
+        // Instantiate internal units
+        u_XIN[i] = new XIN_N_VC(strXIN,nPorts,nVirtualChannels,XID,YID,i);
+        u_XOUT[i] = new XOUT_N_VC(strXOUT,nPorts,nVirtualChannels,XID,YID,i);
+    }
+
+    // Binding ports
+    for( i = 0; i < nPorts; i++ ) {
+        XIN_N_VC* xin = u_XIN[i];
+        // Binding XIN
+        // System signals
+        xin->i_CLK(i_CLK);
+        xin->i_RST(i_RST);
+        // Link signals
+        xin->i_DATA(i_DATA_IN[i]);
+        xin->i_VALID(i_VALID_IN[i]);
+        xin->o_RETURN(o_RETURN_IN[i]);
+
+//        xin->o_VC_SELECTOR(o_VC_IN[i]);
+        xin->i_VC_SELECTOR(i_VC_IN[i]);
+        // Inter-module's signals
+        for( vc = 0; vc < nVirtualChannels; vc++) {
+            for( o = 0; o < nPorts; o++ ) {
+                xin->o_X_REQUEST[vc][o](w_REQUEST[vc][i][o]);
+                xin->i_X_GRANT[vc][o](w_GRANT[vc][o][i]);
+            }
+            xin->o_X_READ_OK[vc](w_READ_OK[vc][i]);
+            xin->i_X_READ[vc](w_READ[vc]);
+            xin->i_X_IDLE[vc](w_IDLE[vc]);
+            xin->o_X_DATA[vc](w_DATA[vc][i]);
+        }
+
+        XOUT_N_VC* xout = u_XOUT[i];
+        // Bindig XOUT
+        // System signals
+        xout->i_CLK(i_CLK);
+        xout->i_RST(i_RST);
+        // Link signals
+        xout->o_VALID(o_VALID_OUT[i]);
+        xout->i_RETURN(i_RETURN_OUT[i]);
+        xout->o_DATA(o_DATA_OUT[i]);
+        xout->o_VC_SELECTOR(o_VC_OUT[i]);
+
+        // Inter-module's signals
+        for( vc = 0; vc < nVirtualChannels; vc++) {
+            xout->i_HOLD_SEND[vc](w_GND);
+            for( o = 0; o < nPorts; o++) {
+                xout->i_X_REQUEST[vc][o](w_REQUEST[vc][o][i]);
+                xout->o_X_GRANT[vc][o](w_GRANT[vc][i][o]);
+            }
+            xout->i_X_READ_OK[vc](w_READ_OK[vc]);
+            xout->o_X_IDLE[vc](w_IDLE[vc][i]);
+            xout->o_X_READ[vc](w_READ[vc][i]);
+            xout->i_X_DATA[vc](w_DATA[vc]);
+        }
+    }
+
+    // Registering process
+    SC_METHOD(p_GND);
+    sensitive << i_RST;
+
+#ifdef DEBUG_PARIS
+    SC_METHOD(p_DEBUG);
+    sensitive << i_CLK.pos();
+#endif
+#ifdef WAVEFORM_PARIS
+    char waveName[15];
+    sprintf(waveName,"ParIS_%u_%u_%u_%u",XID,YID,numVirtualChannels,nPorts);
+    tf = sc_create_vcd_trace_file(waveName);
+
+    sc_trace(tf,i_CLK,"CLK");
+    sc_trace(tf,i_RST,"RST");
+
+    for( i = 0; i < nPorts; i++ ) {
+        char strI[5];
+        sprintf(strI,"(%u)",i);
+        char strDataIn[15];
+        sprintf(strDataIn,"DATA_IN%s",strI);
+        sc_trace(tf, i_DATA_IN[i],strDataIn);
+        char strValidIn[15];
+        sprintf(strValidIn,"VALID_IN%s",strI);
+        sc_trace(tf, i_VALID_IN[i],strValidIn);
+        char strRetIn[15];
+        sprintf(strRetIn,"RET_IN%s",strI);
+        sc_trace(tf, o_RETURN_IN[i],strRetIn);
+
+        char strDataOut[15];
+        sprintf(strDataOut,"DATA_OUT%s",strI);
+        sc_trace(tf, o_DATA_OUT[i],strDataOut);
+        char strValidOut[15];
+        sprintf(strValidOut,"VALID_OUT%s",strI);
+        sc_trace(tf, o_VALID_OUT[i],strValidOut);
+        char strRetOut[15];
+        sprintf(strRetOut,"RET_OUT%s",strI);
+        sc_trace(tf, i_RETURN_OUT[i],strRetOut);
+    }
+    for( vc = 0; vc < nVirtualChannels; vc++) {
+        for( i = 0; i < nPorts; i++) {
+            char strIVc[20];
+            sprintf(strIVc,"Port(%u)Vc(%u)",i,vc);
+            for( o = 0; o < nPorts; o++ ) {
+                char strIVcJ[30];
+                sprintf(strIVcJ,"%s(%u)",strIVc,o);
+
+                char strReq[36];
+                sprintf(strReq,"wREQ%s",strIVcJ);
+                sc_trace(tf,w_REQUEST[vc][i][o],strReq);
+
+                char strGrant[38];
+                sprintf(strGrant,"wGRANT%s",strIVcJ);
+                sc_trace(tf,w_GRANT[vc][i][o],strGrant);
+            }
+
+            char strRok[30];
+            sprintf(strRok,"wROK%s",strIVc);
+            sc_trace(tf,w_READ_OK[vc][i],strRok);
+
+            char strRd[29];
+            sprintf(strRd,"wRD%s",strIVc);
+            sc_trace(tf,w_READ[vc][i],strRd);
+
+            char strIdle[31];
+            sprintf(strIdle,"wIDLE%s",strIVc);
+            sc_trace(tf,w_IDLE[vc][i],strIdle);
+
+            char strData[31];
+            sprintf(strData,"wDATA%s",strIVc);
+            sc_trace(tf,w_DATA[vc][i],strData);
+        }
+    }
+
+#endif
+}
+
+ParIS_N_VC::~ParIS_N_VC() {
+#ifdef WAVEFORM_PARIS
+    sc_close_vcd_trace_file(tf);
+#endif
+    for(unsigned short i = 0; i < numPorts; i++) {
+        XIN_N_VC* xin = u_XIN[i];
+        if(xin) {
+            delete xin;
+        }
+        XOUT_N_VC* xout = u_XOUT[i];
+        if(xout) {
+            delete xout;
+        }
+    }
+    u_XIN.clear();
+    u_XOUT.clear();
+}
+
+void ParIS_N_VC::p_DEBUG() {
+
+    std::string str = sc_time_stamp().to_string();
+
+    for(unsigned short v = 0; v < numVirtualChannels; v++) {
+        for( unsigned short i = 0; i < numPorts; i++ ) {
+            for( unsigned short x = 0; x < numPorts; x++ ) {
+                bool req = w_REQUEST[v][i][x].read();
+                bool grant = w_GRANT[v][i][x].read();
+                if(req) {
+                    printf("\n[Router] [%u][%u][%u] - time: %s, Req[%u][%u]",XID,YID,v,str.c_str(),i,x);
+                }
+                if(grant) {
+                    printf("\n[Router] [%u][%u][%u] - time: %s, Grant[%u][%u]",XID,YID,v,str.c_str(),i,x);
+                }
+
+            }
+        }
+    }
+
+    for(unsigned short v = 0; v < numVirtualChannels; v++) {
+        for( unsigned short i = 0; i < numPorts; i++ ) {
+            if( XID == 0 && YID == 0 ) {
+                Flit d = w_DATA[v][i].read();
+                printf("\n[ParIS] VC[%u] PORT[%u] IDLE: %d- RD: %d- ROK: %d- DATA: %s",
+                       v,i,w_IDLE[v][i].read(),w_READ[v][i].read(),w_READ_OK[v][i].read(),
+                       d.data.to_string(SC_HEX_US).c_str());
+            }
+        }
+    }
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////// ParIS from SoCINfp //////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 ParIS::ParIS(sc_module_name mn,
              unsigned short nPorts,
              unsigned short XID,
@@ -12,7 +251,9 @@ ParIS::ParIS(sc_module_name mn,
       w_READ("ParIS_wREAD",nPorts),
       w_IDLE("ParIS_wIDLE",nPorts),
       w_DATA("ParIS_wDATA",nPorts),
-      w_GND("ParIS_wGND")
+      w_GND("ParIS_wGND"),
+      u_XIN(nPorts,NULL),
+      u_XOUT(nPorts,NULL)
 {
     unsigned short i,j;
     for( i = 0; i < nPorts; i++ ) {
@@ -221,12 +462,19 @@ void ParIS::p_DEBUG() {
 
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////// Factory Methods Routers ////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 extern "C" {
     SS_EXP IRouter* new_Router(sc_simcontext* simcontext,
-                              sc_module_name moduleName,
-                              unsigned short int nPorts,
-                              unsigned short int XID,
-                              unsigned short int YID) {
+                               sc_module_name moduleName,
+                               unsigned short int nPorts,
+                               unsigned short int nVirtualChannels,
+                               unsigned short int XID,
+                               unsigned short int YID) {
         // Simcontext is needed because in shared library a
         // new and different simcontext will be created if
         // the main application simcontext is not passed to
@@ -236,7 +484,12 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new ParIS(moduleName,nPorts,XID,YID);
+        if( nVirtualChannels > 0 ) {
+            return new ParIS_N_VC(moduleName,nPorts,nVirtualChannels,XID,YID);
+        } else {
+            return new ParIS(moduleName,nPorts,XID,YID);
+        }
+
     }
     SS_EXP void delete_Router(IRouter* router) {
         delete router;

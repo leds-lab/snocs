@@ -22,7 +22,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #include "../XOUT/XOUT.h"
 
 /////////////////////////////////////////////////////////////////////////////////
-/// Router interface
+/// Simple Router interface
 /////////////////////////////////////////////////////////////////////////////////
 /*!
  * \brief The IRouter class is an interface (abstract class) for router
@@ -47,10 +47,6 @@ public:
     sc_vector<sc_out<bool> > o_VALID_OUT;   // Valid of output channels
     sc_vector<sc_in<bool> >  i_RETURN_OUT;  // Return of output channels
 
-    // Internal Units - a router is composed by Input and Output modules
-    std::vector<XIN_none_VC*>  u_XIN;
-    std::vector<XOUT_none_VC*> u_XOUT;
-
     // Internal data structures
     unsigned short XID,YID;
 
@@ -59,7 +55,7 @@ public:
             unsigned short XID,
             unsigned short YID);
 
-    ModuleType moduleType() const { return SoCINModule::Router; }
+   ModuleType moduleType() const { return SoCINModule::Router; }
     ~IRouter() = 0;
 };
 
@@ -69,7 +65,8 @@ inline IRouter::IRouter(sc_module_name mn,
                         unsigned short nPorts,
                         unsigned short XID,
                         unsigned short YID)
-    : SoCINModule(mn),numPorts(nPorts),
+    : SoCINModule(mn),
+      numPorts(nPorts),
       i_CLK("IRouter_iCLK"),
       i_RST("IRouter_iRST"),
       i_DATA_IN("IRouter_iDATA_IN",nPorts),
@@ -78,9 +75,56 @@ inline IRouter::IRouter(sc_module_name mn,
       o_DATA_OUT("IRouter_oDATA_OUT",nPorts),
       o_VALID_OUT("IRouter_oVALID_OUT",nPorts),
       i_RETURN_OUT("IRouter_iRETURN_OUT",nPorts),
-      u_XIN(nPorts,NULL),
-      u_XOUT(nPorts,NULL),
       XID(XID),YID(YID) {}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////
+/// Router interface for router that implements virtual channels
+/////////////////////////////////////////////////////////////////////////////////
+class IRouter_VC : public IRouter {
+protected:
+    unsigned short numVirtualChannels;
+    unsigned short widthVcSelector;
+public:
+    // Inherits common interfaces of router without virtual channel
+
+    // Interface - virtual channels
+//    sc_vector<sc_vector<sc_out<bool> > > o_VC_IN;  // IN[VirtualChannel][BitSelector]
+    sc_vector<sc_vector<sc_in<bool> > >  i_VC_IN;  // IN[VirtualChannel][BitSelector]
+    sc_vector<sc_vector<sc_out<bool> > > o_VC_OUT; // OUT[VirtualChanne][BitSelector]
+
+    IRouter_VC(sc_module_name mn,
+               unsigned short nPorts,
+               unsigned short nVirtualChannels,
+               unsigned short XID,
+               unsigned short YID);
+    ~IRouter_VC() = 0;
+
+};
+
+inline IRouter_VC::~IRouter_VC(){}
+
+inline IRouter_VC::IRouter_VC(sc_module_name mn,
+                              unsigned short nPorts,
+                              unsigned short nVirtualChannels,
+                              unsigned short XID,
+                              unsigned short YID)
+    : IRouter(mn,nPorts,XID,YID),
+      numVirtualChannels(nVirtualChannels),
+      widthVcSelector( (unsigned short)ceil(log2(nVirtualChannels)) ),
+//      o_VC_IN("IRouter_VC_oVC_IN",nPorts),
+      i_VC_IN("IRouter_VC_iVC_IN",nPorts),
+      o_VC_OUT("IRouter_VC_oVC_OUT",nPorts)
+{
+    // Initializing Virtual Channel ports with the width of the selector
+    for(unsigned short i = 0; i < nPorts; i++) {
+//        o_VC_IN[i].init(widthVcSelector);
+        o_VC_OUT[i].init(widthVcSelector);
+        i_VC_IN[i].init(widthVcSelector);
+    }
+}
+
 
 /////////////////////////////////////////////////////////////
 /// Typedefs for Factory Methods of concrete Routers
@@ -90,6 +134,7 @@ inline IRouter::IRouter(sc_module_name mn,
  * \param sc_simcontext A pointer of simulation context (required for correct plugins use)
  * \param sc_module_name Name for the module to be instantiated
  * \param nPorts Number of ports of the Router
+ * \param nVirtualChannels Number of virtual channels in the router
  * \param XID Column identifier of the router in the network
  * \param YID Row identifier of the router in the network
  * \return A method for instantiate a Router
@@ -97,6 +142,7 @@ inline IRouter::IRouter(sc_module_name mn,
 typedef IRouter* create_Router(sc_simcontext*,
                                sc_module_name,
                                unsigned short int nPorts,
+                               unsigned short int nVirtualChannels,
                                unsigned short int XID,
                                unsigned short int YID);
 

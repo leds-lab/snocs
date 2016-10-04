@@ -44,6 +44,7 @@ class PluginManager;
 // Buffering
 #define FIFO_IN_DEPTH PARAMS->fifoInDepth   // Input buffers depth
 #define FIFO_OUT_DEPTH PARAMS->fifoOutDepth // Output buffers depth
+#define NUM_VC PARAMS->numVirtualChannels   // Number of virtual channels
 
 // Flow Control
 #define CREDIT FIFO_IN_DEPTH                // Number of credits at power up
@@ -74,6 +75,7 @@ public:
     unsigned short wordWidth;
     unsigned short ribWidth;
     // Buffering
+    unsigned short numVirtualChannels;
     unsigned short fifoInDepth;
     unsigned short fifoOutDepth;
 

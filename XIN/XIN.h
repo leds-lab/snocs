@@ -208,7 +208,7 @@ public:
     // Commands and status signals interconnecting input and output channels
     sc_vector<sc_vector<sc_out<bool> > > o_X_REQUEST;  // Requests[VirtualChannel][Port] to output port
     sc_vector<sc_out<bool> >             o_X_READ_OK;  // Read ok[VirtualChannel] to the outputs
-    sc_vector<sc_out<bool> >             o_VC_SELECTOR;// Output of Virtual channel selector
+//    sc_vector<sc_out<bool> >             o_VC_SELECTOR;// Output of Virtual channel selector
     sc_vector<sc_vector<sc_in<bool> > >  i_X_READ;     // Read[VirtualChannel][Port] commant from output port
     sc_vector<sc_vector<sc_in<bool> > >  i_X_GRANT;    // Grant[VirtualChannel][Port] from the output port
     sc_vector<sc_vector<sc_in<bool> > >  i_X_IDLE;     // Status[VirtualChannel][Port] from output port
@@ -240,11 +240,11 @@ public:
     std::vector<XIN_Virtual*> u_XIN_VC;
 
     // Module's process
-    void p_WRITE_VC() {
-        for( unsigned short i = 0; i < widthVcSel; i++ ) {
-            o_VC_SELECTOR[i].write( i_VC_SELECTOR[i].read() );
-        }
-    }
+//    void p_WRITE_VC() {
+//        for( unsigned short i = 0; i < widthVcSel; i++ ) {
+//            o_VC_SELECTOR[i].write( i_VC_SELECTOR[i].read() );
+//        }
+//    }
 
     SC_HAS_PROCESS(XIN_N_VC);
     // Constructor
@@ -289,7 +289,7 @@ inline XIN_N_VC::XIN_N_VC(sc_module_name mn,
       i_VC_SELECTOR("XIN_N_VC_iVC_SELECTOR"),
       o_X_REQUEST("XIN_N_VC_oX_REQUEST",nVirtualChannels),
       o_X_READ_OK("XIN_N_VC_oX_READ_OK",nVirtualChannels),
-      o_VC_SELECTOR("XIN_N_VC_oVC_SELECTOR"),
+//      o_VC_SELECTOR("XIN_N_VC_oVC_SELECTOR"),
       i_X_READ("XIN_N_VC_iX_READ",nVirtualChannels),
       i_X_GRANT("XIN_N_VC_iX_GRANT",nVirtualChannels),
       i_X_IDLE("XIN_N_VC_iX_IDLE",nVirtualChannels),
@@ -310,7 +310,7 @@ inline XIN_N_VC::XIN_N_VC(sc_module_name mn,
     // Configuring channels according the number of ports and virtual channels
     widthVcSel = (unsigned short) ceil(log2(nVirtualChannels));
     i_VC_SELECTOR.init(widthVcSel);
-    o_VC_SELECTOR.init(widthVcSel);
+//    o_VC_SELECTOR.init(widthVcSel);
     for( i = 0; i < nVirtualChannels; i++ ) {
         o_X_REQUEST[i].init(nPorts);
         i_X_READ[i].init(nPorts);
@@ -386,8 +386,8 @@ inline XIN_N_VC::XIN_N_VC(sc_module_name mn,
         u_XIN->o_X_DATA(o_X_DATA[i]);
     }
 
-    SC_METHOD(p_WRITE_VC);
-    sensitive << i_CLK.pos();
+//    SC_METHOD(p_WRITE_VC);
+//    sensitive << i_CLK.pos();
 }
 
 inline XIN_N_VC::~XIN_N_VC() {

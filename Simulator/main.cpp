@@ -42,6 +42,10 @@ unsigned int setupSimulator(int argc, char* argv[]) {
     X_SIZE = 2;
     Y_SIZE = 2;
 
+    NUM_VC = 1;
+
+    if( NUM_VC == 1 ) NUM_VC = 2; // 1 VC is not accepted by the model because vcWidth = ceil(log2(NUM_VC)) == 0
+
     FLIT_WIDTH = 34;
     TRACE = true;
 
@@ -180,9 +184,9 @@ int sc_main(int argc, char* argv[]) {
         return -1;
     }
 
-    INoC* u_NETWORK = PLUGIN_MANAGER->nocInstance("NoC");
+    INoC* u_NOC = PLUGIN_MANAGER->nocInstance("NoC");
 
-    if( u_NETWORK == NULL ) {
+    if( u_NOC == NULL ) {
         delete PLUGIN_MANAGER;
         return -1;
     }
@@ -199,12 +203,26 @@ int sc_main(int argc, char* argv[]) {
     unsigned short nRouters = X_SIZE*Y_SIZE;
 
     // Wires to connect System Components to the network - Transmission interface
-    sc_vector<sc_signal<Flit> > w_IN_DATA("w_IN_DATA",nRouters);
+    sc_vector<sc_signal<Flit> > w_IN_DATA("w_IN_DATA",nRouters);        //
     sc_vector<sc_signal<bool> > w_IN_VALID("w_IN_VALID",nRouters);
     sc_vector<sc_signal<bool> > w_IN_RETURN("w_IN_RETURN",nRouters);
     sc_vector<sc_signal<Flit> > w_OUT_DATA("w_OUT_DATA",nRouters);
     sc_vector<sc_signal<bool> > w_OUT_VALID("w_OUT_VALID",nRouters);
     sc_vector<sc_signal<bool> > w_OUT_RETURN("w_OUT_RETURN",nRouters);
+
+    // Used only with virtual channels
+    sc_vector<sc_vector<sc_signal<bool> > > w_IN_VC_SEL("w_IN_VC_SEL");
+    sc_vector<sc_vector<sc_signal<bool> > > w_OUT_VC_SEL("w_OUT_VC_SEL");
+
+    if( NUM_VC > 0) {
+        w_IN_VC_SEL.init(nRouters);
+        w_OUT_VC_SEL.init(nRouters);
+        unsigned short vcWidth = ceil(log2(NUM_VC));
+        for( unsigned int r = 0; r < nRouters; r++ ) {
+            w_IN_VC_SEL[r].init(vcWidth);
+            w_OUT_VC_SEL[r].init(vcWidth);
+        }
+    }
 
     // Status signals of the traffic generators attached to the terminals of the NoC
     sc_vector<sc_signal<bool> >         w_TG_EOT("w_TG_EOT",nRouters);
@@ -230,8 +248,9 @@ int sc_main(int argc, char* argv[]) {
     u_STOP->i_CLK_CYCLES(w_GLOBAL_CLOCK);
 
     //////////////////////////////////////////////////////////////////////////////
-    INoC *u_NOC = u_NETWORK;
+    INoC_VC *u_NOC_VC = dynamic_cast<INoC_VC *>(u_NOC);
     //////////////////////////////////////////////////////////////////////////////
+
     // System signals
     u_NOC->i_CLK(w_CLK);
     u_NOC->i_RST(w_RST);
@@ -347,7 +366,7 @@ int sc_main(int argc, char* argv[]) {
     std::cout << "////////////// Start Simulation //////////////" << std::endl;
     std::cout << "//////////////////////////////////////////////" << std::endl << std::endl << std::endl;
 
-    // Start the simulation (the testbench will stop it)
+    // Start the simulation (the StopSim will stop it with sc_stop())
     sc_start();
 
     if(TRACE) {

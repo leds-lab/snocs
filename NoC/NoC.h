@@ -27,11 +27,13 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 class IRouter;
 
 /////////////////////////////////////////////////////////////////////////////////
-/// NoC interface
+/// NoC interface without virtual channels
 /////////////////////////////////////////////////////////////////////////////////
 /*!
  * \brief The INoC class is the interface (abstract class) for concrete
  * implementations of the Network-on-Chip component in the simulator.
+ *
+ * This interaface represents the SoCINfp structure (w/o virtual channels)
  *
  * This interface contais the port communication in a vector style i.e.
  * use sc_vector.
@@ -87,6 +89,49 @@ inline INoC::INoC(sc_module_name mn,unsigned short nRouters)
       o_VALID_OUT("INoC_oVALID_OUT",nRouters),
       i_RETURN_OUT("INoC_iRETURN_OUT",nRouters),
       u_ROUTER(nRouters,NULL) {}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////// NoC interface with virtual channels //////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+class INoC_VC : public INoC {
+protected:
+    unsigned short numVirtualChannels;
+    unsigned short widthVcSelector;
+public:
+    // Inherits the common interface from the INoC
+
+    // Virtual channels interface
+//    sc_vector<sc_vector<sc_out<bool> > > o_VC;
+    sc_vector<sc_vector<sc_in<bool> > >  i_VC_SELECTOR;
+    sc_vector<sc_vector<sc_out<bool> > > o_VC_SELECTOR;
+
+    INoC_VC(sc_module_name mn,
+            unsigned short nRouters,
+            unsigned short nVirtualChannels);
+
+    ~INoC_VC() = 0;
+};
+
+inline INoC_VC::~INoC_VC() {}
+
+inline INoC_VC::INoC_VC(sc_module_name mn,
+                        unsigned short nRouters,
+                        unsigned short nVirtualChannels)
+    : INoC(mn,nRouters), numVirtualChannels(nVirtualChannels),
+//      o_VC("INoC_VC_oL_VC"),
+      i_VC_SELECTOR("INoC_VC_i_VC_SELECTOR",nRouters),
+      o_VC_SELECTOR("INoC_VC_o_VC_SELECTOR",nRouters)
+{
+    widthVcSelector = (unsigned short) ceil(log2(nVirtualChannels));
+//    o_VC.init(widthVcSelector);
+    for( unsigned short i = 0; i < nRouters; i++ ) {
+        i_VC_SELECTOR[i].init(widthVcSelector);
+        o_VC_SELECTOR[i].init(widthVcSelector);
+    }
+}
 
 /////////////////////////////////////////////////////////////
 /// Typedefs for Factory Methods of concrete NoCs

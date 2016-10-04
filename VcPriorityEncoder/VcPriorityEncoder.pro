@@ -3,7 +3,7 @@ include(../common.pri)
 TEMPLATE = aux
 
 HEADERS += \
-    PriorityEncoder.h
+    VcPriorityEncoder.h
 
 SOURCES +=
 

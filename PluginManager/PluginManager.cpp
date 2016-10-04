@@ -217,7 +217,7 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::NoC: {
                 INoC* n = dynamic_cast<INoC* >(module);
                 if( n != NULL) {
-                    std::cout << "Free - NoC" << std::endl;
+//                    std::cout << "Free - NoC" << std::endl;
                     this->destroyNoC(n);
                 }
                 break;
@@ -225,7 +225,7 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::Router: {
                 IRouter* r = dynamic_cast<IRouter*>(module);
                 if( r != NULL ) {
-                    std::cout << "Free - Router" << std::endl;
+//                    std::cout << "Free - Router" << std::endl;
                     this->destroyRouter(r);
                 }
                 break;
@@ -233,7 +233,7 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::Routing:{
                 IRouting* r = dynamic_cast<IRouting*>(module);
                 if( r != NULL ) {
-                    std::cout << "Free - Routing" << std::endl;
+//                    std::cout << "Free - Routing" << std::endl;
                     this->destroyRouting(r);
                 }
                 break;
@@ -241,7 +241,7 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::InputFlowControl: {
                 IInputFlowControl* ifc = dynamic_cast<IInputFlowControl*>(module);
                 if( ifc != NULL ) {
-                    std::cout << "Free - IFC" << std::endl;
+//                    std::cout << "Free - IFC" << std::endl;
                     this->destroyInputFlowControl(ifc);
                 }
                 break;
@@ -249,7 +249,7 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::OutputFlowControl:{
                 IOutputFlowControl* ofc = dynamic_cast<IOutputFlowControl*>(module);
                 if( ofc != NULL ) {
-                    std::cout << "Free - OFC" << std::endl;
+//                    std::cout << "Free - OFC" << std::endl;
                     this->destroyOutputFlowControl(ofc);
                 }
                 break;
@@ -257,7 +257,7 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::Memory: {
                 IMemory* mem = dynamic_cast<IMemory*>(module);
                 if( mem != NULL ) {
-                    std::cout << "Free - Memory" << std::endl;
+//                    std::cout << "Free - Memory" << std::endl;
                     this->destroyMemory(mem);
                 }
                 break;
@@ -265,7 +265,7 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::PriorityGenerator: {
                 IPriorityGenerator* pg = dynamic_cast<IPriorityGenerator*>(module);
                 if( pg != NULL ) {
-                    std::cout << "Free - PG" << std::endl;
+//                    std::cout << "Free - PG" << std::endl;
                     this->destroyPriorityGenerator(pg);
                 }
                 break;
@@ -276,6 +276,7 @@ void PluginManager::deallocateUnits() {
         }
     }
     this->allocatedUnits.clear();
+    std::cout << "Units deallocated!" << std::endl;
 }
 
 INoC* PluginManager::nocInstance(sc_module_name name) {
@@ -287,7 +288,7 @@ INoC* PluginManager::nocInstance(sc_module_name name) {
     create_NoC* new_NoC = (create_NoC*) this->noc->loadSymbol("new_NoC");
     const char* dlsym_error = this->noc->error();
     if( dlsym_error ) {
-        std::cerr << "Erro on load symbom of factory creator function - NoC: " << dlsym_error << std::endl;
+        std::cerr << "Error on load symbom of factory creator function - NoC: " << dlsym_error << std::endl;
         return NULL;
     }
     INoC* n = new_NoC(sc_get_curr_simcontext(),name);
@@ -298,7 +299,8 @@ INoC* PluginManager::nocInstance(sc_module_name name) {
 IRouter* PluginManager::routerInstance(sc_module_name name,
                                        unsigned short XID,
                                        unsigned short YID,
-                                       unsigned short nPorts)
+                                       unsigned short nPorts,
+                                       unsigned short nVirtualChannels)
 {
     if( !pluginsLoaded ) {
         std::cout << "Plugins not loaded to instantiate a router" << std::endl;
@@ -310,7 +312,7 @@ IRouter* PluginManager::routerInstance(sc_module_name name,
        std::cerr << "Error on load symbol of factory creator function - Router: " << dlsym_error << std::endl;
        return NULL;
     }
-    IRouter* r = new_Router(sc_get_curr_simcontext(),name,nPorts,XID,YID);
+    IRouter* r = new_Router(sc_get_curr_simcontext(),name,nPorts,nVirtualChannels,XID,YID);
     this->allocatedUnits.push_back(r);
     return r;
 }

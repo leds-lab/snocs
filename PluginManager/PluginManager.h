@@ -80,7 +80,8 @@ public:
     IRouter* routerInstance(sc_core::sc_module_name name,
                             unsigned short XID,
                             unsigned short YID,
-                            unsigned short nPorts);
+                            unsigned short nPorts,
+                            unsigned short nVirtualChannels);
     IRouting* routingInstance(sc_core::sc_module_name name,
                               unsigned short XID,
                               unsigned short YID,
@@ -105,7 +106,7 @@ public:
                                                   unsigned short PORT_ID,
                                                   unsigned short nPorts);
 
-    void destroyNoC(INoC*);
+    void destroyNoC(INoC* );
     void destroyRouter(IRouter*);
     void destroyRouting(IRouting* );
     void destroyInputFlowControl(IInputFlowControl* );

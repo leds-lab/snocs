@@ -39,7 +39,7 @@ SUBDIRS += \
     SoCIN \
     StopSim \
     SystemSignals \
-    PriorityEncoder
+    VcPriorityEncoder
 
 OTHER_FILES += \
     app.pri \

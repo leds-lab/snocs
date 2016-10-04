@@ -16,6 +16,7 @@ Parameters::Parameters() {
     ySize = 3;
     wordWidth = 34;
     ribWidth = 8;
+    numVirtualChannels = 8;
     fifoInDepth = 4;
     fifoOutDepth = 0; // Without buffer
 }
@@ -33,6 +34,7 @@ Parameters::Parameters(const Parameters &c) {
     this->ySize = c.ySize;
     this->wordWidth = c.wordWidth;
     this->ribWidth = c.ribWidth;
+    this->numVirtualChannels = c.numVirtualChannels;
     this->fifoInDepth = c.fifoInDepth;
     this->fifoOutDepth = c.fifoOutDepth;
 }
@@ -50,6 +52,7 @@ Parameters& Parameters::operator = (const Parameters& c) {
     this->ySize = c.ySize;
     this->wordWidth = c.wordWidth;
     this->ribWidth = c.ribWidth;
+    this->numVirtualChannels = c.numVirtualChannels;
     this->fifoInDepth = c.fifoInDepth;
     this->fifoOutDepth = c.fifoOutDepth;
 

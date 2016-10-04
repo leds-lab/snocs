@@ -28,7 +28,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #include "../FlowControl/FlowControl.h"
 #include "../Multiplexers/Multiplexers.h"
 #include "../Demultiplexers/Demultiplexers.h"
-#include "../PriorityEncoder/PriorityEncoder.h"
+#include "../VcPriorityEncoder/VcPriorityEncoder.h"
 
 #include "../PluginManager/PluginManager.h"
 
@@ -236,7 +236,7 @@ public:
     BinaryMux<bool>*           u_MUX_READ_OK;
     BinaryDemux<bool>*         u_DEMUX_READ;
     BinaryMux<Flit>*           u_MUX_DATA;
-    PriorityEncoder*           u_PE;
+    VcPriorityEncoder*         u_PE;
     std::vector<XOUT_Virtual*> u_XOUT_VC;
 
     // Module's process
@@ -322,7 +322,7 @@ inline XOUT_N_VC::XOUT_N_VC(sc_module_name mn,
     u_MUX_READ_OK = new BinaryMux<bool>("XOUT_N_VC_mux_READ_OK",nVirtualChannels);
     u_DEMUX_READ = new BinaryDemux<bool>("XOUT_N_VC_demux_READ",nVirtualChannels);
     u_MUX_DATA = new BinaryMux<Flit>("XOUT_N_VC_mux_DATA",nVirtualChannels);
-    u_PE = new PriorityEncoder("XOUT_N_VC_PRIORITY_ENCODER",nVirtualChannels);
+    u_PE = new VcPriorityEncoder("XOUT_N_VC_PRIORITY_ENCODER",nVirtualChannels);
     for( i = 0; i < nVirtualChannels; i++) {
         char strXoutVc[18];
         sprintf(strXoutVc,"XOUT_u_VC(%u)",i);
