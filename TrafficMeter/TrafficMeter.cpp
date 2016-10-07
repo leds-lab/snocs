@@ -130,7 +130,7 @@ void TrafficMeter::writeInfo() {
             fprintf(outFile,"%10lu\t"  , packet->packetCreationCycle);
             fprintf(outFile,"%10lu\t"  , this->cycleOfArriving);
             fprintf(outFile,"%10lu\t"  , i_CLK_CYCLES.read());
-            fprintf(outFile,"%5u\t"  , packet->payloadLength);
+            fprintf(outFile,"%5u\t"    , packet->payloadLength);
             fprintf(outFile,"  %.2f\t" , round(packet->requiredBW) );
             fprintf(outFile,"\n");
             delete packet;

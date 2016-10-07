@@ -22,6 +22,11 @@ const char* SETUP_MESSAGES[] =
  "Conf file parse fail - oops"    // [2]
 };
 
+// TODO Verificar
+//#define ADDRESS_TO_INDEX(x,y)       ((x*MESH_H)+y)
+//#define INDEX_TO_ADDRESS_X(i)       (i/MESH_H)
+//#define INDEX_TO_ADDRESS_Y(i)       (i%MESH_H)
+
 /*!
  * \brief setupSimulator Setup all global definitions for the
  * simulator.

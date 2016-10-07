@@ -63,7 +63,9 @@ class PluginManager;
   HLP is composed as follow: From bit 31 to 8 | HLP[31..8] (8..0 is RIB)
 
   HLP[31..30] Thread ID       - Max. 4 threads
+  HLP[29..21] Free
   HLP[20..18] Traffic Class   - Max. 8 classes
+  HLP[17..16] Packet type: 0x0 (NORMAL), 0x1 (ALOCATE CIRCUIT), 0x2 (RELEASE CIRCUIT), 0x3 (GRANT)
   HLP[15..12] Packet X source - From(RIB_WIDTH*2-1) to ([RIB_WIDTH*2-RIB_WIDTH/2] or [RIB_WIDTH+RIB_WIDTH/2])
   HLP[11.. 8] Packet Y source - From(RIB_WIDTH+RIB_WIDTH/2-1) to(RIB_WIDTH)
      Packet source (both x and y) is used to generate simulation report or to some routing technique
@@ -76,7 +78,7 @@ class PluginManager;
 #define TRAFFIC_CLASS_POSITION PARAMS->trafficClassPosition // Position of the traffic class in the header
 #define NUMBER_OF_THREADS PARAMS->numberOfThreads           // Number of threads supported by the simulator
 #define THREAD_ID_POSITION PARAMS->threadIdPosition         // Position of the thread id in the header
-#define PACKET_TYPE_POSITION 16 // ???
+#define PACKET_TYPE_POSITION 16                             // Position of packet type: TYPE: 0
 
 // Buffering
 #define FIFO_IN_DEPTH PARAMS->fifoInDepth   // Input buffers depth
@@ -147,7 +149,7 @@ public:
 ////////////////////////////// ROUTER PARAMETERS ///////////////////////////////
 // MECHANISMS TYPES
 #define ROUTING_TYPE        0
-#define FC_TYPE             1
+#define FC_TYPE             1 // 0: Handshake | 1: Credit-based
 #define ARBITER_TYPE        0
 #define SWITCH_TYPE         0
 

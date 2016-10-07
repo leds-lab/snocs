@@ -4,6 +4,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <chrono>
+#include <random>
+
 #include "fg.h"
 #define FILENAME  "traffic.tcf"
 #define VAR_IDL_FXD_PCK 1
@@ -34,6 +37,7 @@
 void fg::f_send_flit(Flit flit, unsigned int traffic_class)
 ////////////////////////////////////////////////////////////////////////////////
 {
+    // TODO: Verificar como será o tratamento caso haja mais classes de tráfego do que VCs
     UIntVar v_VC = traffic_class;
     bool    v_BOP= flit.data[FLIT_WIDTH-2];
 
@@ -64,7 +68,7 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     UIntVar flit;           // Auxiliary variable to build the flit to be sent (FLIT_WIDTH is defined in parameters.h)
 
     UIntVar dest;           // Address of the destination node (RIB_WIDTH is defined in parameters.h)
-    static unsigned long pck_id = 0;
+    static unsigned long pck_id = 1;
 
     if ( (FLIT_WIDTH-2) < (2*RIB_WIDTH + 7)) {
         printf("\n\t[fg.cpp] ERROR: Data channel width should be greater or equal to %d bits\t",2*RIB_WIDTH + 7);
@@ -76,7 +80,7 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     packet->deadline = flow.deadline;
     packet->packetCreationCycle = cycle_to_send + 1;
     packet->packetId = pck_id;
-    packet->payloadLength = payload_length; // Two flits
+    packet->payloadLength = payload_length;
 
     // It calculates the address of the destination node
     dest = (sc_uint<RIB_WIDTH>)(flow.x_dest << (RIB_WIDTH/2) | flow.y_dest);
@@ -84,6 +88,7 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     UIntVar framing = 0;
     framing[ FLIT_WIDTH-2 ] = 1;
 
+    /////////////////// Header ///////////////////
     // It sends the header
     flit =  ( (framing)
               | ((flow.flow_id &0x3) << (THREAD_ID_POSITION) )
@@ -97,11 +102,20 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     headerFlit.packet_ptr = packet;
     f_send_flit(headerFlit, flow.traffic_class); // Send header
 
-    // It sends the trailer flit: the lowest word with "Ola" string
-    char msg[4] = "Ola"; // 4 bytes -> [0]: O , [1]: l, [2]: a, [3]: \0
+    /////////////////// Payload ///////////////////
+    for(unsigned short i = 0; i < payload_length-1; i++) {
+        Flit payload;
+        payload.data = i; // The content of the flit is only the number of flit in the packet
+        payload.packet_ptr = packet;
+        f_send_flit(payload,flow.traffic_class);
+    }
+
+    /////////////////// Trailer ///////////////////
+    // It sends the trailer flit: the lowest word with "Bye" string
+    char msg[4] = "Bye"; // 4 bytes -> [0]: B , [1]: y, [2]: e, [3]: \0
     framing = 0;
     framing[FLIT_WIDTH-1] = 1;
-    //   =   Trailer | ASCI:  O       |        L       |       A       |   \0
+    //   =   Trailer | ASCI:  B       |        y       |       e       |   \0
     flit = ( framing | (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
 
     Flit trailer;
@@ -251,6 +265,10 @@ void fg::p_send()
 
     //  printf("\nTraffic Generator fg_%u_%u loaded its flows\t", XID, YID);
 
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator(seed);
+    srand(time(NULL));
+
     // It closes the input file
     if (fp_in != NULL) fclose(fp_in);
 
@@ -283,8 +301,11 @@ void fg::p_send()
         while (pck_counter < total_pck_2send) {
             // It randomly chooses one of the flows that still has some packet to send
             do {
+//                std::uniform_int_distribution<int> distribution(0,nb_of_flows);
                 flow_index = rand() % (nb_of_flows);
+//                flow_index = distribution(generator);
             } while (flow[flow_index].pck_sent == flow[flow_index].pck_2send);
+            printf("\nFluxo Selecionado: %u",flow_index);
 
             // PARETO-based generation
             // If function of probability is Pareto, it determines the required bw

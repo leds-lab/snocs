@@ -2,7 +2,7 @@
 #define __EXPORT_H__
 
 // Detect Windows OS
-#ifdef _WIN32
+#ifdef __WIN32__
 #  ifdef GLOBAL_DEF
 #    define EXP_DEFINES __declspec(dllexport)
 #  else
