@@ -95,7 +95,7 @@ public:
                        unsigned short YID,
                        unsigned short PORT_ID);
 
-    ModuleType moduleType() const { return SoCINModule::Arbiter; }
+    ModuleType moduleType() const { return SoCINModule::TArbiter; }
     const char* moduleName() const { return "DistributedArbiter"; }
     ~DistributedArbiter();
 };

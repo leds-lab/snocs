@@ -58,7 +58,7 @@ public:
                      unsigned short YID,
                      unsigned short PORT_ID);
 
-    ModuleType moduleType() const { return SoCINModule::OC; }
+    ModuleType moduleType() const { return SoCINModule::TOutputController; }
     const char* moduleName() const { return "OutputController"; }
 
     ~OutputController();

@@ -37,9 +37,46 @@ class PluginManager;
 // Network info
 #define X_SIZE PARAMS->xSize                // Network X dimension
 #define Y_SIZE PARAMS->ySize                // Network Y dimension
-// Packet Format
-#define FLIT_WIDTH PARAMS->wordWidth        // Width of the flit (dataWidth + framing)
-#define RIB_WIDTH PARAMS->ribWidth          // Width of the addressing field (RIB) in the header
+/*!
+  Packet Format for the Mesh 2D SoCIN
+  e.g. 32-bit data width.
+  The flit width (FLIT_WIDTH) is 34-bit because 2 bits are framing:
+       EOP (Bit pos. 33) (end-of-packet - trailer) and BOP (Bit pos. 32) (begin-of-packet - header)
+  HLP (Higher Level Protocol) - Described below packet representation.
+  RIB (Routing Information Bits) - 8 bits - 4 for xDestination and 4 for yDestionation
+                                   (Max. Mesh Size: 16x16 = 256 routers)
+    Packet representation:
+  |-----------------------------------------------------|
+  | EOP | BOP |             Data[31..0]                 |
+  |-----------------------------------------------------|
+  |  0  |  1  | HLP | RIB.xdest[7..0] | RIB.ydest[3..0] | -> Header flit
+  |-----------------------------------------------------|
+  |  0  |  0  |            Payload (data)               | -> Payload flit
+  |  0  |  0  |                  .                      | -> Payload flit
+  |  0  |  0  |                  .                      | -> Payload flit
+  |  0  |  0  |                  .                      | -> Payload flit
+  |  0  |  0  |              Unlimited                  | -> Payload flit
+  |-----------------------------------------------------|
+  |  1  |  0  |            Last Payload                 | -> Trailer flit
+  |-----------------------------------------------------|
+
+  HLP is composed as follow: From bit 31 to 8 | HLP[31..8] (8..0 is RIB)
+
+  HLP[31..30] Thread ID       - Max. 4 threads
+  HLP[20..18] Traffic Class   - Max. 8 classes
+  HLP[15..12] Packet X source - From(RIB_WIDTH*2-1) to ([RIB_WIDTH*2-RIB_WIDTH/2] or [RIB_WIDTH+RIB_WIDTH/2])
+  HLP[11.. 8] Packet Y source - From(RIB_WIDTH+RIB_WIDTH/2-1) to(RIB_WIDTH)
+     Packet source (both x and y) is used to generate simulation report or to some routing technique
+     that consider the source address.
+
+*/
+#define FLIT_WIDTH PARAMS->wordWidth                        // Width of the flit (dataWidth + framing)
+#define RIB_WIDTH PARAMS->ribWidth                          // Width of the addressing field (RIB) in the header
+#define NUMBER_TRAFFIC_CLASSES PARAMS->numberOfClasses      // Number of traffic classes
+#define TRAFFIC_CLASS_POSITION PARAMS->trafficClassPosition // Position of the traffic class in the header
+#define NUMBER_OF_THREADS PARAMS->numberOfThreads           // Number of threads supported by the simulator
+#define THREAD_ID_POSITION PARAMS->threadIdPosition         // Position of the thread id in the header
+#define PACKET_TYPE_POSITION 16 // ???
 
 // Buffering
 #define FIFO_IN_DEPTH PARAMS->fifoInDepth   // Input buffers depth
@@ -74,11 +111,15 @@ public:
     // Packet Format
     unsigned short wordWidth;
     unsigned short ribWidth;
+
+    unsigned short trafficClassPosition;
+    unsigned short numberOfClasses;
+    unsigned short threadIdPosition;
+    unsigned short numberOfThreads;
     // Buffering
     unsigned short numVirtualChannels;
     unsigned short fifoInDepth;
     unsigned short fifoOutDepth;
-
 
 private:
     // Singleton
@@ -137,7 +178,7 @@ public:
 
 // ARBITRATION
 //#define N                   4  	// Number of requests received by an arbiter
-#define LOG2_N              2  	// Log2 of N
+//#define LOG2_N              2  	// Log2 of N
 
 // FLOW CONTROL
 enum fsm_state {S0,S1,S2};     	// States of the FSMs of handshake-type ifc and ofc
@@ -145,25 +186,25 @@ enum fsm_state {S0,S1,S2};     	// States of the FSMs of handshake-type ifc and 
 #define CREDIT_COUNTER_SIZE 3 	// Size of the credit counter
 
 // TRAFFIC CLASSES
-#define RT0                 0
-#define RT1                 1
-#define NRT0                2
-#define NRT1                3
+//#define RT0                 0
+//#define RT1                 1
+//#define NRT0                2
+//#define NRT1                3
 
 // STAMPLER PARAMETERS (block used for aging in XIN_AG
-enum stampler_fsm_state {STAMPLER_S0, STAMPLER_S1};
-#define AGE_CLOCK_WIDTH     2 // VHDL Original name: SIZE_REF
-#define AGE_WIDTH           3 // VHDL Original name: SIZE_COUNT
+//enum stampler_fsm_state {STAMPLER_S0, STAMPLER_S1};
+//#define AGE_CLOCK_WIDTH     2 // VHDL Original name: SIZE_REF
+//#define AGE_WIDTH           3 // VHDL Original name: SIZE_COUNT
 
 // PARIS CHANNEL TYPES
-#define PARIS_CHANNEL_NULL    0
-#define PARIS_CHANNEL_DEFAULT 1
-#define PARIS_CHANNEL_CS      2
-#define PARIS_CHANNEL_AG      3
+//#define PARIS_CHANNEL_NULL    0
+//#define PARIS_CHANNEL_DEFAULT 1
+//#define PARIS_CHANNEL_CS      2
+//#define PARIS_CHANNEL_AG      3
 
 // PARIS CHANNELS SELECTION
-#define PARIS_VC0_TYPE      PARIS_CHANNEL_DEFAULT
-#define PARIS_VC1_TYPE      PARIS_CHANNEL_NULL
+//#define PARIS_VC0_TYPE      PARIS_CHANNEL_DEFAULT
+//#define PARIS_VC1_TYPE      PARIS_CHANNEL_NULL
 
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////// CONSTANTS ////////////////////////////////////////
@@ -178,11 +219,11 @@ enum stampler_fsm_state {STAMPLER_S0, STAMPLER_S1};
 //#define REQ_NONE 0x00
 
 // PORTS IDs
-#define LOCAL_ID  0
-#define NORTH_ID  1
-#define EAST_ID   2
-#define SOUTH_ID  3
-#define WEST_ID   4
+//#define LOCAL_ID  0
+//#define NORTH_ID  1
+//#define EAST_ID   2
+//#define SOUTH_ID  3
+//#define WEST_ID   4
 
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////// DEBUG CONTROL ////////////////////////////////////

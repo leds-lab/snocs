@@ -103,25 +103,27 @@ public:
     /*!
      * \brief The ModuleType enum Determines the type of module implemented
      */
-    enum ModuleType { Router = 1,
-                      Routing,
-                      FlowControl,
-                      InputFlowControl,
-                      OutputFlowControl,
-                      Arbiter,
-                      Memory,
-                      PriorityGenerator,
-                      PriorityEncoder,
-                      NetworkInterface,
-                      Switch,
-                      IC,
-                      OC,
-                      ReqRegister,
-                      InputModule,
-                      OutputModule,
-                      NoC,
-                      StopSim,
-                      Other
+    enum ModuleType { TRouter = 1,
+                      TRouting,
+                      TFlowControl,
+                      TInputFlowControl,
+                      TOutputFlowControl,
+                      TArbiter,
+                      TMemory,
+                      TPriorityGenerator,
+                      TPriorityEncoder,
+                      TNetworkInterface,
+                      TInputController,
+                      TOutputController,
+                      TRequestRegister,
+                      TInputModule,
+                      TOutputModule,
+                      TNoC,
+                      TStopSim,
+                      TTrafficMeter,
+                      TTerminalInstrumentation,
+                      TFlowGenerator,
+                      OtherT
                     };
 
     virtual ModuleType moduleType() const = 0;

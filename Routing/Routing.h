@@ -58,7 +58,7 @@ public:
           o_REQUEST("IRouting_oREQUEST",nPorts),
           XID(XID), YID(YID) {}
 
-    ModuleType moduleType() const { return SoCINModule::Routing; }
+    ModuleType moduleType() const { return SoCINModule::TRouting; }
 
     ~IRouting() = 0;
 };

@@ -12,11 +12,11 @@
 #define VAR_IAT_FXD_PCK 4
 #define VAR_BST_FXD_IAT 5
 
-#define REQUIRED_BW_POSITION    22
-#define TRAFFIC_CLASS_POSITION  18
-#define PACKET_TYPE_POSITION    16
-#define FLOW_ID_POSITION        FLIT_WIDTH-4
-#define MIN_PAYLOAD_LENGTH      4
+//#define REQUIRED_BW_POSITION    22
+//#define TRAFFIC_CLASS_POSITION  18
+//#define PACKET_TYPE_POSITION    16
+//#define FLOW_ID_POSITION        FLIT_WIDTH-4
+//#define MIN_PAYLOAD_LENGTH      4
 
 // Switching types
 #define WH 0
@@ -64,8 +64,7 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     UIntVar flit;           // Auxiliary variable to build the flit to be sent (FLIT_WIDTH is defined in parameters.h)
 
     UIntVar dest;           // Address of the destination node (RIB_WIDTH is defined in parameters.h)
-    unsigned long long i;               // Index to count the flits being sent
-    static unsigned long long pck_id = 0;
+    static unsigned long pck_id = 0;
 
     if ( (FLIT_WIDTH-2) < (2*RIB_WIDTH + 7)) {
         printf("\n\t[fg.cpp] ERROR: Data channel width should be greater or equal to %d bits\t",2*RIB_WIDTH + 7);
@@ -75,7 +74,9 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     Packet* packet = new Packet;
     packet->requiredBW = flow.required_bw;
     packet->deadline = flow.deadline;
-    packet->cycleToSend = cycle_to_send + 1;
+    packet->packetCreationCycle = cycle_to_send + 1;
+    packet->packetId = pck_id;
+    packet->payloadLength = payload_length; // Two flits
 
     // It calculates the address of the destination node
     dest = (sc_uint<RIB_WIDTH>)(flow.x_dest << (RIB_WIDTH/2) | flow.y_dest);
@@ -84,9 +85,8 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     framing[ FLIT_WIDTH-2 ] = 1;
 
     // It sends the header
-//    flit = ( sc_biguint<FLIT_WIDTH> ) ( (unsigned long long) ( (((unsigned long long)HEADER_FRAME)<<(FLIT_WIDTH-2))
     flit =  ( (framing)
-              | ((flow.flow_id &0x3) << (FLOW_ID_POSITION) )
+              | ((flow.flow_id &0x3) << (THREAD_ID_POSITION) )
               | ((flow.traffic_class & 0x7) << TRAFFIC_CLASS_POSITION)
               | ((packet_type & 0x3) << PACKET_TYPE_POSITION)
               | (rib << RIB_WIDTH)
@@ -144,7 +144,7 @@ void fg::p_send()
 
     unsigned int nb_of_flows;
     unsigned int flow_index;
-    unsigned long long cycle_to_send_next_pck; // When the next packet has to be injected
+    unsigned long cycle_to_send_next_pck; // When the next packet has to be injected
     unsigned long long total_pck_2send;
     unsigned long long pck_counter;
     unsigned int nb_of_cycles_per_flit;
@@ -211,22 +211,22 @@ void fg::p_send()
         }
 
         for(flow_index = 0; flow_index < nb_of_flows; flow_index++){
-            fscanf(fp_in,"%u"  , &(flow[flow_index].type));
-            fscanf(fp_in,"%u"  , &(flow[flow_index].x_dest));
-            fscanf(fp_in,"%u"  , &(flow[flow_index].y_dest));
-            fscanf(fp_in,"%u"  , &(flow[flow_index].flow_id));
-            fscanf(fp_in,"%u"  , &(flow[flow_index].traffic_class));
-            fscanf(fp_in,"%u"  , &(flow[flow_index].switching_type));
-            fscanf(fp_in,"%llu", &(flow[flow_index].pck_2send));
-            fscanf(fp_in,"%llu", &(flow[flow_index].deadline));
-            fscanf(fp_in,"%f"  , &(flow[flow_index].required_bw));
-            fscanf(fp_in,"%u"  , &(flow[flow_index].payload_length));
-            fscanf(fp_in,"%u"  , &(flow[flow_index].idle));
-            fscanf(fp_in,"%u"  , &(flow[flow_index].iat));
-            fscanf(fp_in,"%u"  , &(flow[flow_index].burst_size));
-            fscanf(fp_in,"%u"  , &(flow[flow_index].last_payload_length));
-            fscanf(fp_in,"%f"  , &(flow[flow_index].parameter1));
-            fscanf(fp_in,"%f"  , &(flow[flow_index].parameter2));
+            fscanf(fp_in,"%u" , &(flow[flow_index].type));
+            fscanf(fp_in,"%u" , &(flow[flow_index].x_dest));
+            fscanf(fp_in,"%u" , &(flow[flow_index].y_dest));
+            fscanf(fp_in,"%u" , &(flow[flow_index].flow_id));
+            fscanf(fp_in,"%u" , &(flow[flow_index].traffic_class));
+            fscanf(fp_in,"%u" , &(flow[flow_index].switching_type));
+            fscanf(fp_in,"%lu", &(flow[flow_index].pck_2send));
+            fscanf(fp_in,"%lu", &(flow[flow_index].deadline));
+            fscanf(fp_in,"%f" , &(flow[flow_index].required_bw));
+            fscanf(fp_in,"%u" , &(flow[flow_index].payload_length));
+            fscanf(fp_in,"%u" , &(flow[flow_index].idle));
+            fscanf(fp_in,"%u" , &(flow[flow_index].iat));
+            fscanf(fp_in,"%u" , &(flow[flow_index].burst_size));
+            fscanf(fp_in,"%u" , &(flow[flow_index].last_payload_length));
+            fscanf(fp_in,"%f" , &(flow[flow_index].parameter1));
+            fscanf(fp_in,"%f" , &(flow[flow_index].parameter2));
             flow[flow_index].pck_sent = 0;
 
 #ifdef DEBUG

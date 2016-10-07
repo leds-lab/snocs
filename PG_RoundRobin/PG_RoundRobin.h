@@ -47,7 +47,7 @@ public:
               unsigned short int YID,
               unsigned short int PORT_ID);
 
-    ModuleType moduleType() const { return SoCINModule::PriorityGenerator; }
+    ModuleType moduleType() const { return SoCINModule::TPriorityGenerator; }
     const char* moduleName() const { return "PG_RoundRobin"; }
 };
 

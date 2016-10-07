@@ -214,7 +214,7 @@ void PluginManager::deallocateUnits() {
     for( unsigned int i = 0; i < allocatedUnits.size(); i++ ) {
         SoCINModule* module = allocatedUnits[i];
         switch( module->moduleType() ) {
-            case SoCINModule::NoC: {
+            case SoCINModule::TNoC: {
                 INoC* n = dynamic_cast<INoC* >(module);
                 if( n != NULL) {
 //                    std::cout << "Free - NoC" << std::endl;
@@ -222,7 +222,7 @@ void PluginManager::deallocateUnits() {
                 }
                 break;
             }
-            case SoCINModule::Router: {
+            case SoCINModule::TRouter: {
                 IRouter* r = dynamic_cast<IRouter*>(module);
                 if( r != NULL ) {
 //                    std::cout << "Free - Router" << std::endl;
@@ -230,7 +230,7 @@ void PluginManager::deallocateUnits() {
                 }
                 break;
             }
-            case SoCINModule::Routing:{
+            case SoCINModule::TRouting:{
                 IRouting* r = dynamic_cast<IRouting*>(module);
                 if( r != NULL ) {
 //                    std::cout << "Free - Routing" << std::endl;
@@ -238,7 +238,7 @@ void PluginManager::deallocateUnits() {
                 }
                 break;
             }
-            case SoCINModule::InputFlowControl: {
+            case SoCINModule::TInputFlowControl: {
                 IInputFlowControl* ifc = dynamic_cast<IInputFlowControl*>(module);
                 if( ifc != NULL ) {
 //                    std::cout << "Free - IFC" << std::endl;
@@ -246,7 +246,7 @@ void PluginManager::deallocateUnits() {
                 }
                 break;
             }
-            case SoCINModule::OutputFlowControl:{
+            case SoCINModule::TOutputFlowControl:{
                 IOutputFlowControl* ofc = dynamic_cast<IOutputFlowControl*>(module);
                 if( ofc != NULL ) {
 //                    std::cout << "Free - OFC" << std::endl;
@@ -254,7 +254,7 @@ void PluginManager::deallocateUnits() {
                 }
                 break;
             }
-            case SoCINModule::Memory: {
+            case SoCINModule::TMemory: {
                 IMemory* mem = dynamic_cast<IMemory*>(module);
                 if( mem != NULL ) {
 //                    std::cout << "Free - Memory" << std::endl;
@@ -262,7 +262,7 @@ void PluginManager::deallocateUnits() {
                 }
                 break;
             }
-            case SoCINModule::PriorityGenerator: {
+            case SoCINModule::TPriorityGenerator: {
                 IPriorityGenerator* pg = dynamic_cast<IPriorityGenerator*>(module);
                 if( pg != NULL ) {
 //                    std::cout << "Free - PG" << std::endl;

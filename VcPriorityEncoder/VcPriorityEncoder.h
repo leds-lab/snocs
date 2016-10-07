@@ -39,7 +39,7 @@ public:
     SC_HAS_PROCESS(VcPriorityEncoder);
     VcPriorityEncoder(sc_module_name mn, unsigned short numReqs);
 
-    ModuleType moduleType() const { return SoCINModule::PriorityEncoder; }
+    ModuleType moduleType() const { return SoCINModule::TPriorityEncoder; }
     const char* moduleName() const { return "VcPriorityEncoder"; }
 
     ~VcPriorityEncoder();

@@ -81,7 +81,7 @@ public:
                                 unsigned int short YID,
                                 unsigned short PORT_ID);
 
-    ModuleType moduleType() const { return SoCINModule::PriorityEncoder; }
+    ModuleType moduleType() const { return SoCINModule::TPriorityEncoder; }
     const char* moduleName() const { return "ProgrammablePriorityEncoder"; }
 
     ~ProgrammablePriorityEncoder();

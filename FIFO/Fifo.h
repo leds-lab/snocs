@@ -70,7 +70,7 @@ public:
          unsigned short YID,
          unsigned short PORT_ID);
 
-    inline ModuleType moduleType() const { return SoCINModule::Memory; }
+    inline ModuleType moduleType() const { return SoCINModule::TMemory; }
     inline const char* moduleName() const { return "FIFO"; }
 
     ~FIFO();

@@ -25,8 +25,8 @@ StopSim::StopSim(sc_module_name mn,
 
 void StopSim::p_STOP() {
 
-    unsigned long long int stopTime_ns;
-    unsigned long long int stopTime_cycles;
+    unsigned long int stopTime_ns;
+    unsigned long int stopTime_cycles;
     char str[512];
     FILE *fp_in;
     FILE *fp_out;
@@ -78,8 +78,8 @@ void StopSim::p_STOP() {
         w_EOT.write(v_EOT);
 
 #ifdef DEBUG_STOPSIM
-        cout << "\n";
-        cout << "[StopSim] cycle = " << i_CLK_CYCLES.read();
+        std::cout << std::endl;
+        std::cout << "[StopSim] cycle = " << i_CLK_CYCLES.read();
 
         std::cout << "\n Packets Sent = " << r_TOTAL_PACKETS_SENT.read() << " (";
         for( i = 0; i < numRouters; i++ ) {
@@ -87,7 +87,7 @@ void StopSim::p_STOP() {
         }
         std::cout << ")" << std::endl;
 
-        std::cout << "\n Packets Received = " << r_TOTAL_PACKETS_RECEIVED.read() << " (";
+        std::cout << " Packets Received = " << r_TOTAL_PACKETS_RECEIVED.read() << " (";
         for( i = 0; i < numRouters; i++ ) {
             std::cout << i_TG_NUM_PACKETS_RECEIVED[i].read() << " + ";
         }
@@ -96,8 +96,8 @@ void StopSim::p_STOP() {
 
         if (stopTime_cycles == 0) {
             if (w_EOT.read() == 1) {
-                if (r_TOTAL_PACKETS_SENT.read()==r_TOTAL_PACKETS_RECEIVED.read()) {
-                    fprintf(fp_out,"%llu", i_CLK_CYCLES.read());
+                if (r_TOTAL_PACKETS_SENT.read() == r_TOTAL_PACKETS_RECEIVED.read()) {
+                    fprintf(fp_out,"%lu", i_CLK_CYCLES.read());
                     fclose(fp_out);
                     o_EOS.write(1);
                     wait();
@@ -107,7 +107,7 @@ void StopSim::p_STOP() {
         } else {
             if (i_CLK_CYCLES.read() >= stopTime_cycles) {
                 // lltoa is used only to not generate warning on fprintf format to long long
-                fprintf(fp_out,"%%llu", i_CLK_CYCLES.read());
+                fprintf(fp_out,"%lu", i_CLK_CYCLES.read());
                 fclose(fp_out);
                 o_EOS.write(1);
                 wait();

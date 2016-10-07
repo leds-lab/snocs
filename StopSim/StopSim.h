@@ -28,10 +28,10 @@ protected:
 public:
     // Interface
     // System signals
-    sc_in<bool>               i_CLK;         // Clock
-    sc_in<bool>               i_RST;         // Reset
-    sc_out<bool>              o_EOS;         // End-of-Simulation
-    sc_in<unsigned long long> i_CLK_CYCLES;  // Global counter of cycles
+    sc_in<bool>          i_CLK;         // Clock
+    sc_in<bool>          i_RST;         // Reset
+    sc_out<bool>         o_EOS;         // End-of-Simulation
+    sc_in<unsigned long> i_CLK_CYCLES;  // Global counter of cycles
 
     // Traffic Generators signals
     sc_vector<sc_in<bool> >         i_TG_EOT;                 // End-of-Transmission of each TG
@@ -54,7 +54,7 @@ public:
             unsigned short nRouters,
             char* filename);
 
-    ModuleType moduleType() const { return SoCINModule::StopSim; }
+    ModuleType moduleType() const { return SoCINModule::TStopSim; }
     const char* moduleName() const { return "StopSim"; }
 
     ~StopSim(){}

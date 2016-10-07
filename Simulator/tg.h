@@ -24,7 +24,7 @@ SC_MODULE(tg) {
     // System signals
     sc_in_clk       	 clk;
     sc_in<bool>       	 rst;
-    sc_in<unsigned long long> clock_cycles;
+    sc_in<unsigned long> clock_cycles;
 
     // Link signals
     sc_out<Flit>    out_data;   // Output data channel

@@ -14,8 +14,14 @@ Parameters::Parameters() {
 
     xSize = 3;
     ySize = 3;
+
     wordWidth = 34;
     ribWidth = 8;
+    trafficClassPosition = 18;
+    numberOfClasses = 8;
+    threadIdPosition = 30;
+    numberOfThreads = 4;
+
     numVirtualChannels = 8;
     fifoInDepth = 4;
     fifoOutDepth = 0; // Without buffer
@@ -72,3 +78,4 @@ Parameters::~Parameters() {
     }
     Parameters::params = 0;
 }
+

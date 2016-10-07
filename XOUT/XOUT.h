@@ -97,7 +97,7 @@ public:
          unsigned short YID,
          unsigned short PORT_ID);
 
-    ModuleType moduleType() const { return SoCINModule::OutputModule; }
+    ModuleType moduleType() const { return SoCINModule::TOutputModule; }
     const char* moduleName() const { return "XOUT_Virtual"; }
 
     ~XOUT_Virtual();
@@ -265,7 +265,7 @@ public:
          unsigned short YID,
          unsigned short PORT_ID);
 
-    ModuleType moduleType() const { return SoCINModule::OutputModule; }
+    ModuleType moduleType() const { return SoCINModule::TOutputModule; }
     const char* moduleName() const { return "XOUT_N_VC"; }
 
     ~XOUT_N_VC();
@@ -475,7 +475,7 @@ public:
          unsigned short YID,
          unsigned short PORT_ID);
 
-    ModuleType moduleType() const { return SoCINModule::OutputModule; }
+    ModuleType moduleType() const { return SoCINModule::TOutputModule; }
     const char* moduleName() const { return "XOUT"; }
 
     ~XOUT_none_VC();

@@ -48,7 +48,7 @@ public:
                   unsigned short YID,
                   unsigned short PORT_ID);
 
-    inline ModuleType moduleType() const { return SoCINModule::InputFlowControl; }
+    inline ModuleType moduleType() const { return SoCINModule::TInputFlowControl; }
     inline const char* moduleName() const { return "IFC_Handshake"; }
 };
 /////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ public:
                   unsigned short YID,
                   unsigned short PORT_ID);
 
-    inline ModuleType moduleType() const { return SoCINModule::OutputFlowControl; }
+    inline ModuleType moduleType() const { return SoCINModule::TOutputFlowControl; }
     inline const char* moduleName() const { return "OFC_Handshake"; }
 };
 /////////////////////////////////////////////////////////////

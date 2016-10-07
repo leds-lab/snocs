@@ -71,7 +71,7 @@ public:
 
     INoC(sc_module_name mn,unsigned short nRouters);
 
-    ModuleType moduleType() const { return SoCINModule::NoC; }
+    ModuleType moduleType() const { return SoCINModule::TNoC; }
 
     ~INoC() = 0;
 };

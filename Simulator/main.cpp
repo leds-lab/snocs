@@ -1,6 +1,7 @@
 #include "../NoC/NoC.h"
 #include "../StopSim/StopSim.h"
 #include "../SystemSignals/SystemSignals.h"
+#include "../TrafficMeter/TrafficMeter.h"
 
 #include "../PluginManager/PluginManager.h"
 
@@ -103,7 +104,7 @@ void generateListNodesGtkwave() {
     fprintf(out,"\n@200");
     fprintf(out,"\n-System-Signals");
     fprintf(out,"\n@22");
-    fprintf(out,"\nSystemC.GLOBAL_CLK[63:0]");
+    fprintf(out,"\nSystemC.GLOBAL_CLK[31:0]");
     fprintf(out,"\n@28");
     fprintf(out,"\nSystemC.CLK");
     fprintf(out,"\nSystemC.RST");
@@ -251,19 +252,19 @@ int sc_main(int argc, char* argv[]) {
     printf("\nTclk = %.0f ns", CLK_PERIOD);
 
     // System signals
-    sc_clock                      w_CLK("CLK", CLK_PERIOD, SC_NS); // System clock | Tclk=1 ns
-    sc_signal<bool>               w_RST;                           // Reset
-    sc_signal<unsigned long long> w_GLOBAL_CLOCK;                  // Number of cycles
+    sc_clock                 w_CLK("CLK", CLK_PERIOD, SC_NS); // System clock | Tclk=1 ns
+    sc_signal<bool>          w_RST;                           // Reset
+    sc_signal<unsigned long> w_GLOBAL_CLOCK;                  // Number of cycles
 
     unsigned short nRouters = X_SIZE*Y_SIZE;
 
     // Wires to connect System Components to the network - Transmission interface
-    sc_vector<sc_signal<Flit> > w_IN_DATA("w_IN_DATA",nRouters);        //
-    sc_vector<sc_signal<bool> > w_IN_VALID("w_IN_VALID",nRouters);
-    sc_vector<sc_signal<bool> > w_IN_RETURN("w_IN_RETURN",nRouters);
-    sc_vector<sc_signal<Flit> > w_OUT_DATA("w_OUT_DATA",nRouters);
-    sc_vector<sc_signal<bool> > w_OUT_VALID("w_OUT_VALID",nRouters);
-    sc_vector<sc_signal<bool> > w_OUT_RETURN("w_OUT_RETURN",nRouters);
+    sc_vector<sc_signal<Flit> > w_IN_DATA("w_IN_DATA",nRouters);        // Network data input
+    sc_vector<sc_signal<bool> > w_IN_VALID("w_IN_VALID",nRouters);      // Network input flow control
+    sc_vector<sc_signal<bool> > w_IN_RETURN("w_IN_RETURN",nRouters);    // Network input flow control
+    sc_vector<sc_signal<Flit> > w_OUT_DATA("w_OUT_DATA",nRouters);      // Network data output
+    sc_vector<sc_signal<bool> > w_OUT_VALID("w_OUT_VALID",nRouters);    // Network output flow control
+    sc_vector<sc_signal<bool> > w_OUT_RETURN("w_OUT_RETURN",nRouters);  // Network output flow control
 
     // Used only with virtual channels
     sc_vector<sc_vector<sc_signal<bool> > > w_IN_VC_SEL("w_IN_VC_SEL");
@@ -308,6 +309,11 @@ int sc_main(int argc, char* argv[]) {
     INoC_VC *u_NOC_VC = dynamic_cast<INoC_VC *>(u_NOC);
     //////////////////////////////////////////////////////////////////////////////
 
+    //////////////////////////////////////////////////////////////////////////////
+    std::vector<TrafficMeter *> u_TMs(nRouters,NULL);
+    //////////////////////////////////////////////////////////////////////////////
+
+
     // System signals
     u_NOC->i_CLK(w_CLK);
     u_NOC->i_RST(w_RST);
@@ -331,7 +337,11 @@ int sc_main(int argc, char* argv[]) {
             char* outFilename = new char[20];
             sprintf(outFilename,"ext_%u_%u_out",x,y);
             // Instantiate TM
-            tm_single* u_TM = new tm_single(strTmName,x,y,WORK_DIR,outFilename);
+//            u_TM[rId] = new TrafficMeter(strTmName,WORK_DIR,outFilename)
+
+//            tm_single* u_TM = new tm_single(strTmName,x,y,WORK_DIR,outFilename);
+            TrafficMeter* u_TM = new TrafficMeter(strTmName,WORK_DIR,outFilename);
+            u_TMs[rId] = u_TM;
 
             //------------- Binding signals -------------//
 
@@ -356,13 +366,13 @@ int sc_main(int argc, char* argv[]) {
                 u_TG->o_VC(w_IN_VC_SEL[rId]);
 
             //------------- Binding TM -------------//
-            u_TM->clk(w_CLK);
-            u_TM->rst(w_RST);
-            u_TM->eos(w_EOS);
-            u_TM->clock_cycles(w_GLOBAL_CLOCK);
-            u_TM->data(w_OUT_DATA[rId]);
-            u_TM->val(w_OUT_VALID[rId]);
-            u_TM->ret(w_OUT_RETURN[rId]);
+            u_TM->i_CLK(w_CLK);
+            u_TM->i_RST(w_RST);
+            u_TM->i_EOS(w_EOS);
+            u_TM->i_CLK_CYCLES(w_GLOBAL_CLOCK);
+            u_TM->i_DATA(w_OUT_DATA[rId]);
+            u_TM->i_VALID(w_OUT_VALID[rId]);
+            u_TM->i_RETURN(w_OUT_RETURN[rId]);
             if(NUM_VC>0)
                 u_TM->i_VC_SEL(w_OUT_VC_SEL[rId]);
 
@@ -459,13 +469,17 @@ int sc_main(int argc, char* argv[]) {
 
     printf("\n\nExecuted in: %s\n\n",formattedTime);
 
-    delete[] formattedTime;
-
     if(TRACE) {
         sc_close_vcd_trace_file(tf);
         generateListNodesGtkwave();
     }
 
+
+    // Deallocating simulator units and auxiliar data
+    for( unsigned short i = 0; i < nRouters; i++ ) {
+        delete u_TMs[i];
+    }
+    delete[] formattedTime;
     delete PLUGIN_MANAGER;
 
     return 0;

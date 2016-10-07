@@ -26,7 +26,7 @@ using namespace sc_core;
 using namespace sc_dt;
 
 /////////////////////////////////////////////////////////////////////////
-/// Parameterizable data representation (unsigned only)
+/// Parameterizable data representation (unsigned)
 /////////////////////////////////////////////////////////////////////////
 class UIntVar : public sc_unsigned {
 public:
@@ -137,6 +137,119 @@ public:
 
     ~UIntVar() {}
 };
+
+/////////////////////////////////////////////////////////////////////////
+/// Parameterizable data representation (signed)
+/////////////////////////////////////////////////////////////////////////
+class IntVar : public sc_signed {
+public:
+    ////////// Constructors //////////
+    IntVar() : sc_signed(FLIT_WIDTH) {} // Default
+    IntVar(int v, int width)
+    : sc_signed( width )
+    { *this = v; }
+
+    // Follow SystemC specs
+    IntVar( const IntVar& v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    IntVar( const sc_unsigned& v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    IntVar( const sc_signed& v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    IntVar( const char* v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    IntVar( int64 v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    IntVar( uint64 v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    IntVar( long v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    IntVar( unsigned long v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    IntVar( int v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    IntVar( unsigned int v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    IntVar( double v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    IntVar( const sc_bv_base& v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    IntVar( const sc_lv_base& v )
+    : sc_signed( FLIT_WIDTH )
+    { *this = v; }
+
+    ////////// Assignment operators //////////
+    IntVar& operator = ( const IntVar& v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( const sc_unsigned& v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( const sc_signed& v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( const char* v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( int64 v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( uint64 v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( long v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( unsigned long v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( int v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( unsigned int v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( double v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( const sc_bv_base& v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( const sc_lv_base& v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( const sc_int_base& v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    IntVar& operator = ( const sc_uint_base& v )
+    { sc_signed::operator = ( v ); return *this; }
+
+    ~IntVar() {}
+};
 /////////////////////////////////////////////////////////////////////////
 /// END of Parameterizable data representation
 /////////////////////////////////////////////////////////////////////////
@@ -147,9 +260,11 @@ public:
 /// Packet structure
 /////////////////////////////////////////////////////////////////////////
 struct Packet {
-    unsigned int requiredBW;
-    unsigned long long deadline;
-    unsigned long long cycleToSend;
+    unsigned long int packetId;            // Packet identifier in the network - exclusive by packet
+    unsigned short payloadLength;          // Number of payload flits
+    float requiredBW;                      // Required bandwidth for the packet
+    unsigned long int deadline;            // Defined deadline for the packet
+    unsigned long int packetCreationCycle; // Packet cycle generation
 };
 /////////////////////////////////////////////////////////////////////////
 /// END of Packet structure

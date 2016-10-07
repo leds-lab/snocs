@@ -8,6 +8,7 @@ SOURCES += \
     ../PluginManager/PluginManager.cpp \
     ../SystemSignals/SystemSignals.cpp \
     ../StopSim/StopSim.cpp \
+    ../TrafficMeter/TrafficMeter.cpp \
     fg.cpp \
     fifo_in.cpp \
     fifo_out.cpp \
@@ -16,13 +17,14 @@ SOURCES += \
     ifc_handshake.cpp \
     ofc_credit.cpp \
     ofc_credit_vct.cpp \
-    ofc_handshake.cpp \
-    tm_single.cpp
+    ofc_handshake.cpp
+#    tm_single.cpp
 
 HEADERS += \
     ../PluginManager/PluginManager.h \
     ../SystemSignals/SystemSignals.h \
     ../StopSim/StopSim.h \
+    ../TrafficMeter/TrafficMeter.h \
     fg.h \
     fifo_in.h \
     fifo_out.h \
@@ -34,7 +36,7 @@ HEADERS += \
     ofc_credit.h \
     ofc_credit_vct.h \
     ofc_handshake.h \
-    tg.h \
-    tm_single.h
+    tg.h
+#    tm_single.h
 
 OTHER_FILES += simconf.conf

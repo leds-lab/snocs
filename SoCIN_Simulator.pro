@@ -39,13 +39,15 @@ SUBDIRS += \
     SoCIN \
     StopSim \
     SystemSignals \
-    VcPriorityEncoder
+    VcPriorityEncoder \
+    TrafficMeter
 
 OTHER_FILES += \
     app.pri \
     common.pri \
     plugin.pri \
     resources.pri \
+    socindefines.pri \
     export.h \
     SoCINModule.h \
     SoCINDefines.h \

@@ -55,7 +55,7 @@ public:
             unsigned short XID,
             unsigned short YID);
 
-   ModuleType moduleType() const { return SoCINModule::Router; }
+   ModuleType moduleType() const { return SoCINModule::TRouter; }
     ~IRouter() = 0;
 };
 

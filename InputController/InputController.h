@@ -70,7 +70,7 @@ public:
              unsigned short YID,
              unsigned short PORT_ID);
 
-    ModuleType moduleType() const { return SoCINModule::IC; }
+    ModuleType moduleType() const { return SoCINModule::TInputController; }
     const char* moduleName() const { return "InputController"; }
 
     ~InputController();

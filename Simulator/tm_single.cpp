@@ -8,7 +8,7 @@
 #include "tm_single.h"
 
 //#define REQUIRED_BW_POSITION    22
-#define TRAFFIC_CLASS_POSITION	18
+//#define TRAFFIC_CLASS_POSITION	18
 //#define FLOW_ID_POSITION        DATA_WIDTH-2
 //#define MIN_PAYLOAD_LENGTH      3
 
@@ -55,7 +55,7 @@ void tm_single::f_write_received_flit(FILE *fp_out)
         fprintf(fp_out,"%2u\t"   , flow_id);
         fprintf(fp_out,"%2u\t"   , traffic_class);
         fprintf(fp_out,"%10llu\t", p->deadline);
-        fprintf(fp_out,"%10llu\t", p->cycleToSend);
+        fprintf(fp_out,"%10llu\t", p->packetCreationCycle);
         fprintf(fp_out,"%10llu\t", cycle_of_arriving);
         fprintf(fp_out,"%10llu\t", (unsigned long long) clock_cycles.read());
         fprintf(fp_out,"%7u\t"   , pck_size-1);  // IT DOES NOT TAKE INTO ACCOUNT THE HEADER

@@ -78,7 +78,7 @@ public:
                     unsigned short XID,
                     unsigned short YID,
                     unsigned short PORT_ID);
-    ModuleType moduleType() const { return SoCINModule::ReqRegister; }
+    ModuleType moduleType() const { return SoCINModule::TRequestRegister; }
     const char* moduleName() const { return "RequestRegister"; }
     ~RequestRegister() {}
 };

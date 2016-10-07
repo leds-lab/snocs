@@ -24,12 +24,12 @@ public:
 
     // INTERFACE
     // System signals
-    ::sc_core::sc_in<bool>                i_CLK;
-    ::sc_core::sc_out<bool>               o_RST;
-    ::sc_core::sc_out<unsigned long long> o_GLOBAL_CLOCK;
+    ::sc_core::sc_in<bool>           i_CLK;
+    ::sc_core::sc_out<bool>          o_RST;
+    ::sc_core::sc_out<unsigned long> o_GLOBAL_CLOCK;
 
     // Internal Signals
-    unsigned long long r_COUNTER; // Global clock counter register
+    unsigned long r_COUNTER; // Global clock counter register
 
     // Module's processes
     void p_CLOCK();

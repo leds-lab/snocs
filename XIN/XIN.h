@@ -90,7 +90,7 @@ public:
     // Internal data structures
     unsigned short XID, YID, PORT_ID;
 
-    ModuleType moduleType() const { return SoCINModule::InputModule; }
+    ModuleType moduleType() const { return SoCINModule::TInputModule; }
     const char* moduleName() const { return "XIN_Virtual"; }
 };
 
@@ -264,7 +264,7 @@ public:
         unsigned short YID,
         unsigned short PORT_ID);
 
-    ModuleType moduleType() const { return SoCINModule::InputModule; }
+    ModuleType moduleType() const { return SoCINModule::TInputModule; }
     const char* moduleName() const { return "XIN_N_VC"; }
 
     ~XIN_N_VC();
@@ -374,7 +374,6 @@ inline XIN_N_VC::XIN_N_VC(sc_module_name mn,
         u_XIN->i_CLK(i_CLK);
         u_XIN->i_RST(i_RST);
         u_XIN->i_DATA(i_DATA);
-        // TODO: Verificar se é necessário fazer bind porta por porta
         u_XIN->o_X_REQUEST(o_X_REQUEST[i]);
         u_XIN->o_X_READ_OK(o_X_READ_OK[i]);
         u_XIN->i_X_READ(i_X_READ[i]);
@@ -478,7 +477,7 @@ public:
         unsigned short YID,
         unsigned short PORT_ID);
 
-    ModuleType moduleType() const { return SoCINModule::InputModule; }
+    ModuleType moduleType() const { return SoCINModule::TInputModule; }
     const char* moduleName() const { return "XIN"; }
 
     ~XIN_none_VC();

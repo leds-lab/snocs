@@ -24,7 +24,7 @@ SC_MODULE(fg)
     // System signals
     sc_in<bool>               clk;
     sc_in<bool>               rst;
-    sc_in<unsigned long long> clock_cycles;
+    sc_in<unsigned long> clock_cycles;
 
     // Interface to the VCs of the communication port (its is done by means of FIFOs)
     sc_out<Flit>  snd_data;	// I/F with the output FIFO
@@ -45,23 +45,23 @@ SC_MODULE(fg)
 
     // Data structures with the basic fields of a flow
     struct FLOW_TYPE {
-        unsigned int       type;                //  0: 0 = gtr determines the traffic model, 1 = tg determines the traffic model by using PARETO
-        unsigned int       x_dest;              //  1: X address of the destination node
-        unsigned int       y_dest;              //  2: Y address of the destination node
-        unsigned int       flow_id;             //  3: Flow identifier
-        unsigned int       traffic_class;       //  4: Class of traffic (RT0, RT1, nRT0, nRT1)
-        unsigned long long pck_2send;           //  5: Number of packets to be sent by the flow
-        unsigned long long deadline;            //  6: Required deadline to deliver the message
-        float              required_bw;         //  7: A percentual value of the channel bandwidth (e.g. 0.2 = 20%)
-        unsigned int       payload_length;      //  8: Number of flits in the payload (including the trailer)
-        unsigned int       idle;                //  9: Number of idle cycles between two packets
-        unsigned int       iat;                 // 10: Inter-arrival time
-        unsigned int       burst_size;          // 11: Number of packets in a burst transmission
-        unsigned int       last_payload_length; // 12: Number of flits in the payload (including the trailer) of the last packet in a burst
-        float              parameter1;          // 13: Additional parameter for TG-based trafic modelling (e.g.alfa_on in Pareto)
-        float              parameter2;          // 14: Additional parameter for TG-based trafic modelling (e.g.alfa_off in Pareto)
-        unsigned int       switching_type;      // 15: Switching type
-        unsigned long long pck_sent;            // 16: Status about the number of packets already sent
+        unsigned int  type;                //  0: 0 = gtr determines the traffic model, 1 = tg determines the traffic model by using PARETO
+        unsigned int  x_dest;              //  1: X address of the destination node
+        unsigned int  y_dest;              //  2: Y address of the destination node
+        unsigned int  flow_id;             //  3: Flow identifier
+        unsigned int  traffic_class;       //  4: Class of traffic (RT0, RT1, nRT0, nRT1)
+        unsigned long pck_2send;           //  5: Number of packets to be sent by the flow
+        unsigned long deadline;            //  6: Required deadline to deliver the message
+        float         required_bw;         //  7: A percentual value of the channel bandwidth (e.g. 0.2 = 20%)
+        unsigned int  payload_length;      //  8: Number of flits in the payload (including the trailer)
+        unsigned int  idle;                //  9: Number of idle cycles between two packets
+        unsigned int  iat;                 // 10: Inter-arrival time
+        unsigned int  burst_size;          // 11: Number of packets in a burst transmission
+        unsigned int  last_payload_length; // 12: Number of flits in the payload (including the trailer) of the last packet in a burst
+        float         parameter1;          // 13: Additional parameter for TG-based trafic modelling (e.g.alfa_on in Pareto)
+        float         parameter2;          // 14: Additional parameter for TG-based trafic modelling (e.g.alfa_off in Pareto)
+        unsigned int  switching_type;      // 15: Switching type
+        unsigned long pck_sent;            // 16: Status about the number of packets already sent
     };
 
     // Module process
