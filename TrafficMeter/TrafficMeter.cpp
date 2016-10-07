@@ -44,8 +44,13 @@ void TrafficMeter::p_PROBE() {
     // It prints the header of the table
     fprintf(outFile,"FILE: %s",pathFilename);
     fprintf(outFile,"\n");
+#ifdef __WIN32__
+    fprintf(outFile,"\n    Packet\tXs\tYs\tXd\tYd\tThread\tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
+    fprintf(outFile,"\n        ID\t  \t  \t  \t  \t    ID\t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
+#else
     fprintf(outFile,"\n    Packet\tXs\tYs\tXd\tYd\tThread\tTraffic\t    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
     fprintf(outFile,"\n        ID\t  \t  \t  \t  \t    ID\t  Class\t            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
+#endif
 
     fprintf(outFile,"\n#\n");
 
