@@ -44,8 +44,8 @@ void TrafficMeter::p_PROBE() {
     // It prints the header of the table
     fprintf(outFile,"FILE: %s",pathFilename);
     fprintf(outFile,"\n");
-    fprintf(outFile,"\n\tPacket\tXs\tYs\tXd\tYd\tThread\tTraffic\t    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
-    fprintf(outFile,"\n\t    ID\t  \t  \t  \t  \t    ID\t  Class\t            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
+    fprintf(outFile,"\n    Packet\tXs\tYs\tXd\tYd\tThread\tTraffic\t    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
+    fprintf(outFile,"\n        ID\t  \t  \t  \t  \t    ID\t  Class\t            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
 
     fprintf(outFile,"\n#\n");
 
@@ -119,14 +119,14 @@ void TrafficMeter::writeInfo() {
             fprintf(outFile,"%2u\t"    , ySrc);
             fprintf(outFile,"%2u\t"    , xDest);
             fprintf(outFile,"%2u\t"    , yDest);
-            fprintf(outFile,"\t%2u\t"  , threadId);
-            fprintf(outFile,"\t%2u\t"  , trafficClass);
+            fprintf(outFile,"  %2u\t"  , threadId);
+            fprintf(outFile,"  %2u\t"  , trafficClass);
             fprintf(outFile,"%10lu\t"  , packet->deadline);
-            fprintf(outFile,"\t%10lu\t"  , packet->packetCreationCycle);
+            fprintf(outFile,"%10lu\t"  , packet->packetCreationCycle);
             fprintf(outFile,"%10lu\t"  , this->cycleOfArriving);
             fprintf(outFile,"%10lu\t"  , i_CLK_CYCLES.read());
             fprintf(outFile,"%5u\t"  , packet->payloadLength);
-            fprintf(outFile,"\t%.2f\t" , round(packet->requiredBW) );
+            fprintf(outFile,"  %.2f\t" , round(packet->requiredBW) );
             fprintf(outFile,"\n");
             delete packet;
         } else {
