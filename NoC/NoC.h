@@ -20,9 +20,6 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #include "../SoCINModule.h"
 #include "../SoCINDefines.h"
 
-// Convert cartesian coordinate of the router in the MESH network to router ID
-#define COORDINATE_TO_ID(x,y) (y * X_SIZE + x)
-
 // Forward declaration
 class IRouter;
 

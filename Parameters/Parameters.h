@@ -37,6 +37,11 @@ class PluginManager;
 // Network info
 #define X_SIZE PARAMS->xSize                // Network X dimension
 #define Y_SIZE PARAMS->ySize                // Network Y dimension
+// Convert cartesian coordinate of the router in the MESH network to router ID
+#define COORDINATE_TO_ID(x,y) (y * X_SIZE + x)
+#define ID_TO_COORDINATE_X(i) (i % X_SIZE)
+#define ID_TO_COORDINATE_Y(i) (i / X_SIZE)
+
 /*!
   Packet Format for the Mesh 2D SoCIN
   e.g. 32-bit data width.

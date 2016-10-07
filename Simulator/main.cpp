@@ -7,7 +7,6 @@
 
 // TEMP
 #include "tg.h"
-#include "tm_single.h"
 
 #include <systemc>
 
@@ -16,16 +15,12 @@
 using namespace sc_core;
 using namespace sc_dt;
 
+// Messages to setup of the simulator
 const char* SETUP_MESSAGES[] =
 {"Setup successfully performed!", // [0]
  "Fail on load plugins ;-(",      // [1]
  "Conf file parse fail - oops"    // [2]
 };
-
-// TODO Verificar
-//#define ADDRESS_TO_INDEX(x,y)       ((x*MESH_H)+y)
-//#define INDEX_TO_ADDRESS_X(i)       (i/MESH_H)
-//#define INDEX_TO_ADDRESS_Y(i)       (i%MESH_H)
 
 /*!
  * \brief setupSimulator Setup all global definitions for the
@@ -47,8 +42,8 @@ const char* SETUP_MESSAGES[] =
  */
 unsigned int setupSimulator(int argc, char* argv[]) {
     // TODO: Fazer parse para obter configurações do sistema (X_SIZE, Y_SIZE, FLIT_WIDTH, TRACE...)
-    X_SIZE = 2;
-    Y_SIZE = 2;
+    X_SIZE = 4;
+    Y_SIZE = 4;
 
     NUM_VC = 0;
 
@@ -77,10 +72,10 @@ unsigned int setupSimulator(int argc, char* argv[]) {
         if( PLUGIN_MANAGER->loadPlugins() ) {
             std::cout << "Plugins loaded!" << std::endl;
         } else {
-            return 1;
+            return 1; // Return 1 to main that show message 1
         }
     } else {
-        return 2;
+        return 2;    // Main show message 2 from the SETUP_MESSAGES[2] vector
     }
 
     return 0;
@@ -342,9 +337,6 @@ int sc_main(int argc, char* argv[]) {
             char* outFilename = new char[20];
             sprintf(outFilename,"ext_%u_%u_out",x,y);
             // Instantiate TM
-//            u_TM[rId] = new TrafficMeter(strTmName,WORK_DIR,outFilename)
-
-//            tm_single* u_TM = new tm_single(strTmName,x,y,WORK_DIR,outFilename);
             TrafficMeter* u_TM = new TrafficMeter(strTmName,WORK_DIR,outFilename);
             u_TMs[rId] = u_TM;
 
