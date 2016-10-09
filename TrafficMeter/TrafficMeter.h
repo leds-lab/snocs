@@ -26,6 +26,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
  * with all packets crossing in the link.
  */
 class TrafficMeter : public SoCINModule {
+    unsigned long pckId; // TEMP
 protected:
     // Internal data structures
     char* workDir;          // Out folder - to put the log files

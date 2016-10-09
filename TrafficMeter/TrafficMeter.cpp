@@ -1,7 +1,9 @@
 #include "TrafficMeter.h"
 
 TrafficMeter::TrafficMeter(sc_module_name mn, char *workDir, char *fileName)
-    : SoCINModule(mn), workDir(workDir),outFileName(fileName), outFile(NULL),
+    : SoCINModule(mn),
+      pckId(1),// TEMP
+      workDir(workDir),outFileName(fileName), outFile(NULL),
       i_CLK("TrafficMeter_iCLK"),
       i_RST("TrafficMeter_iRST"),
       i_EOS("TrafficMeter_iEOS"),
@@ -15,7 +17,7 @@ TrafficMeter::TrafficMeter(sc_module_name mn, char *workDir, char *fileName)
     this->trafficClassWidth = (unsigned short) ceil(log2(NUMBER_TRAFFIC_CLASSES));
     this->threadIdWidth = (unsigned short) ceil(log2(NUMBER_OF_THREADS));
 
-    if( widthVcSelector > 0 ) {
+    if( NUM_VC > 1 ) {
         i_VC_SEL.init(widthVcSelector);
     }
 
@@ -44,7 +46,7 @@ void TrafficMeter::p_PROBE() {
     // It prints the header of the table
     fprintf(outFile,"FILE: %s",pathFilename);
     fprintf(outFile,"\n");
-#ifdef __WIN32__
+#if defined(__WIN32__) || defined(_WIN32)
     fprintf(outFile,"\n    Packet\tXs\tYs\tXd\tYd\tThread\tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
     fprintf(outFile,"\n        ID\t  \t  \t  \t  \t    ID\t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
 #else
@@ -119,7 +121,8 @@ void TrafficMeter::writeInfo() {
             unsigned short msbTrafficClassPos = trafficClassWidth != 0 ? TRAFFIC_CLASS_POSITION+trafficClassWidth-1 : TRAFFIC_CLASS_POSITION;
             unsigned short trafficClass = (unsigned short) packetHeader(msbTrafficClassPos,TRAFFIC_CLASS_POSITION).to_uint();
 
-            fprintf(outFile,"%10lu\t"  , packet->packetId);
+//            fprintf(outFile,"%10lu\t"  , packet->packetId); // TEMP
+            fprintf(outFile,"%10lu\t"  , pckId++);   // TEMP
             fprintf(outFile,"%2u\t"    , xSrc);
             fprintf(outFile,"%2u\t"    , ySrc);
             fprintf(outFile,"%2u\t"    , xDest);
