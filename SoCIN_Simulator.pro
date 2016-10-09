@@ -40,7 +40,9 @@ SUBDIRS += \
     StopSim \
     SystemSignals \
     VcPriorityEncoder \
-    TrafficMeter
+    TrafficMeter \
+    SoCIN_Crossbar \
+    Routing_Crossbar
 
 OTHER_FILES += \
     app.pri \
