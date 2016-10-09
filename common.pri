@@ -5,8 +5,6 @@ CONFIG += console
 SYSTEMC_PATH = C:/SystemC
 isEmpty(SYSTEMC_PATH) {
     error("SYSTEMC_PATH not defined. Please fix it (file: common.pri)")
-} else {
-    message("SYSTEMC_PATH $$SYSTEMC_PATH")
 }
 
 INCLUDEPATH = $${SYSTEMC_PATH}/include

@@ -102,6 +102,7 @@ class PluginManager;
 // Singleton
 class EXP_DEFINES Parameters {
 public:
+    unsigned long pckId;
     // Plugin Manager - (de)allocate instances from plugins
     PluginManager* pm;
 

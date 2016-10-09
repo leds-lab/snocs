@@ -48,7 +48,7 @@ class IRouter;
  */
 class INoC : public SoCINModule {
 protected:
-    unsigned short numRouters;
+    unsigned short numInterfaces;
 public:
     // INTERFACE
     // System signals
@@ -64,9 +64,9 @@ public:
     sc_vector<sc_in<bool> >  i_RETURN_OUT;
 
     // Internal units
-    std::vector<IRouter *> u_ROUTER;
+    std::vector<IRouter *> u_ROUTER; // ATTENTION: Initialize the vector size (use resize) or use append|insert for the routers instantiated
 
-    INoC(sc_module_name mn,unsigned short nRouters);
+    INoC(sc_module_name mn,unsigned short nInterfaces);
 
     ModuleType moduleType() const { return SoCINModule::TNoC; }
 
@@ -75,17 +75,18 @@ public:
 
 inline INoC::~INoC(){}
 
-inline INoC::INoC(sc_module_name mn,unsigned short nRouters)
-    : SoCINModule(mn), numRouters(nRouters),
+inline INoC::INoC(sc_module_name mn, unsigned short nInterfaces)
+    : SoCINModule(mn), numInterfaces(nInterfaces),
       i_CLK("INoC_iCLK"),
       i_RST("INoC_iRST"),
-      i_DATA_IN("INoC_iDATA_IN",nRouters),
-      i_VALID_IN("INoC_iVALID_IN",nRouters),
-      o_RETURN_IN("INoC_oRETURN_IN",nRouters),
-      o_DATA_OUT("INoC_oDATA_OUT",nRouters),
-      o_VALID_OUT("INoC_oVALID_OUT",nRouters),
-      i_RETURN_OUT("INoC_iRETURN_OUT",nRouters),
-      u_ROUTER(nRouters,NULL) {}
+      i_DATA_IN("INoC_iDATA_IN",nInterfaces),
+      i_VALID_IN("INoC_iVALID_IN",nInterfaces),
+      o_RETURN_IN("INoC_oRETURN_IN",nInterfaces),
+      o_DATA_OUT("INoC_oDATA_OUT",nInterfaces),
+      o_VALID_OUT("INoC_oVALID_OUT",nInterfaces),
+      i_RETURN_OUT("INoC_iRETURN_OUT",nInterfaces)
+//      u_ROUTER(nInterface,NULL)
+{}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -101,12 +102,11 @@ public:
     // Inherits the common interface from the INoC
 
     // Virtual channels interface
-//    sc_vector<sc_vector<sc_out<bool> > > o_VC;
     sc_vector<sc_vector<sc_in<bool> > >  i_VC_SELECTOR;
     sc_vector<sc_vector<sc_out<bool> > > o_VC_SELECTOR;
 
     INoC_VC(sc_module_name mn,
-            unsigned short nRouters,
+            unsigned short numInterfaces,
             unsigned short nVirtualChannels);
 
     ~INoC_VC() = 0;
@@ -115,18 +115,20 @@ public:
 inline INoC_VC::~INoC_VC() {}
 
 inline INoC_VC::INoC_VC(sc_module_name mn,
-                        unsigned short nRouters,
+                        unsigned short numInterfaces,
                         unsigned short nVirtualChannels)
-    : INoC(mn,nRouters), numVirtualChannels(nVirtualChannels),
-//      o_VC("INoC_VC_oL_VC"),
-      i_VC_SELECTOR("INoC_VC_i_VC_SELECTOR",nRouters),
-      o_VC_SELECTOR("INoC_VC_o_VC_SELECTOR",nRouters)
+    : INoC(mn,numInterfaces), numVirtualChannels(nVirtualChannels),
+      i_VC_SELECTOR("INoC_VC_i_VC_SELECTOR"),
+      o_VC_SELECTOR("INoC_VC_o_VC_SELECTOR")
 {
-    widthVcSelector = (unsigned short) ceil(log2(nVirtualChannels));
-//    o_VC.init(widthVcSelector);
-    for( unsigned short i = 0; i < nRouters; i++ ) {
-        i_VC_SELECTOR[i].init(widthVcSelector);
-        o_VC_SELECTOR[i].init(widthVcSelector);
+    if(nVirtualChannels > 1) {
+        i_VC_SELECTOR.init(numInterfaces);
+        o_VC_SELECTOR.init(numInterfaces);
+        widthVcSelector = (unsigned short) ceil(log2(nVirtualChannels));
+        for( unsigned short i = 0; i < numInterfaces; i++ ) {
+            i_VC_SELECTOR[i].init(widthVcSelector);
+            o_VC_SELECTOR[i].init(widthVcSelector);
+        }
     }
 }
 

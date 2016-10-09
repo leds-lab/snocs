@@ -31,9 +31,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
  * This interface is based on Paris router.
  */
 class IRouter : public SoCINModule {
-protected:
-    unsigned short numPorts;
 public:
+    unsigned short numPorts;
     // Interface
     // System signals
     sc_in<bool> i_CLK;  // Clock
@@ -83,14 +82,12 @@ inline IRouter::IRouter(sc_module_name mn,
 /// Router interface for router that implements virtual channels
 /////////////////////////////////////////////////////////////////////////////////
 class IRouter_VC : public IRouter {
-protected:
+public:
     unsigned short numVirtualChannels;
     unsigned short widthVcSelector;
-public:
     // Inherits common interfaces of router without virtual channel
 
     // Interface - virtual channels
-//    sc_vector<sc_vector<sc_out<bool> > > o_VC_IN;  // IN[VirtualChannel][BitSelector]
     sc_vector<sc_vector<sc_in<bool> > >  i_VC_IN;  // IN[VirtualChannel][BitSelector]
     sc_vector<sc_vector<sc_out<bool> > > o_VC_OUT; // OUT[VirtualChanne][BitSelector]
 
@@ -113,15 +110,17 @@ inline IRouter_VC::IRouter_VC(sc_module_name mn,
     : IRouter(mn,nPorts,XID,YID),
       numVirtualChannels(nVirtualChannels),
       widthVcSelector( (unsigned short)ceil(log2(nVirtualChannels)) ),
-//      o_VC_IN("IRouter_VC_oVC_IN",nPorts),
-      i_VC_IN("IRouter_VC_iVC_IN",nPorts),
-      o_VC_OUT("IRouter_VC_oVC_OUT",nPorts)
+      i_VC_IN("IRouter_VC_iVC_IN"),
+      o_VC_OUT("IRouter_VC_oVC_OUT")
 {
     // Initializing Virtual Channel ports with the width of the selector
-    for(unsigned short i = 0; i < nPorts; i++) {
-//        o_VC_IN[i].init(widthVcSelector);
-        o_VC_OUT[i].init(widthVcSelector);
-        i_VC_IN[i].init(widthVcSelector);
+    if( widthVcSelector > 0 ) {
+        i_VC_IN.init(nPorts);
+        o_VC_OUT.init(nPorts);
+        for(unsigned short i = 0; i < nPorts; i++) {
+            o_VC_OUT[i].init(widthVcSelector);
+            i_VC_IN[i].init(widthVcSelector);
+        }
     }
 }
 

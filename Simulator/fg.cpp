@@ -68,7 +68,6 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     UIntVar flit;           // Auxiliary variable to build the flit to be sent (FLIT_WIDTH is defined in parameters.h)
 
     UIntVar dest;           // Address of the destination node (RIB_WIDTH is defined in parameters.h)
-    static unsigned long pck_id = 1;
 
     if ( (FLIT_WIDTH-2) < (2*RIB_WIDTH + 7)) {
         printf("\n\t[fg.cpp] ERROR: Data channel width should be greater or equal to %d bits\t",2*RIB_WIDTH + 7);
@@ -79,7 +78,7 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     packet->requiredBW = flow.required_bw;
     packet->deadline = flow.deadline;
     packet->packetCreationCycle = cycle_to_send + 1;
-    packet->packetId = pck_id;
+    packet->packetId = PARAMS->pckId++;
     packet->payloadLength = payload_length;
 
     // It calculates the address of the destination node
@@ -123,7 +122,6 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     trailer.packet_ptr = packet;
     f_send_flit(trailer, flow.traffic_class); // Send trailer
 
-    pck_id++;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -267,7 +265,7 @@ void fg::p_send()
 
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine generator(seed);
-    srand(time(NULL));
+//    srand(time(NULL));
 
     // It closes the input file
     if (fp_in != NULL) fclose(fp_in);
@@ -305,7 +303,7 @@ void fg::p_send()
                 flow_index = rand() % (nb_of_flows);
 //                flow_index = distribution(generator);
             } while (flow[flow_index].pck_sent == flow[flow_index].pck_2send);
-            printf("\nFluxo Selecionado: %u",flow_index);
+//            printf("\nFluxo Selecionado: %u",flow_index);
 
             // PARETO-based generation
             // If function of probability is Pareto, it determines the required bw

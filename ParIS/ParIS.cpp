@@ -67,7 +67,6 @@ ParIS_N_VC::ParIS_N_VC(sc_module_name mn,
         xin->i_VALID(i_VALID_IN[i]);
         xin->o_RETURN(o_RETURN_IN[i]);
 
-//        xin->o_VC_SELECTOR(o_VC_IN[i]);
         xin->i_VC_SELECTOR(i_VC_IN[i]);
         // Inter-module's signals
         for( vc = 0; vc < nVirtualChannels; vc++) {
@@ -484,7 +483,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        if( nVirtualChannels > 0 ) {
+        if( nVirtualChannels > 1 ) {
             return new ParIS_N_VC(moduleName,nPorts,nVirtualChannels,XID,YID);
         } else {
             return new ParIS(moduleName,nPorts,XID,YID);

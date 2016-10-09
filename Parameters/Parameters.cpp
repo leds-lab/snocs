@@ -4,6 +4,8 @@
 Parameters* Parameters::params = 0; // Defining and initializing
 
 Parameters::Parameters() {
+    pckId = 1;
+
     pm = new PluginManager();
 // Default values
     clkPeriod = 1;
