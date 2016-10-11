@@ -9,10 +9,12 @@ include(../NoC/NoC.pro)
 include(../plugin.pri)
 include(../socindefines.pri)
 
-TARGET = noc_crossbar
+TARGET = noc_unit
 
-SOURCES += SoCIN_Crossbar.cpp \
-    ../PluginManager/PluginManager.cpp
+SOURCES += \
+    ../PluginManager/PluginManager.cpp \
+    SoCIN_Unit.cpp
 
-HEADERS += SoCIN_Crossbar.h \
-    ../PluginManager/PluginManager.h
+HEADERS += \
+    ../PluginManager/PluginManager.h \
+    SoCIN_Unit.h

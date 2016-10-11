@@ -41,7 +41,7 @@ SUBDIRS += \
     SystemSignals \
     VcPriorityEncoder \
     TrafficMeter \
-    SoCIN_Crossbar \
+    SoCIN_single_unit \
     Routing_Crossbar \
     Paris_Bus
 

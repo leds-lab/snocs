@@ -42,8 +42,8 @@ const char* SETUP_MESSAGES[] =
  */
 unsigned int setupSimulator(int argc, char* argv[]) {
     // TODO: Fazer parse para obter configurações do sistema (X_SIZE, Y_SIZE, FLIT_WIDTH, TRACE...)
-    X_SIZE = 4;
-    Y_SIZE = 4;
+    X_SIZE = 2;
+    Y_SIZE = 2;
 
     NUM_VC = 0;
 
@@ -380,8 +380,13 @@ int sc_main(int argc, char* argv[]) {
             u_NOC->o_VALID_OUT [elementId](w_OUT_VALID[elementId]);
             u_NOC->i_RETURN_OUT[elementId](w_OUT_RETURN[elementId]);
             if( NUM_VC > 1 ) {
-                u_NOC_VC->i_VC_SELECTOR[elementId](w_IN_VC_SEL[elementId]);
-                u_NOC_VC->o_VC_SELECTOR[elementId](w_OUT_VC_SEL[elementId]);
+                if( u_NOC_VC != NULL ) {
+                    u_NOC_VC->i_VC_SELECTOR[elementId](w_IN_VC_SEL[elementId]);
+                    u_NOC_VC->o_VC_SELECTOR[elementId](w_OUT_VC_SEL[elementId]);
+                } else {
+                    std::cout << "\nThe NoC selected don't support virtual channels" << std::endl;
+                    return -1;
+                }
             }
 
             //------------- Binding StopSim -------------//

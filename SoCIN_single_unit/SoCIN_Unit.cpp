@@ -1,17 +1,17 @@
-#include "SoCIN_Crossbar.h"
+#include "SoCIN_Unit.h"
 #include "../Router/Router.h"
 #include "../PluginManager/PluginManager.h"
 
-SoCIN_Crossbar::SoCIN_Crossbar(sc_module_name mn)
+SoCIN_Unit::SoCIN_Unit(sc_module_name mn)
     : INoC_VC( mn, (X_SIZE*Y_SIZE) , NUM_VC)
 {
     // Allocating the number of routers needed
     u_ROUTER.resize(1,NULL);
 
     // Get router instance
-    IRouter* u_R = PLUGIN_MANAGER->routerInstance("ParIS_Crossbar",0,0,(X_SIZE*Y_SIZE),NUM_VC);
+    IRouter* u_R = PLUGIN_MANAGER->routerInstance("SingleRouter",0,0,(X_SIZE*Y_SIZE),NUM_VC);
     if( u_R == NULL ) {
-        std::cout << "\n\t[SoCINfp_VC] -- ERROR: Not possible instantiate a router." << std::endl;
+        std::cout << "\n\t[SoCIN_Unit] -- ERROR: Not possible instantiate a router." << std::endl;
         return;
     }
 
@@ -32,14 +32,14 @@ SoCIN_Crossbar::SoCIN_Crossbar(sc_module_name mn)
         u_R->i_RETURN_OUT[i](i_RETURN_OUT[i]);
 
         // Binding virtual channels if needed
-        if( NUM_VC > 1 ) {
+        if( NUM_VC > 1 && u_R_VC != NULL ) {
             u_R_VC->i_VC_IN[i](i_VC_SELECTOR[i]);
             u_R_VC->o_VC_OUT[i](o_VC_SELECTOR[i]);
         }
     }
 }
 
-SoCIN_Crossbar::~SoCIN_Crossbar() {
+SoCIN_Unit::~SoCIN_Unit() {
     u_ROUTER.clear();
 }
 
@@ -59,7 +59,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new SoCIN_Crossbar(moduleName);
+        return new SoCIN_Unit(moduleName);
     }
     SS_EXP void delete_NoC(INoC* noc) {
         delete noc;
