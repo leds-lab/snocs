@@ -79,4 +79,8 @@ Thumbs.db
 # Simulator
 *.par
 *.tcf
-*work*
+*.out
+*ext*
+*class*
+*flow*
+*summary*
