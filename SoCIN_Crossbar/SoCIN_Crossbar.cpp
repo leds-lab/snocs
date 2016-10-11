@@ -10,6 +10,11 @@ SoCIN_Crossbar::SoCIN_Crossbar(sc_module_name mn)
 
     // Get router instance
     IRouter* u_R = PLUGIN_MANAGER->routerInstance("ParIS_Crossbar",0,0,(X_SIZE*Y_SIZE),NUM_VC);
+    if( u_R == NULL ) {
+        std::cout << "\n\t[SoCINfp_VC] -- ERROR: Not possible instantiate a router." << std::endl;
+        return;
+    }
+
     u_ROUTER[0] = u_R;
 
     u_R->i_CLK(i_CLK);

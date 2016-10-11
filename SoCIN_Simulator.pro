@@ -42,7 +42,8 @@ SUBDIRS += \
     VcPriorityEncoder \
     TrafficMeter \
     SoCIN_Crossbar \
-    Routing_Crossbar
+    Routing_Crossbar \
+    Paris_Bus
 
 OTHER_FILES += \
     app.pri \

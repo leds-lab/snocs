@@ -95,6 +95,10 @@ SoCINfp_VC::SoCINfp_VC(sc_module_name mn)
 
             // Instantiating a router
             IRouter* router = PLUGIN_MANAGER->routerInstance(rName,x,y,nPorts,NUM_VC);
+            if( router == NULL ) {
+                std::cout << "\n\t[SoCINfp_VC] -- ERROR: Not possible instantiate a router." << std::endl;
+                return;
+            }
             IRouter_VC* router_VC = dynamic_cast<IRouter_VC *>(router);
             if( router_VC == NULL ) {
                 std::cout << "\n\t[SoCINfp_VC] -- ERROR: the router instantiated is not a VC router." << std::endl;
@@ -427,6 +431,10 @@ SoCINfp::SoCINfp(sc_module_name mn)
 
             // Instantiating a router
             IRouter* router = PLUGIN_MANAGER->routerInstance(rName,x,y,nPorts,0);
+            if( router == NULL ) {
+                std::cout << "\n\t[SoCINfp_VC] -- ERROR: Not possible instantiate a router." << std::endl;
+                return;
+            }
 
             // Binding ports of the router
             // System signals
