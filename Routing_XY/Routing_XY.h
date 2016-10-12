@@ -43,6 +43,4 @@ public:
     const char* moduleName() const { return "Routing_XY"; }
 };
 
-
-
 #endif // __ROUTING_XY_H__

@@ -1,16 +1,10 @@
-#include "Routing_XY.h"
+#include "Routing_DOR_Torus.h"
 
-/*!
- * \brief Routing_XY::Routing_XY XY routing for Mesh topology constructor
- * \param mn Module name
- * \param nPorts Number of ports to route - number of requests to generate
- * \param XID X
- * \param YID
- */
-Routing_XY::Routing_XY(sc_module_name mn,
-                       unsigned short nPorts,
-                       unsigned short XID,
-                       unsigned short YID)
+
+Routing_DOR_Torus::Routing_DOR_Torus(sc_module_name mn,
+                                     unsigned short nPorts,
+                                     unsigned short XID,
+                                     unsigned short YID)
     : IOrthogonal2DRouting(mn,nPorts,XID,YID)
 {
     SC_METHOD(p_REQUEST);
@@ -18,9 +12,9 @@ Routing_XY::Routing_XY(sc_module_name mn,
 }
 
 /*!
- * \brief Routing_XY::p_REQUEST Process that generate the requests
+ * \brief Routing_DOR_Torus::p_REQUEST Process that generate the requests
  */
-void Routing_XY::p_REQUEST() {
+void Routing_DOR_Torus::p_REQUEST() {
     UIntVar   v_DATA;                   // Used to extract fields from data
     UIntVar   v_XDEST(0,RIB_WIDTH/2);   // x-coordinate
     UIntVar   v_YDEST(0,RIB_WIDTH/2);   // y-coordinate
@@ -48,20 +42,59 @@ void Routing_XY::p_REQUEST() {
     if (v_HEADER_PRESENT) {
         v_X_offset = (int) v_XDEST.to_int() - (int) XID;
         v_Y_offset = (int) v_YDEST.to_int() - (int) YID;
+
         if (v_X_offset != 0) {
             if (v_X_offset > 0) {
-                v_REQUEST = REQ_E;
+                if( v_X_offset > (X_SIZE-1)/2 ) {
+                    v_REQUEST = REQ_W;
+                } else {
+                    v_REQUEST = REQ_E;
+                }
             } else {
-                v_REQUEST = REQ_W;
+                if( (v_X_offset*-1) <= (X_SIZE-1)/2 ) {
+                    v_REQUEST = REQ_W;
+                } else {
+                    v_REQUEST = REQ_E;
+                }
             }
         } else if (v_Y_offset != 0) {
             if (v_Y_offset > 0) {
-                v_REQUEST = REQ_N;
+                if( v_Y_offset > (Y_SIZE-1)/2 ) {
+                    v_REQUEST = REQ_S;
+                } else {
+                    v_REQUEST = REQ_N;
+                }
             } else {
-                v_REQUEST = REQ_S;
+                if( (v_Y_offset*-1) <= (Y_SIZE-1)/2 ) {
+                    v_REQUEST = REQ_S;
+                } else {
+                    v_REQUEST = REQ_N;
+                }
             }
         } else { // X == Y == 0
             v_REQUEST = REQ_L;
+        }
+        std::cout << "\n[DOR_TORUS] XID: " << XID << ", YID: " << YID
+                  << ", xDest: " << v_XDEST << ", yDest: " << v_YDEST
+                  << ", Req: ";
+        switch(v_REQUEST.to_uint()) {
+            case 1:
+                std::cout << "LOCAL";
+                break;
+            case 2:
+                std::cout << "NORTH";
+                break;
+            case 4:
+                std::cout << "EAST";
+                break;
+            case 8:
+                std::cout << "SOUTH";
+                break;
+            case 16:
+                std::cout << "WEST";
+                break;
+            default:
+                std::cout << "NONE";
         }
     } else {
         v_REQUEST = REQ_NONE;
@@ -72,6 +105,7 @@ void Routing_XY::p_REQUEST() {
         o_REQUEST[i].write( v_REQUEST[i] );
     }
 }
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -90,7 +124,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new Routing_XY(moduleName,nPorts,XID,YID);
+        return new Routing_DOR_Torus(moduleName,nPorts,XID,YID);
     }
     SS_EXP void delete_Routing(IRouting* routing) {
         delete routing;
