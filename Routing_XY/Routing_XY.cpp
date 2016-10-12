@@ -11,7 +11,7 @@ Routing_XY::Routing_XY(sc_module_name mn,
                        unsigned short nPorts,
                        unsigned short XID,
                        unsigned short YID)
-    : IMesh2DRouting(mn,nPorts,XID,YID)
+    : IOrthogonal2DRouting(mn,nPorts,XID,YID)
 {
     SC_METHOD(p_REQUEST);
     sensitive << i_READ_OK << i_DATA;
@@ -28,7 +28,7 @@ void Routing_XY::p_REQUEST() {
     bool      v_BOP;                    // packet framing bit: begin of packet
     bool      v_HEADER_PRESENT;         // A header is in the FIFO's output
     UIntVar   v_REQUEST(0,numPorts);    // Encoded request
-    short int v_X, v_Y;                 // Aux. variables used for routing
+    short int v_X_offset, v_Y_offset;                 // Aux. variables used for routing
 
     Flit f = i_DATA.read();
     v_DATA = f.data;
@@ -47,16 +47,16 @@ void Routing_XY::p_REQUEST() {
 
     // It runs the routing algorithm
     if (v_HEADER_PRESENT) {
-        v_X = (int) v_XDEST.to_int() - (int) XID;
-        v_Y = (int) v_YDEST.to_int() - (int) YID;
-        if (v_X != 0) {
-            if (v_X > 0) {
+        v_X_offset = (int) v_XDEST.to_int() - (int) XID;
+        v_Y_offset = (int) v_YDEST.to_int() - (int) YID;
+        if (v_X_offset != 0) {
+            if (v_X_offset > 0) {
                 v_REQUEST = REQ_E;
             } else {
                 v_REQUEST = REQ_W;
             }
-        } else if (v_Y != 0) {
-            if (v_Y > 0) {
+        } else if (v_Y_offset != 0) {
+            if (v_Y_offset > 0) {
                 v_REQUEST = REQ_N;
             } else {
                 v_REQUEST = REQ_S;

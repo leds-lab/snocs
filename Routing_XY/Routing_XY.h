@@ -29,7 +29,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
  * router's coordinates and compares them with the destination
  * router's coordinate-specified on the header's RIB field.
  */
-class Routing_XY : public IMesh2DRouting {
+class Routing_XY : public IOrthogonal2DRouting {
 public:
     // Module's process
     void p_REQUEST();
