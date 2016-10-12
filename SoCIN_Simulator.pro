@@ -43,7 +43,8 @@ SUBDIRS += \
     TrafficMeter \
     SoCIN_single_unit \
     Routing_Crossbar \
-    Paris_Bus
+    Paris_Bus \
+    SoCIN_Torus
 
 OTHER_FILES += \
     app.pri \

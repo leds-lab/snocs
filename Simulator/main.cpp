@@ -42,8 +42,8 @@ const char* SETUP_MESSAGES[] =
  */
 unsigned int setupSimulator(int argc, char* argv[]) {
     // TODO: Fazer parse para obter configurações do sistema (X_SIZE, Y_SIZE, FLIT_WIDTH, TRACE...)
-    X_SIZE = 2;
-    Y_SIZE = 2;
+    X_SIZE = 3;
+    Y_SIZE = 3;
 
     NUM_VC = 0;
 

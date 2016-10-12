@@ -96,7 +96,7 @@ SoCINfp_VC::SoCINfp_VC(sc_module_name mn)
             // Instantiating a router
             IRouter* router = PLUGIN_MANAGER->routerInstance(rName,x,y,nPorts,NUM_VC);
             if( router == NULL ) {
-                std::cout << "\n\t[SoCINfp_VC] -- ERROR: Not possible instantiate a router." << std::endl;
+                std::cout << "\n\t[SoCINfp_VC] -- ERROR: It was not possible instantiate a router." << std::endl;
                 return;
             }
             IRouter_VC* router_VC = dynamic_cast<IRouter_VC *>(router);
@@ -642,10 +642,10 @@ extern "C" {
         // done before component instantiation.
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
-        if( NUM_VC == 0 ) {
-            return new SoCINfp(moduleName);
-        } else {
+        if( NUM_VC > 1 ) {
             return new SoCINfp_VC(moduleName);
+        } else {
+            return new SoCINfp(moduleName);
         }
 
     }
