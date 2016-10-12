@@ -1,5 +1,6 @@
 #include "Routing_DOR_Torus.h"
 
+//#define DEBUG_ROUTING
 
 Routing_DOR_Torus::Routing_DOR_Torus(sc_module_name mn,
                                      unsigned short nPorts,
@@ -74,6 +75,7 @@ void Routing_DOR_Torus::p_REQUEST() {
         } else { // X == Y == 0
             v_REQUEST = REQ_L;
         }
+#ifdef DEBUG_ROUTING
         std::cout << "\n[DOR_TORUS] XID: " << XID << ", YID: " << YID
                   << ", xDest: " << v_XDEST << ", yDest: " << v_YDEST
                   << ", Req: ";
@@ -96,6 +98,7 @@ void Routing_DOR_Torus::p_REQUEST() {
             default:
                 std::cout << "NONE";
         }
+#endif
     } else {
         v_REQUEST = REQ_NONE;
     }
