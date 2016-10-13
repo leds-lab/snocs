@@ -27,11 +27,11 @@ public:
     sc_vector<sc_signal<bool> > w_Y_RETURN_TO_NORTH;
     sc_vector<sc_vector<sc_signal<bool> > > w_Y_VC_SELECTOR_TO_NORTH;// VC link
 
+    // Waveform for debug proposal
+    sc_trace_file* tf;
 
     SC_HAS_PROCESS(SoCIN_Torus);
     SoCIN_Torus(sc_module_name mn);
-
-    sc_trace_file* tf;
 
     const char* moduleName() const { return "SoCIN_Torus"; }
 

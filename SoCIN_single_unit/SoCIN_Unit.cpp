@@ -32,9 +32,14 @@ SoCIN_Unit::SoCIN_Unit(sc_module_name mn)
         u_R->i_RETURN_OUT[i](i_RETURN_OUT[i]);
 
         // Binding virtual channels if needed
-        if( NUM_VC > 1 && u_R_VC != NULL ) {
-            u_R_VC->i_VC_IN[i](i_VC_SELECTOR[i]);
-            u_R_VC->o_VC_OUT[i](o_VC_SELECTOR[i]);
+        if( NUM_VC > 1) {
+            if( u_R_VC != NULL ) {
+                u_R_VC->i_VC_IN[i](i_VC_SELECTOR[i]);
+                u_R_VC->o_VC_OUT[i](o_VC_SELECTOR[i]);
+            } else {
+                std::cout << "\n\t[SoCIN_Unit] -- ERROR: The router instantiated is not a VC router." << std::endl;
+                return;
+            }
         }
     }
 }

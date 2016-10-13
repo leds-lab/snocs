@@ -6,21 +6,21 @@
 
 SoCIN_Torus::SoCIN_Torus(sc_module_name mn)
     : INoC_VC(mn, (X_SIZE*Y_SIZE), NUM_VC ),
-      w_X_DATA_TO_LEFT("w_X_DATA_IN"),
-      w_X_VALID_TO_LEFT("w_X_VALID_IN"),
-      w_X_RETURN_TO_LEFT("w_X_RETURN_IN"),
+      w_X_DATA_TO_LEFT("w_X_DATA_TO_LEFT"),
+      w_X_VALID_TO_LEFT("w_X_VALID_TO_LEFT"),
+      w_X_RETURN_TO_LEFT("w_X_RETURN_TO_LEFT"),
       w_X_VC_SELECTOR_TO_LEFT("w_X_VC_SELECTOR_TO_LEFT"),
-      w_X_DATA_TO_RIGHT("w_X_DATA_OUT"),
-      w_X_VALID_TO_RIGHT("w_X_VALID_OUT"),
-      w_X_RETURN_TO_RIGHT("w_X_RETURN_OUT"),
+      w_X_DATA_TO_RIGHT("w_X_DATA_TO_RIGHT"),
+      w_X_VALID_TO_RIGHT("w_X_VALID_TO_RIGHT"),
+      w_X_RETURN_TO_RIGHT("w_X_RETURN_TO_RIGHT"),
       w_X_VC_SELECTOR_TO_RIGHT("w_X_VC_SELECTOR_TO_RIGHT"),
-      w_Y_DATA_TO_SOUTH("w_Y_DATA_IN"),
-      w_Y_VALID_TO_SOUTH("w_Y_VALID_IN"),
-      w_Y_RETURN_TO_SOUTH("w_Y_RETURN_IN"),
+      w_Y_DATA_TO_SOUTH("w_Y_DATA_TO_SOUTH"),
+      w_Y_VALID_TO_SOUTH("w_Y_VALID_TO_SOUTH"),
+      w_Y_RETURN_TO_SOUTH("w_Y_RETURN_TO_SOUTH"),
       w_Y_VC_SELECTOR_TO_SOUTH("w_Y_VC_SELECTOR_TO_SOUTH"),
-      w_Y_DATA_TO_NORTH("w_Y_DATA_OUT"),
-      w_Y_VALID_TO_NORTH("w_Y_VALID_OUT"),
-      w_Y_RETURN_TO_NORTH("w_Y_RETURN_OUT"),
+      w_Y_DATA_TO_NORTH("w_Y_DATA_TO_NORTH"),
+      w_Y_VALID_TO_NORTH("w_Y_VALID_TO_NORTH"),
+      w_Y_RETURN_TO_NORTH("w_Y_RETURN_TO_NORTH"),
       w_Y_VC_SELECTOR_TO_NORTH("w_Y_VC_SELECTOR_TO_NORTH")
 {
     // Allocating the number of routers needed

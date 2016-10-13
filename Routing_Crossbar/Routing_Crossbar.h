@@ -1,4 +1,3 @@
-// TODO include HEADER text
 #ifndef __ROUTING_CROSSBAR_H__
 #define __ROUTING_CROSSBAR_H__
 

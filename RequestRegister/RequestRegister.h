@@ -194,7 +194,6 @@ inline void RequestRegister::p_REQUESTS_REGISTERS() {
         // If there is no registered request and a header is present,
         // it registers the new request determined by the routing function
         if ((i_READ_OK.read()==1) && (w_BOP.read()==1) && (o_REQUESTING.read()==0)) {
-// TODO: Verificar como ficará o mapeamento caso o sistema de identificação de portas mude
             for(i = 0; i < numPorts; i++) {
                 if( PORT_ID == i ) {
                     r_REQUEST[i].write(0);
@@ -202,37 +201,6 @@ inline void RequestRegister::p_REQUESTS_REGISTERS() {
                     r_REQUEST[i].write( i_REQUEST[i].read() );
                 }
             }
-      /*
-            // REQUEST LOCAL (reqL is not registered by module L)
-            if (PORT_ID==LOCAL_ID)
-                reqL.write(0);
-            else
-                reqL.write(in_reqL.read());
-
-            // REQUEST NORTH (reqN is not registered by module N)
-            if (PORT_ID==NORTH_ID)
-                reqN.write(0);
-            else
-                reqN.write(in_reqN.read());
-
-            // REQUEST EAST (reqE is not registered by module E
-            if (PORT_ID==EAST_ID)
-                reqE.write(0);
-            else
-                reqE.write(in_reqE.read());
-
-            // REQUEST SOUTH (reqS is not registered by module S)
-            if (PORT_ID==SOUTH_ID)
-                reqS.write(0);
-            else
-                reqS.write(in_reqS.read());
-
-            // REQUEST WEST (reqW is not registered by module W)
-            if (PORT_ID==WEST_ID)
-                reqW.write(0);
-            else
-                reqW.write(in_reqW.read());
-     */
         } else {
             if (w_TRAILER_SENT.read()){
                 for( i = 0; i < numPorts; i++) {

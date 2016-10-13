@@ -18,21 +18,21 @@
 ///
 SoCINfp_VC::SoCINfp_VC(sc_module_name mn)
     : INoC_VC(mn,(X_SIZE * Y_SIZE),NUM_VC),
-      w_X_DATA_TO_LEFT("w_X_DATA_IN"),
-      w_X_VALID_TO_LEFT("w_X_VALID_IN"),
-      w_X_RETURN_TO_LEFT("w_X_RETURN_IN"),
+      w_X_DATA_TO_LEFT("w_X_DATA_TO_LEFT"),
+      w_X_VALID_TO_LEFT("w_X_VALID_TO_LEFT"),
+      w_X_RETURN_TO_LEFT("w_X_RETURN_TO_LEFT"),
       w_X_VC_SELECTOR_TO_LEFT("w_X_VC_SELECTOR_TO_LEFT"),
-      w_X_DATA_TO_RIGHT("w_X_DATA_OUT"),
-      w_X_VALID_TO_RIGHT("w_X_VALID_OUT"),
-      w_X_RETURN_TO_RIGHT("w_X_RETURN_OUT"),
+      w_X_DATA_TO_RIGHT("w_X_DATA_TO_RIGHT"),
+      w_X_VALID_TO_RIGHT("w_X_VALID_TO_RIGHT"),
+      w_X_RETURN_TO_RIGHT("w_X_RETURN_TO_RIGHT"),
       w_X_VC_SELECTOR_TO_RIGHT("w_X_VC_SELECTOR_TO_RIGHT"),
-      w_Y_DATA_TO_SOUTH("w_Y_DATA_IN"),
-      w_Y_VALID_TO_SOUTH("w_Y_VALID_IN"),
-      w_Y_RETURN_TO_SOUTH("w_Y_RETURN_IN"),
+      w_Y_DATA_TO_SOUTH("w_Y_DATA_TO_SOUTH"),
+      w_Y_VALID_TO_SOUTH("w_Y_VALID_TO_SOUTH"),
+      w_Y_RETURN_TO_SOUTH("w_Y_RETURN_TO_SOUTH"),
       w_Y_VC_SELECTOR_TO_SOUTH("w_Y_VC_SELECTOR_TO_SOUTH"),
-      w_Y_DATA_TO_NORTH("w_Y_DATA_OUT"),
-      w_Y_VALID_TO_NORTH("w_Y_VALID_OUT"),
-      w_Y_RETURN_TO_NORTH("w_Y_RETURN_OUT"),
+      w_Y_DATA_TO_NORTH("w_Y_DATA_TO_NORTH"),
+      w_Y_VALID_TO_NORTH("w_Y_VALID_TO_NORTH"),
+      w_Y_RETURN_TO_NORTH("w_Y_RETURN_TO_NORTH"),
       w_Y_VC_SELECTOR_TO_NORTH("w_Y_VC_SELECTOR_TO_NORTH")
 {
     // Allocating the number of routers needed
@@ -133,7 +133,6 @@ SoCINfp_VC::SoCINfp_VC(sc_module_name mn)
                 router_VC->o_VALID_OUT[rPortId](w_Y_VALID_TO_NORTH[yWireId]);
                 router_VC->i_RETURN_OUT[rPortId](w_Y_RETURN_TO_NORTH[yWireId]);
                 router_VC->o_VC_OUT[rPortId](w_Y_VC_SELECTOR_TO_NORTH[yWireId]);
-//                router_VC->o_VC_IN[rPortId](w_VC);
             }
             // If EAST is used, it is the port 2 in the router,
             // except in the top border routers that is the port 1,
