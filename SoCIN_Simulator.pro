@@ -45,7 +45,9 @@ SUBDIRS += \
     Routing_Crossbar \
     Paris_Bus \
     SoCIN_Torus \
-    Routing_DOR_Torus
+    Routing_DOR_Torus \
+    SoCIN_Ring \
+    Routing_Ring
 
 OTHER_FILES += \
     app.pri \

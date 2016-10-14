@@ -78,7 +78,7 @@ inline IRouting::~IRouting() {}
  */
 class IOrthogonal2DRouting : public IRouting {
 protected:
-    // Request encoding
+    // Request encoding - char used to minimize the num of bytes used - 1 byte - max. requests one-hot style: 8 (2^8)
     unsigned char REQ_L;
     unsigned char REQ_N;
     unsigned char REQ_E;

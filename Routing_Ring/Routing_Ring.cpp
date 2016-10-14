@@ -1,28 +1,32 @@
-#include "Routing_DOR_Torus.h"
+#include "Routing_Ring.h"
 
 //#define DEBUG_ROUTING
 
-Routing_DOR_Torus::Routing_DOR_Torus(sc_module_name mn,
-                                     unsigned short nPorts,
-                                     unsigned short XID,
-                                     unsigned short YID)
-    : IOrthogonal2DRouting(mn,nPorts,XID,YID)
+Routing_Ring::Routing_Ring(sc_module_name mn,
+                           unsigned short nPorts,
+                           unsigned short XID,
+                           unsigned short YID)
+    : IRouting(mn,nPorts,XID,YID),
+      REQ_NONE(0),
+      REQ_LOCAL(1),
+      REQ_CLOCKWISE(2),
+      REQ_ANTICLOCKWISE(4)
 {
     SC_METHOD(p_REQUEST);
     sensitive << i_READ_OK << i_DATA;
 }
 
 /*!
- * \brief Routing_DOR_Torus::p_REQUEST Process that generate the requests
+ * \brief Routing_Ring::p_REQUEST Process that generate the requests
  */
-void Routing_DOR_Torus::p_REQUEST() {
+void Routing_Ring::p_REQUEST() {
     UIntVar   v_DATA;                   // Used to extract fields from data
     UIntVar   v_XDEST(0,RIB_WIDTH/2);   // x-coordinate
     UIntVar   v_YDEST(0,RIB_WIDTH/2);   // y-coordinate
     bool      v_BOP;                    // packet framing bit: begin of packet
     bool      v_HEADER_PRESENT;         // A header is in the FIFO's output
     UIntVar   v_REQUEST(0,numPorts);    // Encoded request
-    short int v_X_offset, v_Y_offset;   // Aux. variables used for routing
+    short int v_LOCAL, v_DEST, v_OFFSET;// Aux. variables used for routing
 
     Flit f = i_DATA.read();
     v_DATA = f.data;
@@ -41,59 +45,42 @@ void Routing_DOR_Torus::p_REQUEST() {
 
     // It runs the routing algorithm
     if (v_HEADER_PRESENT) {
-        v_X_offset = (int) v_XDEST.to_int() - (int) XID;
-        v_Y_offset = (int) v_YDEST.to_int() - (int) YID;
+        unsigned short v_LAST_ID = X_SIZE * Y_SIZE - 1;
+        v_LOCAL = COORDINATE_TO_ID(XID,YID);
+        v_DEST  = COORDINATE_TO_ID(v_XDEST.to_int(),v_YDEST.to_int());
 
-        if (v_X_offset != 0) {
-            if (v_X_offset > 0) {
-                if( v_X_offset > (X_SIZE-1)/2 ) {
-                    v_REQUEST = REQ_W;
+        v_OFFSET = v_DEST - v_LOCAL;
+
+        if (v_OFFSET != 0) {
+            if (v_OFFSET > 0) {
+                if( v_OFFSET > v_LAST_ID/2 ) {
+                    v_REQUEST = REQ_ANTICLOCKWISE;
                 } else {
-                    v_REQUEST = REQ_E;
+                    v_REQUEST = REQ_CLOCKWISE;
                 }
             } else {
-                if( (v_X_offset*-1) <= (X_SIZE-1)/2 ) {
-                    v_REQUEST = REQ_W;
+                if( (v_OFFSET*-1) <= v_LAST_ID/2 ) {
+                    v_REQUEST = REQ_ANTICLOCKWISE;
                 } else {
-                    v_REQUEST = REQ_E;
-                }
-            }
-        } else if (v_Y_offset != 0) {
-            if (v_Y_offset > 0) {
-                if( v_Y_offset > (Y_SIZE-1)/2 ) {
-                    v_REQUEST = REQ_S;
-                } else {
-                    v_REQUEST = REQ_N;
-                }
-            } else {
-                if( (v_Y_offset*-1) <= (Y_SIZE-1)/2 ) {
-                    v_REQUEST = REQ_S;
-                } else {
-                    v_REQUEST = REQ_N;
+                    v_REQUEST = REQ_CLOCKWISE;
                 }
             }
         } else { // X == Y == 0
-            v_REQUEST = REQ_L;
+            v_REQUEST = REQ_LOCAL;
         }
 #ifdef DEBUG_ROUTING
-        std::cout << "\n[DOR_TORUS] XID: " << XID << ", YID: " << YID
-                  << ", xDest: " << v_XDEST << ", yDest: " << v_YDEST
+        std::cout << "\n[Routing_Ring]"
+                  << " LOCAL: " << v_LOCAL << ", DEST: " << v_DEST
                   << ", Req: ";
         switch(v_REQUEST.to_uint()) {
             case 1:
                 std::cout << "LOCAL";
                 break;
             case 2:
-                std::cout << "NORTH";
+                std::cout << "CLOCKWISE";
                 break;
             case 4:
-                std::cout << "EAST";
-                break;
-            case 8:
-                std::cout << "SOUTH";
-                break;
-            case 16:
-                std::cout << "WEST";
+                std::cout << "ANTICLOCKWISE";
                 break;
             default:
                 std::cout << "NONE";
@@ -111,7 +98,9 @@ void Routing_DOR_Torus::p_REQUEST() {
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-
+/*!
+ * Factory Method to plugin use
+ */
 extern "C" {
     SS_EXP IRouting* new_Routing(sc_simcontext* simcontext,
                               sc_module_name moduleName,
@@ -127,7 +116,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new Routing_DOR_Torus(moduleName,nPorts,XID,YID);
+        return new Routing_Ring(moduleName,nPorts,XID,YID);
     }
     SS_EXP void delete_Routing(IRouting* routing) {
         delete routing;
