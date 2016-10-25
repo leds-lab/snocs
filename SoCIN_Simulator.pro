@@ -43,7 +43,7 @@ SUBDIRS += \
     TrafficMeter \
     SoCIN_single_unit \
     Routing_Crossbar \
-    Paris_Bus \
+    ParIS_Bus \
     SoCIN_Torus \
     Routing_DOR_Torus \
     SoCIN_Ring \
