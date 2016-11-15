@@ -196,6 +196,12 @@ inline void RequestRegister::p_REQUESTS_REGISTERS() {
         if ((i_READ_OK.read()==1) && (w_BOP.read()==1) && (o_REQUESTING.read()==0)) {
             for(i = 0; i < numPorts; i++) {
                 if( PORT_ID == i ) {
+                    if( i_REQUEST[i].read() == 1 ) { // NOTE A input port don't request a same output port
+                        std::cout << "[RequestRegister] -- Trying request the same port on Router["
+                                  <<XID<<"]["<<YID << "] - PORT: "<<PORT_ID
+                                   <<"\nSimulation aborted!" << std::endl;
+                        sc_stop();
+                    }
                     r_REQUEST[i].write(0);
                 } else {
                     r_REQUEST[i].write( i_REQUEST[i].read() );
