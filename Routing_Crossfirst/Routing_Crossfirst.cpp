@@ -54,7 +54,6 @@ void Routing_Crossfirst::p_REQUEST() {
 
         v_OFFSET = v_DEST - v_LOCAL;
 
-
         if (v_OFFSET != 0) {
             unsigned short v_LAST_ID = sysSize-1;
             if( abs(v_OFFSET) > maxHops) {

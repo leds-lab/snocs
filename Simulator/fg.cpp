@@ -67,11 +67,24 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
 {
     UIntVar flit;           // Auxiliary variable to build the flit to be sent (FLIT_WIDTH is defined in parameters.h)
 
-    UIntVar dest;           // Address of the destination node (RIB_WIDTH is defined in parameters.h)
+    unsigned short nodeId = rib.to_uint(); // Node id
+    UIntVar src,dest;                      // Address of the srd and destination node
 
     if ( (FLIT_WIDTH-2) < (2*RIB_WIDTH + 7)) {
         printf("\n\t[fg.cpp] ERROR: Data channel width should be greater or equal to %d bits\t",2*RIB_WIDTH + 7);
         exit(1);
+    }
+
+    // It calculates the address of the source and destination from id to coordinates
+    unsigned short xSrc  = ID_TO_COORDINATE_X(nodeId);
+    unsigned short ySrc  = ID_TO_COORDINATE_Y(nodeId);
+    src = (sc_uint<RIB_WIDTH>) (xSrc << (RIB_WIDTH/2) | ySrc);
+    unsigned short xDest = ID_TO_COORDINATE_X(flow.destination);
+    unsigned short yDest = ID_TO_COORDINATE_Y(flow.destination);
+    dest = (sc_uint<RIB_WIDTH>)(xDest << (RIB_WIDTH/2) | yDest);
+
+    if( src == dest ) {
+        std::cout << "\n[FlowGenerator] WARNING: The packet source and destination are the same - FG: " << FG_ID;
     }
 
     Packet* packet = new Packet;
@@ -80,11 +93,6 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     packet->packetCreationCycle = cycle_to_send + 1;
     packet->packetId = PARAMS->pckId++;
     packet->payloadLength = payload_length;
-
-    // It calculates the address of the destination node
-    unsigned short xDest = ID_TO_COORDINATE_X(flow.destination);
-    unsigned short yDest = ID_TO_COORDINATE_Y(flow.destination);
-    dest = (sc_uint<RIB_WIDTH>)(xDest << (RIB_WIDTH/2) | yDest);
 
     UIntVar framing = 0;
     framing[ FLIT_WIDTH-2 ] = 1;
@@ -95,7 +103,7 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
               | ((flow.flow_id &0x3) << (THREAD_ID_POSITION) )
               | ((flow.traffic_class & 0x7) << TRAFFIC_CLASS_POSITION)
               | ((packet_type & 0x3) << PACKET_TYPE_POSITION)
-              | (rib << RIB_WIDTH)
+              | (src << RIB_WIDTH)
               | dest );
 
     Flit headerFlit;
@@ -220,7 +228,7 @@ void fg::p_send()
             fscanf(fp_in,"%u" , &(flow[flow_index].type));
 //            fscanf(fp_in,"%u" , &(flow[flow_index].x_dest));
 //            fscanf(fp_in,"%u" , &(flow[flow_index].y_dest));
-            fscanf(fp_in,"%u" , &(flow[flow_index].destination));
+            fscanf(fp_in,"%hu" , &(flow[flow_index].destination));
             fscanf(fp_in,"%u" , &(flow[flow_index].flow_id));
             fscanf(fp_in,"%u" , &(flow[flow_index].traffic_class));
             fscanf(fp_in,"%u" , &(flow[flow_index].switching_type));
