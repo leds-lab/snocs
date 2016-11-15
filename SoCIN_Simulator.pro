@@ -47,7 +47,8 @@ SUBDIRS += \
     SoCIN_Torus \
     Routing_DOR_Torus \
     SoCIN_Ring \
-    Routing_Ring
+    Routing_Ring \
+    SoCIN_Spider
 
 OTHER_FILES += \
     app.pri \
