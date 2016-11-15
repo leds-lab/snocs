@@ -47,8 +47,10 @@ void TrafficMeter::p_PROBE() {
     fprintf(outFile,"FILE: %s",pathFilename);
     fprintf(outFile,"\n");
 #if defined(__WIN32__) || defined(_WIN32)
-    fprintf(outFile,"\n    Packet\tXs\tYs\tXd\tYd\tThread\tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
-    fprintf(outFile,"\n        ID\t  \t  \t  \t  \t    ID\t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
+//    fprintf(outFile,"\n    Packet\tXs\tYs\tXd\tYd\tThread\tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
+//    fprintf(outFile,"\n        ID\t  \t  \t  \t  \t    ID\t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
+    fprintf(outFile,"\n    Packet\t src\tdest\tThread\tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
+    fprintf(outFile,"\n        ID\t    \t    \t    ID\t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
 #else
     fprintf(outFile,"\n    Packet\tXs\tYs\tXd\tYd\tThread\tTraffic\t    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
     fprintf(outFile,"\n        ID\t  \t  \t  \t  \t    ID\t  Class\t            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
@@ -112,10 +114,12 @@ void TrafficMeter::writeInfo() {
     if( v_EOP ) {
         Packet* packet = dataFlit.packet_ptr;
         if(packet != NULL) { // For safe packet access
-            unsigned short xSrc  = (unsigned short) packetHeader(RIB_WIDTH*2-1, (RIB_WIDTH*2)-(RIB_WIDTH/2) ).to_uint();
-            unsigned short ySrc  = (unsigned short) packetHeader((RIB_WIDTH*2)-(RIB_WIDTH/2)-1,RIB_WIDTH).to_uint();
+//            unsigned short xSrc  = (unsigned short) packetHeader(RIB_WIDTH*2-1, (RIB_WIDTH*2)-(RIB_WIDTH/2) ).to_uint();
+//            unsigned short ySrc  = (unsigned short) packetHeader((RIB_WIDTH*2)-(RIB_WIDTH/2)-1,RIB_WIDTH).to_uint();
+            unsigned short src = (unsigned short) packetHeader((RIB_WIDTH*2-1),RIB_WIDTH).to_uint();
             unsigned short xDest = (unsigned short) packetHeader(RIB_WIDTH-1,RIB_WIDTH/2).to_uint();
             unsigned short yDest = (unsigned short) packetHeader(RIB_WIDTH/2-1,0).to_uint();
+            unsigned short dest = COORDINATE_TO_ID(xDest,yDest);
             unsigned short msbThreadId = (unsigned short) threadIdWidth != 0 ? THREAD_ID_POSITION + threadIdWidth-1 : THREAD_ID_POSITION;
             unsigned short threadId = (unsigned short) packetHeader(msbThreadId,THREAD_ID_POSITION).to_uint();
             unsigned short msbTrafficClassPos = trafficClassWidth != 0 ? TRAFFIC_CLASS_POSITION+trafficClassWidth-1 : TRAFFIC_CLASS_POSITION;
@@ -123,10 +127,12 @@ void TrafficMeter::writeInfo() {
 
 //            fprintf(outFile,"%10lu\t"  , packet->packetId); // TEMP
             fprintf(outFile,"%10lu\t"  , pckId++);   // TEMP
-            fprintf(outFile,"%2u\t"    , xSrc);
-            fprintf(outFile,"%2u\t"    , ySrc);
-            fprintf(outFile,"%2u\t"    , xDest);
-            fprintf(outFile,"%2u\t"    , yDest);
+//            fprintf(outFile,"%2u\t"    , xSrc);
+//            fprintf(outFile,"%2u\t"    , ySrc);
+            fprintf(outFile,"%4u\t"    , src);
+//            fprintf(outFile,"%2u\t"    , xDest);
+//            fprintf(outFile,"%2u\t"    , yDest);
+            fprintf(outFile,"%4u\t"    , dest);
             fprintf(outFile,"  %2u\t"  , threadId);
             fprintf(outFile,"  %2u\t"  , trafficClass);
             fprintf(outFile,"%10lu\t"  , packet->deadline);

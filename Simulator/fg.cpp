@@ -82,7 +82,9 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     packet->payloadLength = payload_length;
 
     // It calculates the address of the destination node
-    dest = (sc_uint<RIB_WIDTH>)(flow.x_dest << (RIB_WIDTH/2) | flow.y_dest);
+    unsigned short xDest = ID_TO_COORDINATE_X(flow.destination);
+    unsigned short yDest = ID_TO_COORDINATE_Y(flow.destination);
+    dest = (sc_uint<RIB_WIDTH>)(xDest << (RIB_WIDTH/2) | yDest);
 
     UIntVar framing = 0;
     framing[ FLIT_WIDTH-2 ] = 1;
@@ -190,24 +192,16 @@ void fg::p_send()
         exit(1);
     } else {
         // It searches for the traffic description in the file
-        sprintf(fg_name,"tg_%u_%u", XID, YID);
+        sprintf(fg_name,"tg_%u", FG_ID);
         do {
             fscanf(fp_in,"%s",str);
 
             if (!strcmp(fg_name,str)){
                 // It reads the file in order to determine the number of flows
                 fscanf(fp_in,"%d",&nb_of_flows);
-
-                /*
-        switch(nb_of_flows) {
-          case  0 : printf("\nTraffic generator (%d,%d) has no flow.\t" , XID, YID); break;
-          case  1 : printf("\nTraffic generator (%d,%d) has 01 flow.\t", XID, YID); break;
-          default : printf("\nTraffic generator (%d,%d) has %02d flows.\t", XID, YID, nb_of_flows);
-        }
-                */
             }
             if (!strcmp(str,"//")) {
-                printf("\n\n[fg.cpp] Traffic generator (%d,%d) has no flow description. It will be assumed that it has no flow.\t" , XID, YID);
+                printf("\n\n[fg.cpp] Traffic generator (%d) has no flow description. It will be assumed that it has no flow.\t" , FG_ID);
                 nb_of_flows = 0;
                 break;
             }
@@ -218,14 +212,15 @@ void fg::p_send()
     // It allocates memory to store the data structure of each flow
     if (nb_of_flows) {
         if ((flow = (FLOW_TYPE*) malloc(sizeof(FLOW_TYPE)*nb_of_flows))==NULL) {
-            printf("\n\n\tERROR: There is not enough memory to create the flows for core %d %d!!!\n\n", XID,YID);
+            printf("\n\n\tERROR: There is not enough memory to create the flows for core %d !!!\n\n", FG_ID);
             exit(1);
         }
 
         for(flow_index = 0; flow_index < nb_of_flows; flow_index++){
             fscanf(fp_in,"%u" , &(flow[flow_index].type));
-            fscanf(fp_in,"%u" , &(flow[flow_index].x_dest));
-            fscanf(fp_in,"%u" , &(flow[flow_index].y_dest));
+//            fscanf(fp_in,"%u" , &(flow[flow_index].x_dest));
+//            fscanf(fp_in,"%u" , &(flow[flow_index].y_dest));
+            fscanf(fp_in,"%u" , &(flow[flow_index].destination));
             fscanf(fp_in,"%u" , &(flow[flow_index].flow_id));
             fscanf(fp_in,"%u" , &(flow[flow_index].traffic_class));
             fscanf(fp_in,"%u" , &(flow[flow_index].switching_type));
@@ -261,8 +256,6 @@ void fg::p_send()
         }
     }
 
-    //  printf("\nTraffic Generator fg_%u_%u loaded its flows\t", XID, YID);
-
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine generator(seed);
 //    srand(time(NULL));
@@ -278,14 +271,12 @@ void fg::p_send()
     number_of_packets_sent.write(0x0);
     wait();
 
-
     //////////////////
     // FLOW GENERATION
     //////////////////
-
     if (nb_of_flows) {
         // It determines the router id (network address)
-        id = (XID << RIB_WIDTH/2) | YID;
+        id = FG_ID;
 
         // It determines the total number of packets to be sent by all the flows
         for(total_pck_2send = 0, i=0; i<nb_of_flows; i++)
@@ -500,9 +491,9 @@ void fg::p_receive()
         const Flit f = rcv_data.read();
         data = f.data;
         trailer = data[FLIT_WIDTH-1];
-//        std::cout << "FG(receive) - Data: " << data.to_string(SC_HEX_US,false) << std::endl;
-        if ((rcv_rok.read()==1) && trailer)
+        if ((rcv_rok.read()==1) && trailer) {
             number_of_packets_received.write(number_of_packets_received.read() + 1);
+        }
 
         wait();
     }

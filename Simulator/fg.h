@@ -41,13 +41,14 @@ SC_MODULE(fg)
     sc_out<unsigned int>          number_of_packets_received;
 
     // Internal data structures
-    unsigned short int XID, YID, PORT_ID;
+    unsigned short int FG_ID;
 
     // Data structures with the basic fields of a flow
     struct FLOW_TYPE {
         unsigned int  type;                //  0: 0 = gtr determines the traffic model, 1 = tg determines the traffic model by using PARETO
-        unsigned int  x_dest;              //  1: X address of the destination node
-        unsigned int  y_dest;              //  2: Y address of the destination node
+//        unsigned int  x_dest;              //  1: X address of the destination node
+//        unsigned int  y_dest;              //  2: Y address of the destination node
+        unsigned short destination;
         unsigned int  flow_id;             //  3: Flow identifier
         unsigned int  traffic_class;       //  4: Class of traffic (RT0, RT1, nRT0, nRT1)
         unsigned long pck_2send;           //  5: Number of packets to be sent by the flow
@@ -77,11 +78,9 @@ SC_MODULE(fg)
 
     //////////////////////////////////////////////////////////////////////////////
     fg(sc_module_name nm,
-       unsigned short int XID,
-       unsigned short int YID) :
+       unsigned short int FG_ID) :
         sc_module(nm),
-        XID(XID),
-        YID(YID)
+        FG_ID(FG_ID)
     //////////////////////////////////////////////////////////////////////////////
     {
         vcWidth = (unsigned short) ceil(log2(NUM_VC));

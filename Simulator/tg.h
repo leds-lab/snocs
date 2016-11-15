@@ -55,10 +55,10 @@ SC_MODULE(tg) {
     sc_signal<bool> rcv_rd_wire;
 
     // Internal data structures
-    unsigned short int XID, YID, PORT_ID;
+    unsigned short int TG_ID;
 
     void p_debug(void) {
-        if ((XID+YID)==0) {
+        if ((TG_ID)==0) {
             if (snd_wr_wire.read()) {
                 printf("\n");
                 printf("snd_wok = %d",(unsigned int) snd_wok_wire.read());
@@ -74,11 +74,9 @@ SC_MODULE(tg) {
     SC_HAS_PROCESS(tg);
     //////////////////////////////////////////////////////////////////////////////
     tg(sc_module_name nm,
-        unsigned short int XID,
-        unsigned short int YID) :
+        unsigned short int TG_ID) :
         sc_module(nm),
-        XID(XID),
-        YID(YID)
+        TG_ID(TG_ID)
     //////////////////////////////////////////////////////////////////////////////
     {
 //        SC_METHOD(p_debug);
@@ -88,7 +86,7 @@ SC_MODULE(tg) {
         }
 
         //////////////////////////////////
-        fg *fg0 = new fg("fg0", XID, YID);
+        fg *fg0 = new fg("fg0",TG_ID);
         //////////////////////////////////
         fg0->clk(clk);
         fg0->rst(rst);
@@ -107,7 +105,7 @@ SC_MODULE(tg) {
 
 #ifndef USE_UNBOUNDED_FIFO
         ///////////////////////////////////////////////////////////
-        fifo_out *fifo0 = new fifo_out("fifo0", XID, YID, PORT_ID);
+        fifo_out *fifo0 = new fifo_out("fifo0", 0, 0, 0);
         ///////////////////////////////////////////////////////////
         fifo0->clk(clk);
         fifo0->rst(rst);
@@ -129,7 +127,7 @@ SC_MODULE(tg) {
 #endif
 
         //////////////////////////////////////////////
-        ofc *ofc0 = new ofc("ofc0", XID, YID, PORT_ID);
+        ofc *ofc0 = new ofc("ofc0", 0, 0, 0);
         //////////////////////////////////////////////
         ofc0->clk(clk);
         ofc0->rst(rst);
@@ -140,7 +138,7 @@ SC_MODULE(tg) {
 
 #ifndef USE_UNBOUNDED_FIFO
         /////////////////////////////////////////////////////////
-        fifo_in *fifo1 = new fifo_in("fifo1", XID, YID, PORT_ID);
+        fifo_in *fifo1 = new fifo_in("fifo1", 0, 0, 0);
         /////////////////////////////////////////////////////////
         fifo1->clk(clk);
         fifo1->rst(rst);
@@ -162,7 +160,7 @@ SC_MODULE(tg) {
 #endif
 
         //////////////////////////////////////////////
-        ifc *ifc0 = new ifc("ifc0", XID, YID, PORT_ID);
+        ifc *ifc0 = new ifc("ifc0", 0, 0, 0);
         //////////////////////////////////////////////
         ifc0->clk(clk);
         ifc0->rst(rst);
