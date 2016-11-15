@@ -300,9 +300,8 @@ public:
 
     friend std::ostream& operator<<(std::ostream& os, const Flit& flit)
     {
-        os << "{" << std::endl << "Data:" << flit.data << ","
-           << "Packet_ID:" << flit.packet_ptr << std::endl
-           << "}";
+        os << "{" << "Data:" << flit.data.to_string(SC_HEX_US) << ","
+           << "Packet_ID:" << flit.packet_ptr << "}";
         return os;
     }
 
