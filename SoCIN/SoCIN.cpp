@@ -192,7 +192,7 @@ SoCINfp_VC::SoCINfp_VC(sc_module_name mn)
     sc_trace(tf,i_RST,"RST");
     unsigned short i,vcBit;
     // Interfaces - routers
-    for( i = 0; i < numRouters; i++ ) {
+    for( i = 0; i < numInterfaces; i++ ) {
         char strI[5];
         sprintf(strI,"(%u)",i);
         char strDataIn[15];
@@ -512,7 +512,7 @@ SoCINfp::SoCINfp(sc_module_name mn)
     sc_trace(tf,i_RST,"RST");
     unsigned short i;
     // Interfaces - routers
-    for( i = 0; i < numRouters; i++ ) {
+    for( i = 0; i < numInterfaces; i++ ) {
         char strI[5];
         sprintf(strI,"(%u)",i);
         char strDataIn[15];

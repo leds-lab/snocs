@@ -24,7 +24,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
  */
 class StopSim : public SoCINModule {
 protected:
-    unsigned short numRouters;
+    unsigned short numInterfaces;
 public:
     // Interface
     // System signals
@@ -51,7 +51,7 @@ public:
 
     SC_HAS_PROCESS(StopSim);
     StopSim(sc_module_name mn,
-            unsigned short nRouters,
+            unsigned short nInterfaces,
             char* filename);
 
     ModuleType moduleType() const { return SoCINModule::TStopSim; }

@@ -102,7 +102,7 @@ SoCIN_Ring::SoCIN_Ring(sc_module_name mn)
 
             // Port 2 is the RIGHT port
             rPortId = 2;
-            wireId = routerId == 0 ? X_SIZE*Y_SIZE-1 : routerId - 1;
+            wireId = routerId == 0 ? numInterfaces-1 : routerId - 1;
             router->i_DATA_IN[rPortId](w_DATA_TO_LEFT[wireId]);
             router->i_VALID_IN[rPortId](w_VALID_TO_LEFT[wireId]);
             router->o_RETURN_IN[rPortId](w_RETURN_TO_LEFT[wireId]);
@@ -128,7 +128,7 @@ SoCIN_Ring::SoCIN_Ring(sc_module_name mn)
     sc_trace(tf,i_RST,"RST");
     unsigned short i,vcBit;
     // Interfaces - routers
-    for( i = 0; i < numRouters; i++ ) {
+    for( i = 0; i < numInterfaces; i++ ) {
         char strI[5];
         sprintf(strI,"(%u)",i);
         char strDataIn[15];

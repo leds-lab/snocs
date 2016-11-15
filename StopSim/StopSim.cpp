@@ -4,16 +4,16 @@
 //#define DEBUG_STOPSIM
 
 StopSim::StopSim(sc_module_name mn,
-                 unsigned short nRouters,
+                 unsigned short nInterfaces,
                  char *filename)
-    : SoCINModule(mn),numRouters(nRouters),
+    : SoCINModule(mn),numInterfaces(nInterfaces),
       i_CLK("StopSim_iCLK"),
       i_RST("StopSim_iRST"),
       o_EOS("StopSim_oEOS"),
       i_CLK_CYCLES("StopSim_iCLK_CYCLES"),
-      i_TG_EOT("StopSim_iTG_EOT",nRouters),
-      i_TG_NUM_PACKETS_SENT("StopSim_iTG_NUM_PACKETS_SENT",nRouters),
-      i_TG_NUM_PACKETS_RECEIVED("StopSim_iTG_NUM_PACKETS_RECEIVED",nRouters),
+      i_TG_EOT("StopSim_iTG_EOT",nInterfaces),
+      i_TG_NUM_PACKETS_SENT("StopSim_iTG_NUM_PACKETS_SENT",nInterfaces),
+      i_TG_NUM_PACKETS_RECEIVED("StopSim_iTG_NUM_PACKETS_RECEIVED",nInterfaces),
       r_TOTAL_PACKETS_SENT("StopSim_rTOTAL_PACKETS_SENT"),
       r_TOTAL_PACKETS_RECEIVED("StopSim_rTOTAL_PACKETS_RECEIVED"),
       w_EOT("StopSim_wEOT"),
@@ -67,7 +67,7 @@ void StopSim::p_STOP() {
         v_NUM_PACKET_SENT = 0;
         v_NUM_PACKET_RECEIVED = 0;
         v_EOT = true;
-        for( i = 0; i < numRouters; i++ ) {
+        for( i = 0; i < numInterfaces; i++ ) {
             v_NUM_PACKET_SENT += i_TG_NUM_PACKETS_SENT[i].read();
             v_NUM_PACKET_RECEIVED += i_TG_NUM_PACKETS_RECEIVED[i].read();
             v_EOT &= i_TG_EOT[i].read();
@@ -106,7 +106,6 @@ void StopSim::p_STOP() {
             }
         } else {
             if (i_CLK_CYCLES.read() >= stopTime_cycles) {
-                // lltoa is used only to not generate warning on fprintf format to long long
                 fprintf(fp_out,"%lu", i_CLK_CYCLES.read());
                 fclose(fp_out);
                 o_EOS.write(1);

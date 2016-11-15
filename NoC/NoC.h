@@ -50,6 +50,7 @@ class INoC : public SoCINModule {
 protected:
     unsigned short numInterfaces;
 public:
+    inline unsigned short getNumberOfInterfaces() const { return this->numInterfaces; }
     // INTERFACE
     // System signals
     sc_in<bool> i_CLK;
@@ -64,7 +65,8 @@ public:
     sc_vector<sc_in<bool> >  i_RETURN_OUT;
 
     // Internal units
-    std::vector<IRouter *> u_ROUTER; // ATTENTION: Initialize the vector size (use resize) or use append|insert for the routers instantiated
+    std::vector<IRouter *> u_ROUTER; // ATTENTION: Initialize the vector size (use resize) or use
+                                     // append|insert for the routers instantiated
 
     INoC(sc_module_name mn,unsigned short nInterfaces);
 
@@ -85,7 +87,6 @@ inline INoC::INoC(sc_module_name mn, unsigned short nInterfaces)
       o_DATA_OUT("INoC_oDATA_OUT",nInterfaces),
       o_VALID_OUT("INoC_oVALID_OUT",nInterfaces),
       i_RETURN_OUT("INoC_iRETURN_OUT",nInterfaces)
-//      u_ROUTER(nInterface,NULL)
 {}
 
 

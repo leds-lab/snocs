@@ -17,7 +17,7 @@ using namespace sc_dt;
 
 // Forward declaration of functions below the main
 unsigned int setupSimulator(int argc, char* argv[]);
-void generateListNodesGtkwave();
+void generateListNodesGtkwave(unsigned short numElements);
 char *print_time(unsigned long long total_sec);
 
 
@@ -91,7 +91,8 @@ int sc_main(int argc, char* argv[]) {
     sc_signal<bool>          w_RST;                           // Reset
     sc_signal<unsigned long> w_GLOBAL_CLOCK;                  // Number of cycles
 
-    unsigned short numElements = X_SIZE*Y_SIZE;
+    unsigned short numElements = u_NOC->getNumberOfInterfaces();
+    std::cout << "\n >>>>>>> Number of elements: " << numElements << std::endl;
 
     // Wires to connect System Components to the network - Transmission interface
     sc_vector<sc_signal<Flit> > w_IN_DATA("w_IN_DATA",numElements);        // Network data input
@@ -133,7 +134,7 @@ int sc_main(int argc, char* argv[]) {
     u_SYS_SIGNALS->o_GLOBAL_CLOCK(w_GLOBAL_CLOCK);
 
     //////////////////////////////////////////////////////////////////////////////
-    StopSim* u_STOP = new StopSim("StopSim",(unsigned short)(X_SIZE*Y_SIZE),(char *)"stopsim");
+    StopSim* u_STOP = new StopSim("StopSim",numElements,(char *)"stopsim");
     //////////////////////////////////////////////////////////////////////////////
     u_STOP->i_CLK(w_CLK);
     u_STOP->i_RST(w_RST);
@@ -153,83 +154,78 @@ int sc_main(int argc, char* argv[]) {
     u_NOC->i_RST(w_RST);
 
     // Instantiating System Components (TGs, TMs) & binding dynamic ports
-    for( unsigned short x = 0; x < X_SIZE; x++ ) {
-        for( unsigned short y = 0; y < Y_SIZE; y++ ) {
-            // Get the router ID according X and Y network position to configure the system
-            unsigned short elementId = COORDINATE_TO_ID(x,y);
+    for( unsigned short elementId = 0; elementId < numElements; elementId++ ) {
+        // Assembling TG name
+        char strTgName[10];
+        sprintf(strTgName,"TG_%u",elementId);
+        // Instantiate TG
+        tg* u_TG = new tg(strTgName,elementId);
 
-            // Assembling TG name
-            char strTgName[10];
-            sprintf(strTgName,"TG_%u_%u",x,y);
-            // Instantiate TG
-            tg* u_TG = new tg(strTgName,x,y);
+        // Assembling TM name
+        char strTmName[10];
+        sprintf(strTmName,"TM_%u",elementId);
+        // Assembling out filename
+        char* outFilename = new char[20];
+        sprintf(outFilename,"ext_%u_out",elementId);
+        // Instantiate TM
+        TrafficMeter* u_TM = new TrafficMeter(strTmName,WORK_DIR,outFilename);
+        u_TMs[elementId] = u_TM;
 
-            // Assembling TM name
-            char strTmName[10];
-            sprintf(strTmName,"TM_%u_%u",x,y);
-            // Assembling out filename
-            char* outFilename = new char[20];
-            sprintf(outFilename,"ext_%u_%u_out",x,y);
-            // Instantiate TM
-            TrafficMeter* u_TM = new TrafficMeter(strTmName,WORK_DIR,outFilename);
-            u_TMs[elementId] = u_TM;
+        //------------- Binding signals -------------//
 
-            //------------- Binding signals -------------//
+        //------------- Binding TG -------------//
+        // System signals
+        u_TG->clk(w_CLK);
+        u_TG->rst(w_RST);
+        u_TG->clock_cycles(w_GLOBAL_CLOCK);
+        // Connections with routers
+        // The data that outgoing of the network, incoming in the traffic generator and vice-versa
+        u_TG->in_data(w_OUT_DATA[elementId]);
+        u_TG->in_val(w_OUT_VALID[elementId]);
+        u_TG->in_ret(w_OUT_RETURN[elementId]);
+        u_TG->out_data(w_IN_DATA[elementId]);
+        u_TG->out_val(w_IN_VALID[elementId]);
+        u_TG->out_ret(w_IN_RETURN[elementId]);
+        // Status signals to simulation control
+        u_TG->eot(w_TG_EOT[elementId]);
+        u_TG->number_of_packets_sent(w_TG_NUM_PACKETS_SENT[elementId]);
+        u_TG->number_of_packets_received(w_TG_NUM_PACKETS_RECEIVED[elementId]);
+        if(NUM_VC>1)
+            u_TG->o_VC(w_IN_VC_SEL[elementId]);
 
-            //------------- Binding TG -------------//
-            // System signals
-            u_TG->clk(w_CLK);
-            u_TG->rst(w_RST);
-            u_TG->clock_cycles(w_GLOBAL_CLOCK);
-            // Connections with routers
-            // The data that outgoing of the network, incoming in the traffic generator and vice-versa
-            u_TG->in_data(w_OUT_DATA[elementId]);
-            u_TG->in_val(w_OUT_VALID[elementId]);
-            u_TG->in_ret(w_OUT_RETURN[elementId]);
-            u_TG->out_data(w_IN_DATA[elementId]);
-            u_TG->out_val(w_IN_VALID[elementId]);
-            u_TG->out_ret(w_IN_RETURN[elementId]);
-            // Status signals to simulation control
-            u_TG->eot(w_TG_EOT[elementId]);
-            u_TG->number_of_packets_sent(w_TG_NUM_PACKETS_SENT[elementId]);
-            u_TG->number_of_packets_received(w_TG_NUM_PACKETS_RECEIVED[elementId]);
-            if(NUM_VC>1)
-                u_TG->o_VC(w_IN_VC_SEL[elementId]);
+        //------------- Binding TM -------------//
+        u_TM->i_CLK(w_CLK);
+        u_TM->i_RST(w_RST);
+        u_TM->i_EOS(w_EOS);
+        u_TM->i_CLK_CYCLES(w_GLOBAL_CLOCK);
+        u_TM->i_DATA(w_OUT_DATA[elementId]);
+        u_TM->i_VALID(w_OUT_VALID[elementId]);
+        u_TM->i_RETURN(w_OUT_RETURN[elementId]);
+        if(NUM_VC>1)
+            u_TM->i_VC_SEL(w_OUT_VC_SEL[elementId]);
 
-            //------------- Binding TM -------------//
-            u_TM->i_CLK(w_CLK);
-            u_TM->i_RST(w_RST);
-            u_TM->i_EOS(w_EOS);
-            u_TM->i_CLK_CYCLES(w_GLOBAL_CLOCK);
-            u_TM->i_DATA(w_OUT_DATA[elementId]);
-            u_TM->i_VALID(w_OUT_VALID[elementId]);
-            u_TM->i_RETURN(w_OUT_RETURN[elementId]);
-            if(NUM_VC>1)
-                u_TM->i_VC_SEL(w_OUT_VC_SEL[elementId]);
-
-            //------------- Binding NoC -------------//
-            u_NOC->i_DATA_IN   [elementId](w_IN_DATA[elementId]);
-            u_NOC->i_VALID_IN  [elementId](w_IN_VALID[elementId]);
-            u_NOC->o_RETURN_IN [elementId](w_IN_RETURN[elementId]);
-            u_NOC->o_DATA_OUT  [elementId](w_OUT_DATA[elementId]);
-            u_NOC->o_VALID_OUT [elementId](w_OUT_VALID[elementId]);
-            u_NOC->i_RETURN_OUT[elementId](w_OUT_RETURN[elementId]);
-            if( NUM_VC > 1 ) {
-                if( u_NOC_VC != NULL ) {
-                    u_NOC_VC->i_VC_SELECTOR[elementId](w_IN_VC_SEL[elementId]);
-                    u_NOC_VC->o_VC_SELECTOR[elementId](w_OUT_VC_SEL[elementId]);
-                } else {
-                    std::cout << "\nThe NoC selected don't support virtual channels" << std::endl;
-                    return -1;
-                }
+        //------------- Binding NoC -------------//
+        u_NOC->i_DATA_IN   [elementId](w_IN_DATA[elementId]);
+        u_NOC->i_VALID_IN  [elementId](w_IN_VALID[elementId]);
+        u_NOC->o_RETURN_IN [elementId](w_IN_RETURN[elementId]);
+        u_NOC->o_DATA_OUT  [elementId](w_OUT_DATA[elementId]);
+        u_NOC->o_VALID_OUT [elementId](w_OUT_VALID[elementId]);
+        u_NOC->i_RETURN_OUT[elementId](w_OUT_RETURN[elementId]);
+        if( NUM_VC > 1 ) {
+            if( u_NOC_VC != NULL ) {
+                u_NOC_VC->i_VC_SELECTOR[elementId](w_IN_VC_SEL[elementId]);
+                u_NOC_VC->o_VC_SELECTOR[elementId](w_OUT_VC_SEL[elementId]);
+            } else {
+                std::cout << "\nThe NoC selected don't support virtual channels" << std::endl;
+                return -1;
             }
-
-            //------------- Binding StopSim -------------//
-            u_STOP->i_TG_NUM_PACKETS_SENT[elementId](w_TG_NUM_PACKETS_SENT[elementId]);
-            u_STOP->i_TG_NUM_PACKETS_RECEIVED[elementId](w_TG_NUM_PACKETS_RECEIVED[elementId]);
-            u_STOP->i_TG_EOT[elementId](w_TG_EOT[elementId]);
-
         }
+
+        //------------- Binding StopSim -------------//
+        u_STOP->i_TG_NUM_PACKETS_SENT[elementId](w_TG_NUM_PACKETS_SENT[elementId]);
+        u_STOP->i_TG_NUM_PACKETS_RECEIVED[elementId](w_TG_NUM_PACKETS_RECEIVED[elementId]);
+        u_STOP->i_TG_EOT[elementId](w_TG_EOT[elementId]);
+
     }
 
     sc_trace_file *tf = NULL;
@@ -242,51 +238,46 @@ int sc_main(int argc, char* argv[]) {
         sc_trace(tf, w_RST, "RST");
         sc_trace(tf, w_EOS, "EOS");
         sc_trace(tf, w_GLOBAL_CLOCK, "GLOBAL_CLK");
-        for( unsigned short x = 0; x < X_SIZE; x++ ) {
-            for( unsigned short y = 0; y < Y_SIZE; y++ ) {
-                // Get the router ID according X and Y network position to configure the system
-                unsigned short rId = COORDINATE_TO_ID(x,y);
+        for( unsigned short elementId = 0; elementId < numElements; elementId++ ) {
+            // Assembling signal names to trace
+            char strDataIn[20];
+            sprintf(strDataIn,"L_DATA_IN_%u",elementId);
+            char strValIn[20];
+            sprintf(strValIn,"L_VAL_IN_%u",elementId);
+            char strRetIn[20];
+            sprintf(strRetIn,"L_RET_IN_%u",elementId);
+            char strDataOut[20];
+            sprintf(strDataOut,"L_DATA_OUT_%u",elementId);
+            char strValOut[20];
+            sprintf(strValOut,"L_VAL_OUT_%u",elementId);
+            char strRetOut[20];
+            sprintf(strRetOut,"L_RET_OUT_%u",elementId);
+            char strTgEOT[15];
+            sprintf(strTgEOT,"TG_%u_EOT",elementId);
+            if(NUM_VC > 1) {
+                char strVcSelIn[25];
+                sprintf(strVcSelIn,"L_VC_SEL_IN_%u",elementId);
+                char strVcSelOut[26];
+                sprintf(strVcSelOut,"L_VC_SEL_OUT_%u",elementId);
+                for(unsigned short vcBit = 0; vcBit < vcWidth; vcBit++) {
+                    char strVcSelInBit[29];
+                    sprintf(strVcSelInBit,"%s(%u)",strVcSelIn,vcBit);
+                    char strVcSelOutBit[30];
+                    sprintf(strVcSelOutBit,"%s(%u)",strVcSelOut,vcBit);
 
-                // Assembling signal names to trace
-                char strDataIn[20];
-                sprintf(strDataIn,"L_DATA_IN_%u_%u",x,y);
-                char strValIn[20];
-                sprintf(strValIn,"L_VAL_IN_%u_%u",x,y);
-                char strRetIn[20];
-                sprintf(strRetIn,"L_RET_IN_%u_%u",x,y);
-                char strDataOut[20];
-                sprintf(strDataOut,"L_DATA_OUT_%u_%u",x,y);
-                char strValOut[20];
-                sprintf(strValOut,"L_VAL_OUT_%u_%u",x,y);
-                char strRetOut[20];
-                sprintf(strRetOut,"L_RET_OUT_%u_%u",x,y);
-                char strTgEOT[15];
-                sprintf(strTgEOT,"TG_%u_%u_EOT",x,y);
-                if(NUM_VC > 1) {
-                    char strVcSelIn[25];
-                    sprintf(strVcSelIn,"L_VC_SEL_IN_%u_%u",x,y);
-                    char strVcSelOut[26];
-                    sprintf(strVcSelOut,"L_VC_SEL_OUT_%u_%u",x,y);
-                    for(unsigned short vcBit = 0; vcBit < vcWidth; vcBit++) {
-                        char strVcSelInBit[29];
-                        sprintf(strVcSelInBit,"%s(%u)",strVcSelIn,vcBit);
-                        char strVcSelOutBit[30];
-                        sprintf(strVcSelOutBit,"%s(%u)",strVcSelOut,vcBit);
-
-                        sc_trace(tf,w_IN_VC_SEL[rId][vcBit],strVcSelInBit);
-                        sc_trace(tf,w_OUT_VC_SEL[rId][vcBit],strVcSelOutBit);
-                    }
+                    sc_trace(tf,w_IN_VC_SEL[elementId][vcBit],strVcSelInBit);
+                    sc_trace(tf,w_OUT_VC_SEL[elementId][vcBit],strVcSelOutBit);
                 }
-
-                // Add to trace
-                sc_trace(tf,w_IN_DATA[rId],strDataIn);
-                sc_trace(tf,w_IN_VALID[rId],strValIn);
-                sc_trace(tf,w_IN_RETURN[rId],strRetIn);
-                sc_trace(tf,w_OUT_DATA[rId],strDataOut);
-                sc_trace(tf,w_OUT_VALID[rId],strValOut);
-                sc_trace(tf,w_OUT_RETURN[rId],strRetOut);
-                sc_trace(tf,w_TG_EOT[rId],strTgEOT);
             }
+
+            // Add to trace
+            sc_trace(tf,w_IN_DATA[elementId],strDataIn);
+            sc_trace(tf,w_IN_VALID[elementId],strValIn);
+            sc_trace(tf,w_IN_RETURN[elementId],strRetIn);
+            sc_trace(tf,w_OUT_DATA[elementId],strDataOut);
+            sc_trace(tf,w_OUT_VALID[elementId],strValOut);
+            sc_trace(tf,w_OUT_RETURN[elementId],strRetOut);
+            sc_trace(tf,w_TG_EOT[elementId],strTgEOT);
         }
     }
 
@@ -309,7 +300,7 @@ int sc_main(int argc, char* argv[]) {
 
     if(TRACE) {
         sc_close_vcd_trace_file(tf);
-        generateListNodesGtkwave();
+        generateListNodesGtkwave(numElements);
     }
 
 
@@ -386,7 +377,7 @@ unsigned int setupSimulator(int argc, char* argv[]) {
  * \brief generateListNodesGtkwave Generate the list_nodes.sav file
  * to be read by Gtkwave tool and load signals in pre-defined layout.
  */
-void generateListNodesGtkwave() {
+void generateListNodesGtkwave(unsigned short numElements) {
 
     FILE* out;
     char fileName[256];
@@ -395,11 +386,9 @@ void generateListNodesGtkwave() {
         printf("\n\tCannot open the file \"%s\" to write gtkwave list nodes.\n",fileName);
         return;
     }
-    unsigned short x_size = X_SIZE;
-    unsigned short y_size = Y_SIZE;
     unsigned short flit_width = FLIT_WIDTH;
     unsigned short vcWidth = ceil(log2(NUM_VC));
-    unsigned short x,y,vcBit;   // Loop counters
+    unsigned short elementId,vcBit;   // Loop counters
 
     fprintf(out,"[timestart] 0");
     fprintf(out,"\n@200");
@@ -412,66 +401,62 @@ void generateListNodesGtkwave() {
     fprintf(out,"\n@200");
     fprintf(out,"\n-Core-Connections");
 
-    for( x = 0; x < x_size; x++) {
-        for( y = 0; y < y_size; y++) {
-            fprintf(out,"\n-Core_%u_%u",x,y);
-            // For virtual channel in selector
-            if(NUM_VC > 1) {
-                fprintf(out,"\n@c00028");
-                fprintf(out,"\n#{SystemC.L_VC_SEL_IN_%u_%u([%u:0])}",x,y,vcWidth-1);
-                for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
-                    fprintf(out," SystemC.L_VC_SEL_IN_%u_%u(%u)",x,y,vcBit);
-                }
-                fprintf(out,"\n@28");
-                for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
-                    fprintf(out,"\nSystemC.L_VC_SEL_IN_%u_%u(%u)",x,y,vcBit);
-                }
-                fprintf(out,"\n@1401200");
-                fprintf(out,"\n-group_end");
+    for( elementId = 0; elementId < numElements; elementId++) {
+        fprintf(out,"\n-Core_%u",elementId);
+        // For virtual channel in selector
+        if(NUM_VC > 1) {
+            fprintf(out,"\n@c00028");
+            fprintf(out,"\n#{SystemC.L_VC_SEL_IN_%u([%u:0])}",elementId,vcWidth-1);
+            for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
+                fprintf(out," SystemC.L_VC_SEL_IN_%u(%u)",elementId,vcBit);
             }
-
             fprintf(out,"\n@28");
-            fprintf(out,"\nSystemC.L_VAL_IN_%u_%u",x,y);
-            fprintf(out,"\nSystemC.L_RET_IN_%u_%u",x,y);
-            fprintf(out,"\n@22");
-            fprintf(out,"\nSystemC.L_DATA_IN_%u_%u[%u:0]",x,y,flit_width-1);
-
-            // For virtual channel out selector
-            if(NUM_VC > 1) {
-                fprintf(out,"\n@c00028");
-                fprintf(out,"\n#{SystemC.L_VC_SEL_OUT_%u_%u([%u:0])}",x,y,vcWidth-1);
-                for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
-                    fprintf(out," SystemC.L_VC_SEL_OUT_%u_%u(%u)",x,y,vcBit);
-                }
-                fprintf(out,"\n@28");
-                for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
-                    fprintf(out,"\nSystemC.L_VC_SEL_OUT_%u_%u(%u)",x,y,vcBit);
-                }
-                fprintf(out,"\n@1401200");
-                fprintf(out,"\n-group_end");
+            for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
+                fprintf(out,"\nSystemC.L_VC_SEL_IN_%u(%u)",elementId,vcBit);
             }
-
-            fprintf(out,"\n@28");
-            fprintf(out,"\nSystemC.L_VAL_OUT_%u_%u",x,y);
-            fprintf(out,"\nSystemC.L_RET_OUT_%u_%u",x,y);
-            fprintf(out,"\n@22");
-            fprintf(out,"\nSystemC.L_DATA_OUT_%u_%u[%u:0]",x,y,flit_width-1);
-            fprintf(out,"\n@200");
+            fprintf(out,"\n@1401200");
+            fprintf(out,"\n-group_end");
         }
+
+        fprintf(out,"\n@28");
+        fprintf(out,"\nSystemC.L_VAL_IN_%u",elementId);
+        fprintf(out,"\nSystemC.L_RET_IN_%u",elementId);
+        fprintf(out,"\n@22");
+        fprintf(out,"\nSystemC.L_DATA_IN_%u[%u:0]",elementId,flit_width-1);
+
+        // For virtual channel out selector
+        if(NUM_VC > 1) {
+            fprintf(out,"\n@c00028");
+            fprintf(out,"\n#{SystemC.L_VC_SEL_OUT_%u([%u:0])}",elementId,vcWidth-1);
+            for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
+                fprintf(out," SystemC.L_VC_SEL_OUT_%u(%u)",elementId,vcBit);
+            }
+            fprintf(out,"\n@28");
+            for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
+                fprintf(out,"\nSystemC.L_VC_SEL_OUT_%u(%u)",elementId,vcBit);
+            }
+            fprintf(out,"\n@1401200");
+            fprintf(out,"\n-group_end");
+        }
+
+        fprintf(out,"\n@28");
+        fprintf(out,"\nSystemC.L_VAL_OUT_%u",elementId);
+        fprintf(out,"\nSystemC.L_RET_OUT_%u",elementId);
+        fprintf(out,"\n@22");
+        fprintf(out,"\nSystemC.L_DATA_OUT_%u[%u:0]",elementId,flit_width-1);
+        fprintf(out,"\n@200");
     }
 
     fprintf(out,"\n-Status");
     fprintf(out,"\n@28");
-    for( x = 0; x < x_size; x++)
-        for( y = 0; y < y_size; y++)
-            fprintf(out,"\nSystemC.TG_%u_%u_EOT",x,y);
+    for( elementId = 0; elementId < numElements; elementId++)
+        fprintf(out,"\nSystemC.TG_%u_EOT",elementId);
 
     fprintf(out,"\nSystemC.EOS");
     fprintf(out,"\n[pattern_trace] 1");
     fprintf(out,"\n[pattern_trace] 0\n");
 
     fclose(out);
-
 }
 
 ////////////////////////////////////////////////////////////////////////////////
