@@ -1,6 +1,6 @@
 #include "Routing_Crossfirst.h"
 
-#define DEBUG_ROUTING
+//#define DEBUG_ROUTING
 
 Routing_Crossfirst::Routing_Crossfirst(sc_module_name mn,
                                      unsigned short nPorts,
@@ -56,24 +56,37 @@ void Routing_Crossfirst::p_REQUEST() {
 
         if (v_OFFSET != 0) {
             unsigned short v_LAST_ID = sysSize-1;
-            if( abs(v_OFFSET) > maxHops) {
-                v_REQUEST = REQ_ACROSS;
-            } else {
-                if (v_OFFSET > 0) {
-                    if( v_OFFSET > v_LAST_ID/2 ) {
+            if (v_OFFSET > 0) {                
+                if( v_OFFSET > v_LAST_ID/2 ) {
+                    if( (sysSize - v_OFFSET) > maxHops ) {
+                        v_REQUEST = REQ_ACROSS;
+                    } else {
                         v_REQUEST = REQ_ANTICLOCKWISE;
+                    }
+                } else {
+                    if( v_OFFSET > maxHops ) {
+                        v_REQUEST = REQ_ACROSS;
                     } else {
                         v_REQUEST = REQ_CLOCKWISE;
                     }
-                } else {
-                    if( (v_OFFSET*-1) <= v_LAST_ID/2 ) {
+                }
+            } else {
+                v_OFFSET = v_OFFSET*-1; // Or use abs(v_OFFSET) the result is the same
+                if( v_OFFSET <= v_LAST_ID/2 ) {
+                    if(v_OFFSET > maxHops) {
+                        v_REQUEST = REQ_ACROSS;
+                    } else {
                         v_REQUEST = REQ_ANTICLOCKWISE;
+                    }
+                } else {
+                    if( (sysSize - v_OFFSET) > maxHops ) {
+                        v_REQUEST = REQ_ACROSS;
                     } else {
                         v_REQUEST = REQ_CLOCKWISE;
                     }
                 }
             }
-        } else { // X == Y == 0
+        } else { // Current == Destination
             v_REQUEST = REQ_LOCAL;
         }
 #ifdef DEBUG_ROUTING
