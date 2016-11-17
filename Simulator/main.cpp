@@ -334,8 +334,8 @@ int sc_main(int argc, char* argv[]) {
  */
 unsigned int setupSimulator(int argc, char* argv[]) {
     // TODO: Fazer parse para obter configurações do sistema (X_SIZE, Y_SIZE, FLIT_WIDTH, TRACE...)
-    X_SIZE = 3;
-    Y_SIZE = 3;
+    X_SIZE = 4;
+    Y_SIZE = 4;
 
     NUM_VC = 0;
 
