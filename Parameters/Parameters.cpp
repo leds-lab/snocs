@@ -9,13 +9,14 @@ Parameters::Parameters() {
     pm = new PluginManager();
 // Default values
     clkPeriod = 1;
-    traceSystem = true;
+    traceSystem = false;
     workDir = const_cast<char*>("work");
     pluginsDir = const_cast<char*>("./plugins");
     confFile = const_cast<char*>("simconf.conf");
 
-    xSize = 3;
-    ySize = 3;
+    xSize = 4;
+    ySize = 4;
+    zSize = 4;
 
     wordWidth = 34;
     ribWidth = 8;
@@ -24,7 +25,7 @@ Parameters::Parameters() {
     threadIdPosition = 30;
     numberOfThreads = 4;
 
-    numVirtualChannels = 8;
+    numVirtualChannels = 0;
     fifoInDepth = 4;
     fifoOutDepth = 0; // Without buffer
 }
@@ -40,6 +41,7 @@ Parameters::Parameters(const Parameters &c) {
 
     this->xSize = c.xSize;
     this->ySize = c.ySize;
+    this->zSize = c.zSize;
     this->wordWidth = c.wordWidth;
     this->ribWidth = c.ribWidth;
     this->numVirtualChannels = c.numVirtualChannels;
@@ -58,6 +60,7 @@ Parameters& Parameters::operator = (const Parameters& c) {
 
     this->xSize = c.xSize;
     this->ySize = c.ySize;
+    this->zSize = c.zSize;
     this->wordWidth = c.wordWidth;
     this->ribWidth = c.ribWidth;
     this->numVirtualChannels = c.numVirtualChannels;

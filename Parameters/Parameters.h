@@ -37,6 +37,7 @@ class PluginManager;
 // Network info
 #define X_SIZE PARAMS->xSize                // Network X dimension
 #define Y_SIZE PARAMS->ySize                // Network Y dimension
+#define Z_SIZE PARAMS->zSize                // Network Z dimension (3D topologies)
 // Convert cartesian coordinate of the router in the MESH network to router ID
 #define COORDINATE_TO_ID(x,y) (y * X_SIZE + x)
 #define ID_TO_COORDINATE_X(i) (i % X_SIZE)
@@ -116,6 +117,7 @@ public:
     // Network info
     unsigned short xSize;
     unsigned short ySize;
+    unsigned short zSize;
     // Packet Format
     unsigned short wordWidth;
     unsigned short ribWidth;
