@@ -38,7 +38,7 @@ void TrafficMeter::p_PROBE() {
     // Open file to write log
     if( (this->outFile = fopen(pathFilename,"wt")) == NULL ) {
         printf("\n[TrafficMeter] ERROR: It is not possible to open file \"%s\" to write log." \
-               "\n Verify the write permission on the folder." \
+               "\n Verify if the folder exists and the user write permission is granted." \
                "\n  Exiting...",pathFilename);
         exit(-1);
     }
@@ -114,9 +114,9 @@ void TrafficMeter::writeInfo() {
     if( v_EOP ) {
         Packet* packet = dataFlit.packet_ptr;
         if(packet != NULL) { // For safe packet access
-//            unsigned short xSrc  = (unsigned short) packetHeader(RIB_WIDTH*2-1, (RIB_WIDTH*2)-(RIB_WIDTH/2) ).to_uint();
-//            unsigned short ySrc  = (unsigned short) packetHeader((RIB_WIDTH*2)-(RIB_WIDTH/2)-1,RIB_WIDTH).to_uint();
-            unsigned short src = (unsigned short) packetHeader((RIB_WIDTH*2-1),RIB_WIDTH).to_uint();
+            unsigned short xSrc  = (unsigned short) packetHeader(RIB_WIDTH*2-1, (RIB_WIDTH*2)-(RIB_WIDTH/2) ).to_uint();
+            unsigned short ySrc  = (unsigned short) packetHeader((RIB_WIDTH*2)-(RIB_WIDTH/2)-1,RIB_WIDTH).to_uint();
+            unsigned short src = COORDINATE_TO_ID(xSrc,ySrc);
             unsigned short xDest = (unsigned short) packetHeader(RIB_WIDTH-1,RIB_WIDTH/2).to_uint();
             unsigned short yDest = (unsigned short) packetHeader(RIB_WIDTH/2-1,0).to_uint();
             unsigned short dest = COORDINATE_TO_ID(xDest,yDest);
