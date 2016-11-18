@@ -1,4 +1,3 @@
-
 #ifndef __TG_H__
 #define __TG_H__
 
@@ -7,16 +6,7 @@
 #include "fg.h"
 #include "ifc.h"
 #include "ofc.h"
-
-//#define USE_UNBOUNDED_FIFO
-
-#ifdef USE_UNBOUNDED_FIFO
-    #include "unboundedfifo.h"
-#else
-    #include "fifo_in.h"
-    #include "fifo_out.h"
-#endif
-
+#include "unboundedfifo.h"
 
 SC_MODULE(tg) {
 
@@ -103,28 +93,15 @@ SC_MODULE(tg) {
         if(NUM_VC>1)
             fg0->o_VC(o_VC);
 
-#ifndef USE_UNBOUNDED_FIFO
-        ///////////////////////////////////////////////////////////
-        fifo_out *fifo0 = new fifo_out("fifo0", 0, 0, 0);
-        ///////////////////////////////////////////////////////////
-        fifo0->clk(clk);
-        fifo0->rst(rst);
-        fifo0->rok(snd_rok_wire);
-        fifo0->wok(snd_wok_wire);
-        fifo0->rd(snd_rd_wire);
-        fifo0->wr(snd_wr_wire);
-        fifo0->din(snd_data_wire);
-        fifo0->dout(out_data);
-#else
         UnboundedFifo* fifoOut = new UnboundedFifo("FifoOutTG");
         fifoOut->i_CLK(clk);
+        fifoOut->i_RST(rst);
         fifoOut->i_DATA_IN(snd_data_wire);
         fifoOut->i_WR(snd_wr_wire);
         fifoOut->i_RD(snd_rd_wire);
         fifoOut->o_WR_OK(snd_wok_wire);
         fifoOut->o_RD_OK(snd_rok_wire);
         fifoOut->o_DATA_OUT(out_data);
-#endif
 
         //////////////////////////////////////////////
         ofc *ofc0 = new ofc("ofc0", 0, 0, 0);
@@ -136,28 +113,15 @@ SC_MODULE(tg) {
         ofc0->rok(snd_rok_wire);
         ofc0->rd(snd_rd_wire);
 
-#ifndef USE_UNBOUNDED_FIFO
-        /////////////////////////////////////////////////////////
-        fifo_in *fifo1 = new fifo_in("fifo1", 0, 0, 0);
-        /////////////////////////////////////////////////////////
-        fifo1->clk(clk);
-        fifo1->rst(rst);
-        fifo1->rok(rcv_rok_wire);
-        fifo1->wok(rcv_wok_wire);
-        fifo1->rd(rcv_rd_wire);
-        fifo1->wr(rcv_wr_wire);
-        fifo1->din(in_data);
-        fifo1->dout(rcv_data_wire);
-#else
         UnboundedFifo* fifoIn = new UnboundedFifo("FifoInTG");
         fifoIn->i_CLK(clk);
+        fifoIn->i_RST(rst);
         fifoIn->i_DATA_IN(in_data);
         fifoIn->i_WR(rcv_wr_wire);
         fifoIn->i_RD(rcv_rd_wire);
         fifoIn->o_WR_OK(rcv_wok_wire);
         fifoIn->o_RD_OK(rcv_rok_wire);
         fifoIn->o_DATA_OUT(rcv_data_wire);
-#endif
 
         //////////////////////////////////////////////
         ifc *ifc0 = new ifc("ifc0", 0, 0, 0);
