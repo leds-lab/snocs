@@ -12,6 +12,8 @@
 
 #include <ctime>
 
+#define VERSION "1.0"
+
 using namespace sc_core;
 using namespace sc_dt;
 

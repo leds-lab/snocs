@@ -1,4 +1,4 @@
-TARGET = Simulator
+TARGET = SNoCS
 
 include(../app.pri)
 include(../socindefines.pri)
@@ -10,8 +10,7 @@ SOURCES += \
     ../StopSim/StopSim.cpp \
     ../TrafficMeter/TrafficMeter.cpp \
     fg.cpp \
-    fifo_in.cpp \
-    fifo_out.cpp \
+    unboundedfifo.cpp \
     ifc_credit.cpp \
     ifc_credit_vct.cpp \
     ifc_handshake.cpp \
@@ -26,8 +25,7 @@ HEADERS += \
     ../StopSim/StopSim.h \
     ../TrafficMeter/TrafficMeter.h \
     fg.h \
-    fifo_in.h \
-    fifo_out.h \
+    unboundedfifo.h \
     ifc.h \
     ifc_credit.h \
     ifc_credit_vct.h \
