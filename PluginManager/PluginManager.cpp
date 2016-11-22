@@ -116,7 +116,9 @@ bool PluginManager::parseFile() {
 
     FILE* file;
 
-    if( (file = fopen(CONF_FILE,"r")) ) {
+    char strConfFile[256];
+    sprintf(strConfFile,"%s/%s",WORK_DIR,CONF_FILE);
+    if( (file = fopen(strConfFile,"r")) ) {
         char buff[256];
         while ( fgets(buff,sizeof buff,file) != NULL ) {
             parseProperty(buff);

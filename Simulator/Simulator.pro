@@ -1,4 +1,5 @@
 TARGET = SNoCS
+CONFIG += c++11
 
 include(../app.pri)
 include(../socindefines.pri)
@@ -10,13 +11,7 @@ SOURCES += \
     ../StopSim/StopSim.cpp \
     ../TrafficMeter/TrafficMeter.cpp \
     fg.cpp \
-    unboundedfifo.cpp \
-    ifc_credit.cpp \
-    ifc_credit_vct.cpp \
-    ifc_handshake.cpp \
-    ofc_credit.cpp \
-    ofc_credit_vct.cpp \
-    ofc_handshake.cpp
+    UnboundedFifo.cpp
 #    tm_single.cpp
 
 HEADERS += \
@@ -25,16 +20,8 @@ HEADERS += \
     ../StopSim/StopSim.h \
     ../TrafficMeter/TrafficMeter.h \
     fg.h \
-    unboundedfifo.h \
-    ifc.h \
-    ifc_credit.h \
-    ifc_credit_vct.h \
-    ifc_handshake.h \
-    ofc.h \
-    ofc_credit.h \
-    ofc_credit_vct.h \
-    ofc_handshake.h \
-    tg.h
+    tg.h \
+    UnboundedFifo.h
 #    tm_single.h
 
 OTHER_FILES += simconf.conf

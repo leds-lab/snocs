@@ -32,7 +32,7 @@ void StopSim::p_STOP() {
     FILE *fp_out;
 
     // It opens the input file and reads the stop time
-    sprintf(str,"%s.par",confFileName);
+    sprintf(str,"%s/../../%s.par",WORK_DIR,confFileName);
     if ((fp_in=fopen(str,"r")) == NULL) {
         printf("\n [StopSim] ERROR: Impossible to open file \"%s\".\nExiting...", str);
         exit(1);
@@ -48,7 +48,7 @@ void StopSim::p_STOP() {
     }
 
     // It opens the output file
-    sprintf(str,"%s.out",confFileName);
+    sprintf(str,"%s/%s.out",WORK_DIR,confFileName);
     if ((fp_out=fopen(str,"wt")) == NULL) {
         printf("\n	[StopSim] ERROR: Impossible to open file \"%s\". Exiting...", str);
         exit(1);

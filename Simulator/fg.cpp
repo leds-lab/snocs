@@ -195,8 +195,10 @@ void fg::p_send()
     /////////////////////////////////////////////
 
     // It tries to open the file
-    if ((fp_in=fopen(FILENAME,"rt")) == NULL) {
-        printf("\n\t[fg.cpp] ERROR: Impossible to open file \"%s\". Exiting...", FILENAME);
+    char strTCF[256];
+    sprintf(strTCF,"%s/%s",WORK_DIR,FILENAME);
+    if ((fp_in=fopen(strTCF,"rt")) == NULL) {
+        printf("\n\t[fg.cpp] ERROR: Impossible to open file \"%s\". Exiting...", strTCF);
         exit(1);
     } else {
         // It searches for the traffic description in the file

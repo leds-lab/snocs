@@ -2,11 +2,12 @@
 #define __TG_H__
 
 #include <systemc.h>
-#include "../SoCINDefines.h"
 #include "fg.h"
-#include "ifc.h"
-#include "ofc.h"
-#include "unboundedfifo.h"
+
+#include "../SoCINDefines.h"
+#include "../FlowControl/FlowControl.h"
+#include "../PluginManager/PluginManager.h"
+#include "UnboundedFifo.h"
 
 SC_MODULE(tg) {
 
@@ -46,6 +47,9 @@ SC_MODULE(tg) {
 
     // Internal data structures
     unsigned short int TG_ID;
+
+    IInputFlowControl*  u_IFC;
+    IOutputFlowControl* u_OFC;
 
     void p_debug(void) {
         if ((TG_ID)==0) {
@@ -104,14 +108,14 @@ SC_MODULE(tg) {
         fifoOut->o_DATA_OUT(out_data);
 
         //////////////////////////////////////////////
-        ofc *ofc0 = new ofc("ofc0", 0, 0, 0);
+        u_OFC = PLUGIN_MANAGER->outputFlowControlInstance("TG_OFC",0,0,0,FIFO_IN_DEPTH);
         //////////////////////////////////////////////
-        ofc0->clk(clk);
-        ofc0->rst(rst);
-        ofc0->val(out_val);
-        ofc0->ret(out_ret);
-        ofc0->rok(snd_rok_wire);
-        ofc0->rd(snd_rd_wire);
+        u_OFC->i_CLK(clk);
+        u_OFC->i_RST(rst);
+        u_OFC->o_VALID(out_val);
+        u_OFC->i_RETURN(out_ret);
+        u_OFC->i_READ_OK(snd_rok_wire);
+        u_OFC->o_READ(snd_rd_wire);
 
         UnboundedFifo* fifoIn = new UnboundedFifo("FifoInTG");
         fifoIn->i_CLK(clk);
@@ -124,17 +128,17 @@ SC_MODULE(tg) {
         fifoIn->o_DATA_OUT(rcv_data_wire);
 
         //////////////////////////////////////////////
-        ifc *ifc0 = new ifc("ifc0", 0, 0, 0);
+        u_IFC = PLUGIN_MANAGER->inputFlowControlInstance("TG_IFC",0,0,0);
         //////////////////////////////////////////////
-        ifc0->clk(clk);
-        ifc0->rst(rst);
-        ifc0->val(in_val);
-        ifc0->ret(in_ret);
-        ifc0->rok(rcv_rok_wire);
-        ifc0->rd(rcv_rd_wire);
-        ifc0->wok(rcv_wok_wire);
-        ifc0->wr(rcv_wr_wire);
-        ifc0->data(rcv_data_wire);
+        u_IFC->i_CLK(clk);
+        u_IFC->i_RST(rst);
+        u_IFC->i_VALID(in_val);
+        u_IFC->o_RETURN(in_ret);
+        u_IFC->i_READ_OK(rcv_rok_wire);
+        u_IFC->i_READ(rcv_rd_wire);
+        u_IFC->i_WRITE_OK(rcv_wok_wire);
+        u_IFC->o_WRITE(rcv_wr_wire);
+        u_IFC->i_DATA(rcv_data_wire);
     }
 
 };

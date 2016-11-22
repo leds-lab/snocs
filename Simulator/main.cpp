@@ -8,11 +8,17 @@
 // TEMP
 #include "tg.h"
 
+// SystemC
 #include <systemc>
 
+// STL
 #include <ctime>
 
-#define VERSION "1.0"
+#define SNOCS_MAJOR 1
+#define SNOCS_MINOR 0
+#define SNOCS_PATCH 0
+
+#define VERSION STRINGIFY( SNOCS_MAJOR.SNOCS_MINOR.SNOCS_PATCH )
 
 using namespace sc_core;
 using namespace sc_dt;
@@ -23,6 +29,7 @@ class InputParser;
 unsigned int setupSimulator(int argc, char* argv[],InputParser& opt);
 void generateListNodesGtkwave(unsigned short numElements);
 char *print_time(unsigned long long total_sec);
+void printConfiguration();
 
 // Messages to setup of the simulator
 const char* SETUP_MESSAGES[] =
@@ -35,7 +42,7 @@ void showHelp() {
 
     std::cout << "\nSoCIN Simulator Help" << std::endl;
 #if defined(VERSION)
-    std::cout << "Version " << VERSION << std::endl;
+    std::cout << "Version: " << VERSION << std::endl;
 #endif
     std::cout << "Developed by LEDS - Univali" << std::endl;
     std::cout << "Copyright 2017 LEDS - Univali. All rights reserved."
@@ -53,10 +60,10 @@ void showHelp() {
     std::cout << "This simulator was developed to extend the original SoCIN Simulator.\n"
                  "The SNoCS is a RTL-based implementation of ParIS router in SystemC.\n"
                  "This simulator was designed to comprise a set of network topologies\n"
-                 "besides the 2D Mesh with alternatives implementations to the basic\n"
+                 "besides the 2D Mesh with alternative implementations to the basic\n"
                  "attributes of the network (routing, flow control, arbitration,\n"
                  "buffering, ...)." << std::endl;
-    std::cout << "The system is composed of a Network and terminal instrumentation\n"
+    std::cout << "\nThe system is composed of a Network and terminal instrumentation\n"
                  "as described by Dally and Towles in:\n"
                  "\"Principles and Practices of Interconnection Networks\", 2004."
               << std::endl << std::endl << std::endl;
@@ -80,7 +87,7 @@ void showHelp() {
               << "  -ysize value        Network Y dimension. Value > 1" << std::endl
               << "                      Default=4, Min: 2" << std::endl
               << "  -zsize value        Network Z dimension. Value > 1" << std::endl
-              << "                      Default=4, Min: 2" << std::endl
+              << "                      Default=0 (no Z dimension), Min: 2" << std::endl
               << "  -datawidth value    Number of bits of the data channel. Value >= 32" << std::endl
               << "                      Default=32, Min: 32, Max: 510" << std::endl
               << "  -fifoin value       Routers input buffers depth (flits). 1 < Value <= 1024." << std::endl
@@ -89,11 +96,12 @@ void showHelp() {
               << "                      Default=0 (no output buffers), Min: 0, Max: 1024" << std::endl
               << "  -vc value           Number of virtual channels. 0 <= Value <= 32" << std::endl
               << "                      Default=0 (no virtual channels), Min: 0, Max: 32" << std::endl
-              << "  -trace <0|1>        Generate waveforms. Value 0 don't generate. Value 1 generate." << std::endl
-              << "                      Default=0 - Don't generate waveforms" << std::endl;
-    std::cout << "\nIMPORTANT: <xsize> and <ysize> define the system size (number of elements)\n"
-                 "not only for 2D orthogonal topologies, but also to some others, \n"
-                 "like ring (xsize * ysize = NumberOfElements)" << std::endl;
+              << "  -trace              Generate waveforms." << std::endl
+              << "                      Default= Don't generate waveforms" << std::endl;
+    std::cout << "\nIMPORTANT: <xsize> and <ysize> options define the system size\n"
+                 "(i.e. number of elements). Not only for 2D orthogonal topologies,\n"
+                 "but also to some others, like ring (xsize * ysize = NumberOfElements).\n"
+                 "The option <zsize> is used only for 3D topologies!" << std::endl;
 
 }
 
@@ -129,45 +137,13 @@ class InputParser{
 
 int sc_main(int argc, char* argv[]) {
 
+    //// [1] Configuration
     InputParser optParser(argc,argv);
     if(optParser.cmdOptionExists("-h")
             || optParser.cmdOptionExists("--help")
             || optParser.cmdOptionExists("-help")) {
         showHelp();
         return 0;
-    }
-
-    if(argc < 2) {
-        std::cout << "Simulator <tClk_in_ns> <work_dir> <plugins_dir>\n" \
-                     "Using default values:\n" \
-                     "tClk: 1 ns\n" \
-                     "work_dir: ./work\n" \
-                     "plugins_dir: ./plugins" << std::endl;
-    } else {
-        std::cout << "Simulator <tClk> <work_dir> <plugins_dir>";
-        switch(argc) {
-            case 2:
-                std::cout << "\ntClk: " << argv[1] << " ns\n" \
-                          << "work_dir: ./work (default)\n" \
-                             "plugins_dir: ./plugins (default)" << std::endl;
-                break;
-            case 3:
-                std::cout << "\ntClk: " << argv[1] << " ns\n" \
-                          << "work_dir: " << argv[2] << "\n" \
-                             "plugins_dir: ./plugins (default)" << std::endl;
-                break;
-            case 4:
-                std::cout << "\ntClk: " << argv[1] << " ns\n" \
-                          << "work_dir: " << argv[2] << "\n" \
-                             "plugins_dir: "<< argv[3] << std::endl;
-                break;
-            default:
-                std::cout << "\ntClk: " << argv[1] << " ns\n" \
-                          << "work_dir: " << argv[2] << "\n" \
-                             "plugins_dir: "<< argv[3] << "\n" \
-                             "Additional parameters unused." << std::endl;
-                break;
-        }
     }
 
     unsigned int setupCode = setupSimulator(argc,argv,optParser);
@@ -179,9 +155,14 @@ int sc_main(int argc, char* argv[]) {
     }
 
     if( setupCode != 0) {
+        std::cout << "\n\nFor info: SNoCS -h" << std::endl;
         return -1;
     }
 
+    printConfiguration();
+    //// [1] Configuration
+
+    /// [2] Network models building
     INoC* u_NOC = PLUGIN_MANAGER->nocInstance("NoC");
 
     if( u_NOC == NULL ) {
@@ -191,15 +172,13 @@ int sc_main(int argc, char* argv[]) {
 
     // ------------------- Establishing system -------------------
 
-    printf("\nTclk = %.0f ns", CLK_PERIOD);
-
+    /// [3] Signals instantation
     // System signals
     sc_clock                 w_CLK("CLK", CLK_PERIOD, SC_NS); // System clock | Tclk=1 ns
     sc_signal<bool>          w_RST;                           // Reset
     sc_signal<unsigned long> w_GLOBAL_CLOCK;                  // Number of cycles
 
     unsigned short numElements = u_NOC->getNumberOfInterfaces();
-    std::cout << "\n >>>>>>> Number of elements: " << numElements << std::endl;
 
     // Wires to connect System Components to the network - Transmission interface
     sc_vector<sc_signal<Flit> > w_IN_DATA("w_IN_DATA",numElements);        // Network data input
@@ -233,6 +212,7 @@ int sc_main(int argc, char* argv[]) {
     // Status signal saying that stopsim is ready to stop simulation
     sc_signal<bool> w_EOS;
 
+    /// [4] System models building and binding
     //////////////////////////////////////////////////////////////////////////////
     SystemSignals *u_SYS_SIGNALS = new SystemSignals("SystemSignals");
     //////////////////////////////////////////////////////////////////////////////
@@ -335,11 +315,12 @@ int sc_main(int argc, char* argv[]) {
 
     }
 
+    /// [5] Trace generation
     sc_trace_file *tf = NULL;
     if( TRACE ) {
-        // TEMP - TODO: Mudar quando for integrar no RS
-        //tf=sc_create_vcd_trace_file("system");
-        tf=sc_create_vcd_trace_file(u_NOC->moduleName());
+        char strWaveformFile[256];
+        sprintf(strWaveformFile,"%s/snocs_wave",WORK_DIR);
+        tf=sc_create_vcd_trace_file(strWaveformFile);
         // Signal tracing
         sc_trace(tf, w_CLK, "CLK");
         sc_trace(tf, w_RST, "RST");
@@ -388,6 +369,7 @@ int sc_main(int argc, char* argv[]) {
         }
     }
 
+    /// [7] System simulation
     std::cout << "\n\n\n//////////////////////////////////////////////" << std::endl;
     std::cout << "////////////// SoCIN Simulator  //////////////" << std::endl;
     std::cout << "////////////// Start Simulation //////////////" << std::endl;
@@ -405,6 +387,7 @@ int sc_main(int argc, char* argv[]) {
 
     printf("\n\nExecuted in: %s\n\n",formattedTime);
 
+    /// [8] System destroying
     if(TRACE) {
         sc_close_vcd_trace_file(tf);
         generateListNodesGtkwave(numElements);
@@ -421,56 +404,140 @@ int sc_main(int argc, char* argv[]) {
     return 0;
 }
 
+void printConfiguration() {
+
+    std::cout << "  --- Configuration ---" << std::endl << std::endl;
+
+    const char* prefix = {"  * "};
+
+    std::cout << prefix << "tClk: " << CLK_PERIOD << " ns\n" \
+              << prefix << "work_dir: " << WORK_DIR << "\n" \
+              << prefix << "plugins_dir: " << PLUGINS_DIR << std::endl;
+
+    std::cout << prefix << "X Size: " << X_SIZE << std::endl
+              << prefix << "Y Size: " << Y_SIZE << std::endl;
+    if( Z_SIZE > 1 ) {
+        std::cout << prefix << "Z Size: " << Z_SIZE << std::endl;
+    }
+    std::cout << prefix << "Data Width: " << (FLIT_WIDTH-2) << std::endl;
+    if( NUM_VC > 1 ) {
+        std::cout << prefix << "Number of Virtual Channels: " << NUM_VC << std::endl;
+    } else {
+        std::cout << prefix << "No virtual channels!" << std::endl;
+    }
+
+    std::cout << prefix << "Routers input buffers depth (flits): " << FIFO_IN_DEPTH << std::endl;
+    if( FIFO_OUT_DEPTH > 0 ) {
+        std::cout << prefix << "Routers output buffers depth (flits): " << FIFO_OUT_DEPTH << std::endl;
+    } else {
+        std::cout << prefix << "No output buffers in the routers!" << std::endl;
+    }
+
+    if( TRACE ) {
+        std::cout << prefix << "Generate Waveforms (.vcd)!" << std::endl;
+    } else {
+        std::cout << prefix << "Don't generate Waveforms (.vcd)!" << std::endl;
+    }
+
+}
+
+int getIntArg(InputParser& opt,std::string arg, int defaultValue, int min, int max = 0) {
+    if( opt.cmdOptionExists(arg) ) {
+        std::string var = opt.getCmdOption(arg);
+        if( var.empty() ) {
+            std::cout << arg << ": Argument missing or wrong... using default = "<< defaultValue << std::endl;
+            return defaultValue;
+        } else {
+            int varValue = atoi(var.c_str());
+            if(varValue < min) {
+                std::cout << arg << ": Value not permitted. The minimum is \'" << min
+                          << "\'... using default = " << defaultValue  << std::endl;
+                return defaultValue;
+            } else if(varValue > max && max > 0) {
+                std::cout << arg << ": Value not permitted. The maximum is \'" << max
+                          << "\'... using default = " << defaultValue  << std::endl;
+                return defaultValue;
+            } else {
+                return varValue;
+            }
+        }
+    } else {
+        return defaultValue;
+    }
+}
+
 /*!
  * \brief setupSimulator Setup all global definitions for the
  * simulator.
  *
  * Configure:
- * X_SIZE      : X dimension
- * Y_SIZE      : Y dimension
- * Z_SIZE      : Z dimension
- * FLIT_WIDTH  : Width of data channel plus framing bits
- * TRACE       : Flag to indicate if must be generated a .vcd file (wavefor)
- * CLK_PERIOD  : Via command-line argument[1] - define the clock period. If argument missing, the default (1 ns) clock period would be used.
- * WORK_DIR    : Via command-line argument[2] - define the work output folder to report data files. If argument missing, the default ("./work") would be used.
- * PLUGINS_DIR : Via command-line argument[3] - define the plugins directory or use default ("./plugins") directory if argument would missing.
+ * Clock period; Work folder; Plugins folder; System Dimension;
+ * trace enable/disable
  *
  * Finally, try parse the configuration file and load plugins.
  * \param argc Number of arguments passed to executable.
  * \param argv A char array with the arguments passed to executable.
+ * \param opt A object to parse command-line arguments
  * \return Zero if all configurations successfully performed. A positive number with the index of message error.
  */
 unsigned int setupSimulator(int argc, char* argv[], InputParser &opt) {
-    // TODO: Fazer parse para obter configurações do sistema (X_SIZE, Y_SIZE, FLIT_WIDTH, TRACE...)
-    X_SIZE = 4;
-    Y_SIZE = 4;
-    Z_SIZE = 4;
 
-    FLIT_WIDTH = 34;
+    bool clkDefault = true;
+    bool workDefault = true;
+    bool pluginsDefault = true;
 
-    NUM_VC = 0;
-    FIFO_IN_DEPTH = 4;
-    FIFO_OUT_DEPTH = 0;
-
-    TRACE = false;
-
-    if( NUM_VC == 1 ) NUM_VC = 2; // 1 VC is not accepted by the model because vcWidth = ceil(log2(NUM_VC)) == 0
-
-    switch(argc) {
-        case 4: // argv[3] == Plugins folder
-            PLUGINS_DIR = argv[3];
-        case 3: // argv[2] == Work folder
-            WORK_DIR = argv[2];
-        case 2: // argv[1] == Clock period
-            CLK_PERIOD = atof(argv[1]);
-            if(CLK_PERIOD <= 0) {
-                CLK_PERIOD = 1;
-            }
-        case 1: // Only simulator filename
-            break;
-        default: break;
+    std::cout << "Simulator <tClk_in_ns> <work_dir> <plugins_dir>" << std::endl;
+    if(argc > 1) {
+        switch(argc) {
+            case 4:
+                pluginsDefault = false;
+            case 3:
+                workDefault = false;
+            case 2:
+                clkDefault = false;
+                break;
+            default:
+                pluginsDefault = false;
+                workDefault = false;
+                clkDefault = false;
+                break;
+        }
+    } else {
+        std::cout << "Using default values!" << std::endl;
     }
 
+    if( !clkDefault ) {
+        CLK_PERIOD = atof(argv[1]);
+        if( CLK_PERIOD <= 0 ) {
+            CLK_PERIOD = 1;
+        }
+    }
+    if( !workDefault ) {
+        WORK_DIR = argv[2];
+    }
+    if( !pluginsDefault ) {
+        PLUGINS_DIR = argv[3];
+    }
+
+    X_SIZE = getIntArg(opt,"-xsize",4,2);
+    Y_SIZE = getIntArg(opt,"-ysize",4,2);
+    Z_SIZE = getIntArg(opt,"-zsize",0,2);
+    FLIT_WIDTH = getIntArg(opt,"-datawidth",32,32,510) + 2; // Data Width + 2-bit framming (EOP & BOP)
+    NUM_VC = getIntArg(opt,"-vc",0,0,32);
+    FIFO_IN_DEPTH = getIntArg(opt,"-fifoin",4,2,1024);
+    FIFO_OUT_DEPTH = getIntArg(opt,"-fifoout",0,0,1024);
+
+    if( opt.cmdOptionExists("-trace") ) {
+        TRACE = true;
+    } else {
+        TRACE = false;
+    }
+
+    if( NUM_VC == 1 ) {
+        std::cout << "Changing the number of virtual channels to 2,\n"
+                     "because 1 is the same as no virtual channels!" << std::endl;
+        NUM_VC = 2; // 1 VC is not accepted by the model because vcWidth = ceil(log2(NUM_VC)) == 0
+    }
     // Trying parsing configuration file and load plugins
     if( PLUGIN_MANAGER->parseFile() ) {
         if( PLUGIN_MANAGER->loadPlugins() ) {
@@ -492,7 +559,7 @@ unsigned int setupSimulator(int argc, char* argv[], InputParser &opt) {
 void generateListNodesGtkwave(unsigned short numElements) {
 
     FILE* out;
-    char fileName[256];
+    char fileName[512];
     sprintf(fileName,"%s/list_nodes.sav",WORK_DIR);
     if ((out=fopen(fileName,"wb")) == NULL){
         printf("\n\tCannot open the file \"%s\" to write gtkwave list nodes.\n",fileName);

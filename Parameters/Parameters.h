@@ -150,6 +150,8 @@ public:
 /// Global definitions
 ///////////////////////////////////////////////////////////
 
+#define STRINGIFY( Arg ) x_str(Arg)
+#define x_str(Arg) #Arg
 
 /////// OLD ///////
 

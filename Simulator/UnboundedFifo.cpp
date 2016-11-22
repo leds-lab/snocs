@@ -1,4 +1,4 @@
-#include "unboundedfifo.h"
+#include "UnboundedFifo.h"
 
 UnboundedFifo::UnboundedFifo(sc_module_name mn)
     : SoCINModule(mn),
