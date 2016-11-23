@@ -41,6 +41,16 @@ void IFC_CreditBased::p_VALID() {
     o_WRITE.write( i_VALID.read() );
 }
 
+void IFC_CreditBased::p_ALERT_PACKET_RECEIVE() {
+    while(1) {
+        // Always that there is a VALID signal asserted, a packet is being received.
+        if( i_VALID.read() ) {
+            e_PACKET_RECEIVED.notify();
+        }
+        wait();
+    }
+}
+
 void IFC_CreditBased::p_DEBUG() {
 
     if( XID == 1 && YID == 0 && PORT_ID == 2) {
@@ -51,6 +61,7 @@ void IFC_CreditBased::p_DEBUG() {
                    << ", READ ="  << i_READ.read();
     }
 }
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

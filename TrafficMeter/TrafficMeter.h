@@ -19,6 +19,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 
 #include "../SoCINModule.h"
 #include "../SoCINDefines.h"
+#include "../FlowControl/FlowControl.h"
 
 /*!
  * \brief The TrafficMeter class implements a link traffic meter
@@ -59,7 +60,18 @@ public:
     void p_FINISH();
 
     // Aux. method to write a information
+    void initialize();
     void writeInfo();
+
+    // Internal Unit - to monitoring the packet arrives
+    IInputFlowControl* u_IFC;
+
+    // IFC signals to bind
+    sc_signal<bool> w_IFC_READ;
+    sc_signal<bool> w_IFC_READ_OK;
+    sc_signal<bool> w_WRITE_OK;
+    sc_signal<bool> w_RETURN;
+    sc_signal<bool> w_WRITE;
 
     SC_HAS_PROCESS(TrafficMeter);
     TrafficMeter(sc_module_name mn,

@@ -1,4 +1,5 @@
 #include "TrafficMeter.h"
+#include "../PluginManager/PluginManager.h"
 
 TrafficMeter::TrafficMeter(sc_module_name mn, char *workDir, char *fileName)
     : SoCINModule(mn),
@@ -13,16 +14,33 @@ TrafficMeter::TrafficMeter(sc_module_name mn, char *workDir, char *fileName)
       i_RETURN("TrafficMeter_iRETURN"),
       i_DATA("TrafficMeter_iDATA")
 {
+    this->initialize();
+
     unsigned short widthVcSelector = (unsigned short) ceil(log2(NUM_VC));
     this->trafficClassWidth = (unsigned short) ceil(log2(NUMBER_TRAFFIC_CLASSES));
     this->threadIdWidth = (unsigned short) ceil(log2(NUMBER_OF_THREADS));
+
+    u_IFC = PLUGIN_MANAGER->inputFlowControlInstance("IFC_TM",0,0,0);
+    u_IFC->i_CLK(i_CLK);
+    u_IFC->i_RST(i_RST);
+    u_IFC->i_DATA(i_DATA);
+    u_IFC->i_VALID(i_VALID);
+    u_IFC->i_READ(i_RETURN); // Adapt from read to return
+    // Signals unused to traffic meter
+    u_IFC->i_READ_OK(w_IFC_READ_OK);
+    u_IFC->i_WRITE_OK(w_WRITE_OK);
+    u_IFC->o_RETURN(w_RETURN);
+    u_IFC->o_WRITE(w_WRITE);
 
     if( NUM_VC > 1 ) {
         i_VC_SEL.init(widthVcSelector);
     }
 
-    SC_CTHREAD(p_PROBE,i_CLK.pos());
-    sensitive << i_CLK.pos() << i_RST.pos();
+//    SC_CTHREAD(p_PROBE,i_CLK.pos());
+//    sensitive << i_CLK.pos() << i_RST.pos();
+
+    SC_METHOD(p_PROBE);
+    sensitive << u_IFC->e_PACKET_RECEIVED;
 
     SC_METHOD(p_FINISH);
     sensitive << i_EOS;
@@ -30,7 +48,7 @@ TrafficMeter::TrafficMeter(sc_module_name mn, char *workDir, char *fileName)
 
 TrafficMeter::~TrafficMeter() {}
 
-void TrafficMeter::p_PROBE() {
+void TrafficMeter::initialize() {
 
     char pathFilename[256];
     sprintf(pathFilename,"%s/%s",workDir,outFileName);
@@ -46,41 +64,21 @@ void TrafficMeter::p_PROBE() {
     // It prints the header of the table
     fprintf(outFile,"FILE: %s",pathFilename);
     fprintf(outFile,"\n");
-#if defined(__WIN32__) || defined(_WIN32)
-//    fprintf(outFile,"\n    Packet\tXs\tYs\tXd\tYd\tThread\tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
-//    fprintf(outFile,"\n        ID\t  \t  \t  \t  \t    ID\t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
+    #if defined(__WIN32__) || defined(_WIN32)
+    //    fprintf(outFile,"\n    Packet\tXs\tYs\tXd\tYd\tThread\tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
+    //    fprintf(outFile,"\n        ID\t  \t  \t  \t  \t    ID\t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
     fprintf(outFile,"\n    Packet\t src\tdest\tThread\tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
     fprintf(outFile,"\n        ID\t    \t    \t    ID\t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
-#else
+    #else
     fprintf(outFile,"\n    Packet\tXs\tYs\tXd\tYd\tThread\tTraffic\t    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
     fprintf(outFile,"\n        ID\t  \t  \t  \t  \t    ID\t  Class\t            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
-#endif
+    #endif
 
     fprintf(outFile,"\n#\n");
+}
 
-    wait();
-
-    // TODO verificar como implementar para outras técnicas de controle de fluxo
-    if( FC_TYPE == 0 ) {    // FC_TYPE == 0 -> Handshake
-        while(1) {
-            while( i_VALID.read() == 0 ) wait();
-
-            while( i_RETURN.read() == 0) wait();
-
-            this->writeInfo();
-
-            while( i_VALID.read() == 1 ) wait();
-
-            while( i_RETURN.read() == 1 ) wait();
-        }
-    } else {                // Credit-based
-        while(1) {
-            if( i_VALID.read() ) {
-                this->writeInfo();
-            }
-            wait();
-        }
-    }
+void TrafficMeter::p_PROBE() {
+    this->writeInfo();
 }
 
 

@@ -38,6 +38,9 @@ public:
     // Debug
     void p_DEBUG();
 
+    // Packet monitoring - only to traffic meter use
+    void p_ALERT_PACKET_RECEIVE();
+
     SC_HAS_PROCESS(IFC_CreditBased);
     IFC_CreditBased(sc_module_name mn,
                     unsigned short XID,

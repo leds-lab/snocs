@@ -80,6 +80,20 @@ public:
     sc_in<bool>  i_READ_OK; // FIFO has a data to be read (not empty)
     sc_in<Flit>  i_DATA;    // FIFO data output
 
+    // Module's process to traffic meter
+    /*!
+     * \brief p_ALERT_PACKET_RECEIVE It is only used to alert the
+     * traffic meter when a packet was received.
+     * The input i_VALID corresponds to i_VALID link signal - bind with the traffic meter.
+     * The input i_READ corresponds  to i_RETURN link signal. This signal is an adaptation
+     * only for traffic meter use.
+     */
+    virtual void p_ALERT_PACKET_RECEIVE() = 0;
+
+    // Event to emit a notification when a packet is received
+    sc_event e_PACKET_RECEIVED;
+
+    SC_HAS_PROCESS(IInputFlowControl);
     IInputFlowControl(sc_module_name mn,
                        unsigned short XID,
                        unsigned short YID,
@@ -91,7 +105,11 @@ public:
                 i_WRITE_OK("IFC_iWRITE_OK"),
                 i_READ("IFC_iREAD"),
                 i_READ_OK("IFC_iREAD_OK"),
-                i_DATA("IFC_iDATA") {}
+                i_DATA("IFC_iDATA") {
+        // Register the packet monitoring process to traffic meter
+        SC_CTHREAD(p_ALERT_PACKET_RECEIVE,i_CLK.pos());
+        sensitive << i_CLK;
+    }
 
     ~IInputFlowControl() = 0;
 };

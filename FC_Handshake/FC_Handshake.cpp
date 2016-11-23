@@ -108,6 +108,21 @@ void IFC_Handshake::p_OUTPUTS() {
     }
 }
 
+void IFC_Handshake::p_ALERT_PACKET_RECEIVE() {
+    while(1) {
+        while( i_VALID.read() == 0 ) wait();
+
+        while( i_READ.read() == 0) wait();
+
+        // When a VALID and RETURN (READ) are asserted, a packet is being received
+        e_PACKET_RECEIVED.notify();
+
+        while( i_VALID.read() == 1 ) wait();
+
+        while( i_READ.read() == 1 ) wait();
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////

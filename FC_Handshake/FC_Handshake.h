@@ -42,6 +42,9 @@ public:
     void p_NEXT_STATE();
     void p_OUTPUTS();
 
+    // Packet monitoring - only to traffic meter use
+    void p_ALERT_PACKET_RECEIVE();
+
     SC_HAS_PROCESS(IFC_Handshake);
     IFC_Handshake(sc_module_name mn,
                   unsigned short XID,

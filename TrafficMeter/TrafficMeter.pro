@@ -10,7 +10,9 @@ include(../socindefines.pri)
 TEMPLATE = aux
 
 HEADERS += \
-    TrafficMeter.h
+    TrafficMeter.h \
+    ../PluginManager/PluginManager.h
 
 SOURCES += \
-    TrafficMeter.cpp
+    TrafficMeter.cpp \
+    ../PluginManager/PluginManager.cpp
