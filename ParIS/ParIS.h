@@ -61,8 +61,7 @@ public:
     ParIS_N_VC(sc_module_name mn,
                unsigned short nPorts,
                unsigned short nVirtualChannels,
-               unsigned short XID,
-               unsigned short YID);
+               unsigned short ROUTER_ID);
 
     const char* moduleName() const { return "ParIS_N_VC"; }
 
@@ -107,8 +106,7 @@ public:
     SC_HAS_PROCESS(ParIS);
     ParIS(sc_module_name mn,
           unsigned short nPorts,
-          unsigned short XID,
-          unsigned short YID);
+          unsigned short ROUTER_ID);
 
     const char* moduleName() const { return "ParIS"; }
 

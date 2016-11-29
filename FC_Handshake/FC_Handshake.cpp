@@ -5,14 +5,12 @@
 /// \brief IFC_Handshake::IFC_Handshake Constructor that register the processes of handshake
 /// protocol
 /// \param mn Module name
-/// \param XID X identifier of router in the network
-/// \param YID Y identifier of router in the network
+/// \param ROUTER_ID Router identifier in the network
 /// \param PORT_ID Port identifier in the router
 IFC_Handshake::IFC_Handshake(sc_module_name mn,
-                             unsigned short XID,
-                             unsigned short YID,
+                             unsigned short ROUTER_ID,
                              unsigned short PORT_ID)
-    : IInputFlowControl(mn,XID,YID,PORT_ID),
+    : IInputFlowControl(mn,ROUTER_ID,PORT_ID),
       r_CUR_STATE("IFC_Handshake_rCUR_STATE"),
       w_NEXT_STATE("IFC_Handshake_wNEXT_STATE")
 {
@@ -132,8 +130,8 @@ void IFC_Handshake::p_ALERT_PACKET_RECEIVE() {
 /// \param XID X identifier of router in the network
 /// \param YID Y identifier of router in the network
 /// \param PORT_ID Port identifier in the router
-OFC_Handshake::OFC_Handshake(sc_module_name mn,unsigned short XID,unsigned short YID, unsigned short PORT_ID)
-    : IOutputFlowControl(mn,XID,YID,PORT_ID),
+OFC_Handshake::OFC_Handshake(sc_module_name mn, unsigned short ROUTER_ID, unsigned short PORT_ID)
+    : IOutputFlowControl(mn,ROUTER_ID,PORT_ID),
       r_CUR_STATE("OFC_Handshake_rCUR_STATE"),
       w_NEXT_STATE("OFC_Handshake_wNEXT_STATE")
 {
@@ -240,8 +238,7 @@ extern "C" {
 ////////////////// IFC Factory //////////////////
     SS_EXP IInputFlowControl* new_IFC(sc_simcontext* simcontext,
                                       sc_module_name moduleName,
-                                      unsigned short int XID,
-                                      unsigned short int YID,
+                                      unsigned short int ROUTER_ID,
                                       unsigned short int PORT_ID) {
         // Simcontext is needed because in shared library a
         // new and different simcontext will be created if
@@ -252,7 +249,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new IFC_Handshake(moduleName,XID,YID,PORT_ID);
+        return new IFC_Handshake(moduleName,ROUTER_ID,PORT_ID);
     }
     SS_EXP void delete_IFC(IInputFlowControl* ifc) {
         delete ifc;
@@ -261,8 +258,7 @@ extern "C" {
 ////////////////// OFC Factory //////////////////
     SS_EXP IOutputFlowControl* new_OFC(sc_simcontext* simcontext,
                                       sc_module_name moduleName,
-                                      unsigned short int XID,
-                                      unsigned short int YID,
+                                      unsigned short int ROUTER_ID,
                                       unsigned short int PORT_ID,
                                       unsigned short int) {
         // Simcontext is needed because in shared library a
@@ -274,7 +270,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new OFC_Handshake(moduleName,XID,YID,PORT_ID);
+        return new OFC_Handshake(moduleName,ROUTER_ID,PORT_ID);
     }
     SS_EXP void delete_OFC(IOutputFlowControl* ofc) {
         delete ofc;

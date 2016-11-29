@@ -45,18 +45,17 @@ public:
     // Requests
     sc_vector<sc_out<bool> > o_REQUEST;    // Requests from the input ports
 
-    unsigned short XID, YID;
+    unsigned short ROUTER_ID;
 
     IRouting(sc_module_name mn,
              unsigned short nPorts,
-             unsigned short XID,
-             unsigned short YID)
+             unsigned short ROUTER_ID)
         : SoCINModule(mn) , numPorts(nPorts),
           i_READ_OK("IRouting_iREAD_OK"),
           i_DATA("IRouting_iDATA"),
           i_IDLE("IRouting_iIDLE",nPorts),
           o_REQUEST("IRouting_oREQUEST",nPorts),
-          XID(XID), YID(YID) {}
+          ROUTER_ID(ROUTER_ID) {}
 
     ModuleType moduleType() const { return SoCINModule::TRouting; }
 
@@ -85,13 +84,14 @@ protected:
     unsigned char REQ_S;
     unsigned char REQ_W;
     unsigned char REQ_NONE;
+
+    unsigned short XID,YID;
 public:
 
     IOrthogonal2DRouting(sc_module_name mn,
              unsigned short nPorts,
-             unsigned short XID,
-             unsigned short YID)
-        : IRouting(mn,nPorts,XID,YID),
+             unsigned short ROUTER_ID)
+        : IRouting(mn,nPorts,ROUTER_ID),
           REQ_L(1),     // Local port is always the first requisition - 0b00001
           REQ_N(0),     // Initialize ALL communication requests on 0
           REQ_E(0),     // Initialize ALL communication requests on 0
@@ -99,6 +99,8 @@ public:
           REQ_W(0),     // Initialize ALL communication requests on 0
           REQ_NONE(0)   // None request - always 0
     {
+        XID = ID_TO_COORDINATE_X(ROUTER_ID);
+        YID = ID_TO_COORDINATE_Y(ROUTER_ID);
 
         // Regular ParIS router with all ports - LOCAL, NORTH, EAST, SOUTH, WEST
         if( nPorts == 5 ) {
@@ -151,15 +153,13 @@ inline IOrthogonal2DRouting::~IOrthogonal2DRouting() {}
  * \param sc_simcontext A pointer of simulation context (required for correct plugins use)
  * \param sc_module_name Name for the module to be instantiated
  * \param nPorts Number of ports
- * \param XID Column identifier of the router in the network
- * \param YID Row identifier of the router in the network
+ * \param ROUTER_ID Router identifier in the network
  * \return A method for instantiate a Routing
  */
 typedef IRouting* create_Routing(sc_simcontext*,
                                  sc_module_name,
                                  unsigned short nPorts,
-                                 unsigned short int XID,
-                                 unsigned short int YID);
+                                 unsigned short int ROUTER_ID);
 
 /*!
  * \brief destroy_Routing Typedef for deallocating a

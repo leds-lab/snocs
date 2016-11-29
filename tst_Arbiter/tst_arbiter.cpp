@@ -46,10 +46,10 @@ int sc_main(int argc, char *argv[]) {
         return -1;
     }
 
-    unsigned short nPorts, XID, YID, PORT_ID;
+    unsigned short nPorts, ROUTER_ID, PORT_ID;
     // Get number of ports
     nPorts = atoi(argv[2]);
-    XID = YID = PORT_ID = 0;
+    ROUTER_ID = PORT_ID = 0;
 
     printf("\nNumber of Ports: %u",nPorts);
 
@@ -58,9 +58,9 @@ int sc_main(int argc, char *argv[]) {
 
     ////////////// Instantiate system components //////////////
     // Priority Generator
-    IPriorityGenerator* pg = new_PG_t(sc_get_curr_simcontext(),"PG",nPorts,XID,YID,PORT_ID);
+    IPriorityGenerator* pg = new_PG_t(sc_get_curr_simcontext(),"PG",nPorts,ROUTER_ID,PORT_ID);
     // Design Under Test
-    IArbiter* arb = new DistributedArbiter("Arbiter",nPorts,pg,XID,YID,PORT_ID);
+    IArbiter* arb = new DistributedArbiter("Arbiter",nPorts,pg,ROUTER_ID,PORT_ID);
     // Tester (Driver) - testbench
     tst_Arbiter* tb = new tst_Arbiter("Testbench",arb,nPorts);
     tb->i_CLK(w_CLK);

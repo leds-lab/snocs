@@ -15,7 +15,7 @@ SoCIN_Ring::SoCIN_Ring(sc_module_name mn)
     w_RETURN_TO_RIGHT("w_X_RETURN_TO_RIGHT"),
     w_VC_SELECTOR_TO_RIGHT("w_X_VC_SELECTOR_TO_RIGHT")
 {
-    unsigned short numberOfElements = X_SIZE * Y_SIZE;
+    unsigned short numberOfElements = numInterfaces;
 
     // Allocate the number of routers needed
     u_ROUTER.resize(numberOfElements,NULL);
@@ -36,91 +36,86 @@ SoCIN_Ring::SoCIN_Ring(sc_module_name mn)
         }
     }
 
-    unsigned short x,y, // Aux. to identify the router id in cartesian coordinates
-        routerId,       // Aux. to convert cartesian coordinate to number router id
-        rPortId,        // Aux. to identify the port id to be binded in connections between routers
-        wireId;         // Aux. to identify the wires id to binding connections between routers
+    unsigned short routerId, // Aux. to convert cartesian coordinate to number router id
+                   rPortId,  // Aux. to identify the port id to be binded in connections between routers
+                   wireId;   // Aux. to identify the wires id to binding connections between routers
 
-    for( x = 0; x < X_SIZE; x++ ) {
-        for( y = 0; y < Y_SIZE; y++ ) {
+    for( routerId = 0; routerId < numberOfElements; routerId++ ) {
 
-            routerId = COORDINATE_TO_ID(x,y);
+        char rName[15];
+        sprintf(rName,"ParIS[%u]",routerId);
 
-            char rName[15];
-            sprintf(rName,"ParIS[%u][%u]",x,y);
+        // Instantiating a router
+        IRouter* router = PLUGIN_MANAGER->routerInstance(rName,routerId,3,NUM_VC);
+        if(router == NULL) {
+            std::cout << "\n\t[SoCIN_Ring] -- ERROR: It was not possible instantiate a router." << std::endl;
+            return;
+        }
 
-            // Instantiating a router
-            IRouter* router = PLUGIN_MANAGER->routerInstance(rName,x,y,3,NUM_VC);
-            if(router == NULL) {
-                std::cout << "\n\t[SoCIN_Ring] -- ERROR: It was not possible instantiate a router." << std::endl;
+        IRouter_VC* router_VC = dynamic_cast<IRouter_VC *>(router);
+
+        // Binding ports of the router
+        // System signals
+        router->i_CLK(i_CLK);
+        router->i_RST(i_RST);
+
+        // External interface
+        // Port 0 is always the LOCAL port - core communication
+        router->i_DATA_IN[0](i_DATA_IN[routerId]);
+        router->i_VALID_IN[0](i_VALID_IN[routerId]);
+        router->o_RETURN_IN[0](o_RETURN_IN[routerId]);
+        router->o_DATA_OUT[0](o_DATA_OUT[routerId]);
+        router->o_VALID_OUT[0](o_VALID_OUT[routerId]);
+        router->i_RETURN_OUT[0](i_RETURN_OUT[routerId]);
+        if( NUM_VC > 1 ) {
+            if( router_VC != NULL ) {
+                router_VC->i_VC_IN[0](i_VC_SELECTOR[routerId]);
+                router_VC->o_VC_OUT[0](o_VC_SELECTOR[routerId]);
+            } else {
+                std::cout << "\n\t[SoCIN_Ring] -- ERROR: The router instantiated is not a VC router." << std::endl;
                 return;
             }
-
-            IRouter_VC* router_VC = dynamic_cast<IRouter_VC *>(router);
-
-            // Binding ports of the router
-            // System signals
-            router->i_CLK(i_CLK);
-            router->i_RST(i_RST);
-
-            // External interface
-            // Port 0 is always the LOCAL port - core communication
-            router->i_DATA_IN[0](i_DATA_IN[routerId]);
-            router->i_VALID_IN[0](i_VALID_IN[routerId]);
-            router->o_RETURN_IN[0](o_RETURN_IN[routerId]);
-            router->o_DATA_OUT[0](o_DATA_OUT[routerId]);
-            router->o_VALID_OUT[0](o_VALID_OUT[routerId]);
-            router->i_RETURN_OUT[0](i_RETURN_OUT[routerId]);
-            if( NUM_VC > 1 ) {
-                if( router_VC != NULL ) {
-                    router_VC->i_VC_IN[0](i_VC_SELECTOR[routerId]);
-                    router_VC->o_VC_OUT[0](o_VC_SELECTOR[routerId]);
-                } else {
-                    std::cout << "\n\t[SoCIN_Ring] -- ERROR: The router instantiated is not a VC router." << std::endl;
-                    return;
-                }
-            }
-
-            // Port 1 is LEFT port
-            rPortId = 1;
-            wireId = routerId;
-            router->i_DATA_IN[rPortId](w_DATA_TO_RIGHT[wireId]);
-            router->i_VALID_IN[rPortId](w_VALID_TO_RIGHT[wireId]);
-            router->o_RETURN_IN[rPortId](w_RETURN_TO_RIGHT[wireId]);
-            router->o_DATA_OUT[rPortId](w_DATA_TO_LEFT[wireId]);
-            router->o_VALID_OUT[rPortId](w_VALID_TO_LEFT[wireId]);
-            router->i_RETURN_OUT[rPortId](w_RETURN_TO_LEFT[wireId]);
-            if( NUM_VC > 1 ) {
-                if( router_VC != NULL ) { // Once a time is needed this test, so here it is not needed because already verified in external interface.
-                    router_VC->i_VC_IN[rPortId](w_VC_SELECTOR_TO_RIGHT[wireId]);
-                    router_VC->o_VC_OUT[rPortId](w_VC_SELECTOR_TO_LEFT[wireId]);
-                } else {
-                    std::cout << "\n\t[SoCIN_Ring] -- ERROR: The router instantiated is not a VC router." << std::endl;
-                    return;
-                }
-            }
-
-            // Port 2 is the RIGHT port
-            rPortId = 2;
-            wireId = routerId == 0 ? numInterfaces-1 : routerId - 1;
-            router->i_DATA_IN[rPortId](w_DATA_TO_LEFT[wireId]);
-            router->i_VALID_IN[rPortId](w_VALID_TO_LEFT[wireId]);
-            router->o_RETURN_IN[rPortId](w_RETURN_TO_LEFT[wireId]);
-            router->o_DATA_OUT[rPortId](w_DATA_TO_RIGHT[wireId]);
-            router->o_VALID_OUT[rPortId](w_VALID_TO_RIGHT[wireId]);
-            router->i_RETURN_OUT[rPortId](w_RETURN_TO_RIGHT[wireId]);
-            if( NUM_VC > 1 ) {
-                if( router_VC != NULL ) {
-                    router_VC->i_VC_IN[rPortId](w_VC_SELECTOR_TO_LEFT[wireId]);
-                    router_VC->o_VC_OUT[rPortId](w_VC_SELECTOR_TO_RIGHT[wireId]);
-                } else {
-                    std::cout << "\n\t[SoCIN_Ring] -- ERROR: The router instantiated is not a VC router." << std::endl;
-                    return;
-                }
-            }
-
-            u_ROUTER[routerId] = router;
         }
+
+        // Port 1 is LEFT port
+        rPortId = 1;
+        wireId = routerId;
+        router->i_DATA_IN[rPortId](w_DATA_TO_RIGHT[wireId]);
+        router->i_VALID_IN[rPortId](w_VALID_TO_RIGHT[wireId]);
+        router->o_RETURN_IN[rPortId](w_RETURN_TO_RIGHT[wireId]);
+        router->o_DATA_OUT[rPortId](w_DATA_TO_LEFT[wireId]);
+        router->o_VALID_OUT[rPortId](w_VALID_TO_LEFT[wireId]);
+        router->i_RETURN_OUT[rPortId](w_RETURN_TO_LEFT[wireId]);
+        if( NUM_VC > 1 ) {
+            if( router_VC != NULL ) { // Once a time is needed this test, so here it is not needed because already verified in external interface.
+                router_VC->i_VC_IN[rPortId](w_VC_SELECTOR_TO_RIGHT[wireId]);
+                router_VC->o_VC_OUT[rPortId](w_VC_SELECTOR_TO_LEFT[wireId]);
+            } else {
+                std::cout << "\n\t[SoCIN_Ring] -- ERROR: The router instantiated is not a VC router." << std::endl;
+                return;
+            }
+        }
+
+        // Port 2 is the RIGHT port
+        rPortId = 2;
+        wireId = routerId == 0 ? numInterfaces-1 : routerId - 1;
+        router->i_DATA_IN[rPortId](w_DATA_TO_LEFT[wireId]);
+        router->i_VALID_IN[rPortId](w_VALID_TO_LEFT[wireId]);
+        router->o_RETURN_IN[rPortId](w_RETURN_TO_LEFT[wireId]);
+        router->o_DATA_OUT[rPortId](w_DATA_TO_RIGHT[wireId]);
+        router->o_VALID_OUT[rPortId](w_VALID_TO_RIGHT[wireId]);
+        router->i_RETURN_OUT[rPortId](w_RETURN_TO_RIGHT[wireId]);
+        if( NUM_VC > 1 ) {
+            if( router_VC != NULL ) {
+                router_VC->i_VC_IN[rPortId](w_VC_SELECTOR_TO_LEFT[wireId]);
+                router_VC->o_VC_OUT[rPortId](w_VC_SELECTOR_TO_RIGHT[wireId]);
+            } else {
+                std::cout << "\n\t[SoCIN_Ring] -- ERROR: The router instantiated is not a VC router." << std::endl;
+                return;
+            }
+        }
+
+        u_ROUTER[routerId] = router;
     }
 #ifdef WAVEFORM_SOCIN
     tf = sc_create_vcd_trace_file("socin_ring");

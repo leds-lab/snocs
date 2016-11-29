@@ -9,7 +9,7 @@ SoCIN_Unit::SoCIN_Unit(sc_module_name mn)
     u_ROUTER.resize(1,NULL);
 
     // Get router instance
-    IRouter* u_R = PLUGIN_MANAGER->routerInstance("SingleRouter",0,0,(X_SIZE*Y_SIZE),NUM_VC);
+    IRouter* u_R = PLUGIN_MANAGER->routerInstance("SingleRouter",0,numInterfaces,NUM_VC);
     if( u_R == NULL ) {
         std::cout << "\n\t[SoCIN_Unit] -- ERROR: Not possible instantiate a router." << std::endl;
         return;
@@ -22,7 +22,7 @@ SoCIN_Unit::SoCIN_Unit(sc_module_name mn)
 
     IRouter_VC* u_R_VC = dynamic_cast<IRouter_VC *>(u_R);
 
-    for( unsigned short i = 0; i < u_R->numPorts; i++ ) {
+    for( unsigned short i = 0; i < numInterfaces; i++ ) {
         // Binding common ports
         u_R->i_DATA_IN[i](i_DATA_IN[i]);
         u_R->i_VALID_IN[i](i_VALID_IN[i]);

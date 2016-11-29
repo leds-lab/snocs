@@ -4,9 +4,8 @@
 
 Routing_DOR_Torus::Routing_DOR_Torus(sc_module_name mn,
                                      unsigned short nPorts,
-                                     unsigned short XID,
-                                     unsigned short YID)
-    : IOrthogonal2DRouting(mn,nPorts,XID,YID)
+                                     unsigned short ROUTER_ID)
+    : IOrthogonal2DRouting(mn,nPorts,ROUTER_ID)
 {
     SC_METHOD(p_REQUEST);
     sensitive << i_READ_OK << i_DATA;
@@ -41,6 +40,7 @@ void Routing_DOR_Torus::p_REQUEST() {
 
     // It runs the routing algorithm
     if (v_HEADER_PRESENT) {
+
         v_X_offset = (int) v_XDEST.to_int() - (int) XID;
         v_Y_offset = (int) v_YDEST.to_int() - (int) YID;
 
@@ -76,7 +76,7 @@ void Routing_DOR_Torus::p_REQUEST() {
             v_REQUEST = REQ_L;
         }
 #ifdef DEBUG_ROUTING
-        std::cout << "\n[DOR_TORUS] XID: " << XID << ", YID: " << YID
+        std::cout << "\n[DOR_TORUS] ROUTER_ID: " << ROUTER_ID
                   << ", xDest: " << v_XDEST << ", yDest: " << v_YDEST
                   << ", Req: ";
         switch(v_REQUEST.to_uint()) {
@@ -116,8 +116,7 @@ extern "C" {
     SS_EXP IRouting* new_Routing(sc_simcontext* simcontext,
                               sc_module_name moduleName,
                               unsigned short int nPorts,
-                              unsigned short int XID,
-                              unsigned short int YID) {
+                              unsigned short int ROUTER_ID) {
         // Simcontext is needed because in shared library a
         // new and different simcontext will be created if
         // the main application simcontext is not passed to
@@ -127,7 +126,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new Routing_DOR_Torus(moduleName,nPorts,XID,YID);
+        return new Routing_DOR_Torus(moduleName,nPorts,ROUTER_ID);
     }
     SS_EXP void delete_Routing(IRouting* routing) {
         delete routing;

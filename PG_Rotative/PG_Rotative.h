@@ -52,14 +52,12 @@ public:
      * \brief PG_Rotative
      * \param mn
      * \param numReqs_Grants
-     * \param XID
-     * \param YID
+     * \param ROUTER_ID
      * \param PORT_ID
      */
     PG_Rotative(sc_module_name mn,
               unsigned short int numReqs_Grants,
-              unsigned short int XID,
-              unsigned short int YID,
+              unsigned short int ROUTER_ID,
               unsigned short int PORT_ID);
 
 };

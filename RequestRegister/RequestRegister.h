@@ -64,7 +64,7 @@ public:
     sc_signal<bool>             w_TRAILER_SENT;      // Trailer was sent
 
     // Internal data structures
-    unsigned short int XID, YID, PORT_ID;
+    unsigned short int ROUTER_ID, PORT_ID;
 
     // Module's processes
     void p_REQUESTS_REGISTERS();
@@ -75,8 +75,7 @@ public:
     SC_HAS_PROCESS(RequestRegister);
     RequestRegister(sc_module_name mn,
                     unsigned short nPorts,
-                    unsigned short XID,
-                    unsigned short YID,
+                    unsigned short ROUTER_ID,
                     unsigned short PORT_ID);
     ModuleType moduleType() const { return SoCINModule::TRequestRegister; }
     const char* moduleName() const { return "RequestRegister"; }
@@ -89,13 +88,11 @@ public:
 ////////////////////////////////////////////////////////////////
 /// \brief RequestRegister::RequestRegister module constructor
 /// \param nPorts Number of ports - requests
-/// \param XID X identifier of router in the network
-/// \param YID Y identifier of router in the network
+/// \param ROUTER_ID Router identifier in the network
 /// \param PORT_ID Port identifier in the router
 inline RequestRegister::RequestRegister(sc_module_name mn,
                                  unsigned short nPorts,
-                                 unsigned short XID,
-                                 unsigned short YID,
+                                 unsigned short ROUTER_ID,
                                  unsigned short PORT_ID)
     : SoCINModule(mn),
       numPorts(nPorts),
@@ -113,7 +110,7 @@ inline RequestRegister::RequestRegister(sc_module_name mn,
       w_CIRCUIT_RELEASE("ReqReg_wCIRCUIT_RELEASE"),
       r_CIRCUIT_SET("ReqReg_rCIRCUIT_SET"),
       w_TRAILER_SENT("ReqReg_wTRAILER"),
-      XID(XID), YID(YID), PORT_ID(PORT_ID)
+      ROUTER_ID(ROUTER_ID), PORT_ID(PORT_ID)
 {
     // Registering processes
     SC_METHOD(p_INTERNAL_SIGNALS);
@@ -198,7 +195,7 @@ inline void RequestRegister::p_REQUESTS_REGISTERS() {
                 if( PORT_ID == i ) {
                     if( i_REQUEST[i].read() == 1 ) { // NOTE A input port don't request a same output port
                         std::cout << "[RequestRegister] -- Trying request the same port on Router["
-                                  <<XID<<"]["<<YID << "] - PORT: "<<PORT_ID
+                                  << ROUTER_ID << "] - PORT: "<<PORT_ID
                                    <<"\nSimulation aborted!" << std::endl;
                         sc_stop();
                     }

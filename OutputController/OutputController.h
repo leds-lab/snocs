@@ -46,7 +46,7 @@ public:
     sc_out<bool>             o_IDLE;    // Status
 
     // Internal data structures
-    unsigned short XID, YID, PORT_ID;
+    unsigned short ROUTER_ID, PORT_ID;
 
     // Internal Unit - Sub-module
     IArbiter* u_ARBITER;
@@ -54,8 +54,7 @@ public:
     OutputController(sc_module_name mn,
                      unsigned short nPorts,
                      IArbiter* arb,
-                     unsigned short XID,
-                     unsigned short YID,
+                     unsigned short ROUTER_ID,
                      unsigned short PORT_ID);
 
     ModuleType moduleType() const { return SoCINModule::TOutputController; }
@@ -73,8 +72,7 @@ public:
 inline OutputController::OutputController(sc_module_name mn,
                                           unsigned short nPorts,
                                           IArbiter *arb,
-                                          unsigned short XID,
-                                          unsigned short YID,
+                                          unsigned short ROUTER_ID,
                                           unsigned short PORT_ID)
     : SoCINModule(mn), numPorts(nPorts),
       i_CLK("OutputController_iCLK"),
@@ -82,7 +80,7 @@ inline OutputController::OutputController(sc_module_name mn,
       i_REQUEST("OutputController_iREQUEST",nPorts),
       o_GRANT("OutputController_oGRANT",nPorts),
       o_IDLE("OutputController_oIDLE"),
-      XID(XID),YID(YID),PORT_ID(PORT_ID),
+      ROUTER_ID(ROUTER_ID),PORT_ID(PORT_ID),
       u_ARBITER(arb)
 {
     // Binding ports

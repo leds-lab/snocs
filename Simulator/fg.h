@@ -74,13 +74,16 @@ SC_MODULE(fg)
     void f_send_packet(sc_uint<RIB_WIDTH> , unsigned long long, FLOW_TYPE, unsigned long long, unsigned int);
     void f_send_burst_of_packets(sc_uint<RIB_WIDTH> , unsigned long long, FLOW_TYPE);
 
-    SC_HAS_PROCESS(fg);
+    unsigned short nb_cycles_per_flit;
 
+    SC_HAS_PROCESS(fg);
     //////////////////////////////////////////////////////////////////////////////
     fg(sc_module_name nm,
-       unsigned short int FG_ID) :
+       unsigned short int FG_ID,
+       unsigned short nb_cycles_per_flit) :
         sc_module(nm),
-        FG_ID(FG_ID)
+        FG_ID(FG_ID),
+        nb_cycles_per_flit(nb_cycles_per_flit)
     //////////////////////////////////////////////////////////////////////////////
     {
         vcWidth = (unsigned short) ceil(log2(NUM_VC));

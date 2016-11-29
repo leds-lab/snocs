@@ -41,10 +41,11 @@ public:
     // Packet monitoring - only to traffic meter use
     void p_ALERT_PACKET_RECEIVE();
 
+    unsigned short numberOfCyclesPerFlit() const { return 1; } // Credit-based forward a flit in a single cycle
+
     SC_HAS_PROCESS(IFC_CreditBased);
     IFC_CreditBased(sc_module_name mn,
-                    unsigned short XID,
-                    unsigned short YID,
+                    unsigned short ROUTER_ID,
                     unsigned short PORT_ID);
 
     inline ModuleType moduleType() const { return SoCINModule::TInputFlowControl; }
@@ -83,8 +84,7 @@ public:
     SC_HAS_PROCESS(OFC_CreditBased);
     OFC_CreditBased(sc_module_name mn,
                     unsigned short numCredits,
-                    unsigned short XID,
-                    unsigned short YID,
+                    unsigned short ROUTER_ID,
                     unsigned short PORT_ID);
 
     inline ModuleType moduleType() const { return SoCINModule::TOutputFlowControl; }

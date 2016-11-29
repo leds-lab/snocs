@@ -94,7 +94,7 @@ SoCINfp_VC::SoCINfp_VC(sc_module_name mn)
             sprintf(rName,"ParIS[%u][%u]",x,y);
 
             // Instantiating a router
-            IRouter* router = PLUGIN_MANAGER->routerInstance(rName,x,y,nPorts,NUM_VC);
+            IRouter* router = PLUGIN_MANAGER->routerInstance(rName,routerId,nPorts,NUM_VC);
             if( router == NULL ) {
                 std::cout << "\n\t[SoCINfp_VC] -- ERROR: It was not possible instantiate a router." << std::endl;
                 return;
@@ -429,7 +429,7 @@ SoCINfp::SoCINfp(sc_module_name mn)
             sprintf(rName,"ParIS[%u][%u]",x,y);
 
             // Instantiating a router
-            IRouter* router = PLUGIN_MANAGER->routerInstance(rName,x,y,nPorts,0);
+            IRouter* router = PLUGIN_MANAGER->routerInstance(rName,routerId,nPorts,0);
             if( router == NULL ) {
                 std::cout << "\n\t[SoCINfp_VC] -- ERROR: Not possible instantiate a router." << std::endl;
                 return;

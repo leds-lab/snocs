@@ -299,8 +299,7 @@ INoC* PluginManager::nocInstance(sc_module_name name) {
 }
 
 IRouter* PluginManager::routerInstance(sc_module_name name,
-                                       unsigned short XID,
-                                       unsigned short YID,
+                                       unsigned short ROUTER_ID,
                                        unsigned short nPorts,
                                        unsigned short nVirtualChannels)
 {
@@ -314,14 +313,13 @@ IRouter* PluginManager::routerInstance(sc_module_name name,
        std::cerr << "Error on load symbol of factory creator function - Router: " << dlsym_error << std::endl;
        return NULL;
     }
-    IRouter* r = new_Router(sc_get_curr_simcontext(),name,nPorts,nVirtualChannels,XID,YID);
+    IRouter* r = new_Router(sc_get_curr_simcontext(),name,nPorts,nVirtualChannels,ROUTER_ID);
     this->allocatedUnits.push_back(r);
     return r;
 }
 
 IRouting* PluginManager::routingInstance(sc_core::sc_module_name name,
-                                         unsigned short XID,
-                                         unsigned short YID,
+                                         unsigned short ROUTER_ID,
                                          unsigned short nPorts)
 {
     if( !pluginsLoaded ) {
@@ -334,14 +332,13 @@ IRouting* PluginManager::routingInstance(sc_core::sc_module_name name,
        std::cerr << "Error on load symbol of factory creator function - Routing: " << dlsym_error << std::endl;
        return NULL;
     }
-    IRouting* r = new_Routing(sc_get_curr_simcontext(),name,nPorts,XID,YID);
+    IRouting* r = new_Routing(sc_get_curr_simcontext(),name,nPorts,ROUTER_ID);
     this->allocatedUnits.push_back(r);
     return r;
 }
 
 IInputFlowControl* PluginManager::inputFlowControlInstance(sc_core::sc_module_name name,
-                                                           unsigned short XID,
-                                                           unsigned short YID,
+                                                           unsigned short ROUTER_ID,
                                                            unsigned short PORT_ID)
 {
     if( !pluginsLoaded ) {
@@ -354,14 +351,13 @@ IInputFlowControl* PluginManager::inputFlowControlInstance(sc_core::sc_module_na
        std::cerr << "Error on load symbol of factory creator function - IFC: " << dlsym_error << std::endl;
        return NULL;
     }
-    IInputFlowControl* ifc = new_IFC(sc_get_curr_simcontext(),name,XID,YID,PORT_ID);
+    IInputFlowControl* ifc = new_IFC(sc_get_curr_simcontext(),name,ROUTER_ID,PORT_ID);
     this->allocatedUnits.push_back(ifc);
     return ifc;
 }
 
 IOutputFlowControl* PluginManager::outputFlowControlInstance(sc_core::sc_module_name name,
-                                                             unsigned short XID,
-                                                             unsigned short YID,
+                                                             unsigned short ROUTER_ID,
                                                              unsigned short PORT_ID,
                                                              unsigned short bufferDepth)
 {
@@ -375,14 +371,13 @@ IOutputFlowControl* PluginManager::outputFlowControlInstance(sc_core::sc_module_
        std::cerr << "Error on load symbol of factory creator function - OFC: " << dlsym_error << std::endl;
        return NULL;
     }
-    IOutputFlowControl* ofc = new_OFC(sc_get_curr_simcontext(),name,XID,YID,PORT_ID,bufferDepth);
+    IOutputFlowControl* ofc = new_OFC(sc_get_curr_simcontext(),name,ROUTER_ID,PORT_ID,bufferDepth);
     this->allocatedUnits.push_back(ofc);
     return ofc;
 }
 
 IMemory* PluginManager::memoryInstance(sc_core::sc_module_name name,
-                                       unsigned short XID,
-                                       unsigned short YID,
+                                       unsigned short ROUTER_ID,
                                        unsigned short PORT_ID,
                                        unsigned short memSize)
 {
@@ -396,14 +391,13 @@ IMemory* PluginManager::memoryInstance(sc_core::sc_module_name name,
        std::cerr << "Error on load symbol of factory creator function - Memory: " << dlsym_error << std::endl;
        return NULL;
     }
-    IMemory* mem = new_Memory(sc_get_curr_simcontext(),name,XID,YID,PORT_ID,memSize);
+    IMemory* mem = new_Memory(sc_get_curr_simcontext(),name,ROUTER_ID,PORT_ID,memSize);
     this->allocatedUnits.push_back(mem);
     return mem;
 }
 
 IPriorityGenerator* PluginManager::priorityGeneratorInstance(sc_core::sc_module_name name,
-                                                             unsigned short XID,
-                                                             unsigned short YID,
+                                                             unsigned short ROUTER_ID,
                                                              unsigned short PORT_ID,
                                                              unsigned short nPorts)
 {
@@ -417,7 +411,7 @@ IPriorityGenerator* PluginManager::priorityGeneratorInstance(sc_core::sc_module_
        std::cerr << "Error on load symbol of factory creator function - PG: " << dlsym_error << std::endl;
        return NULL;
     }
-    IPriorityGenerator* pg = new_PG(sc_get_curr_simcontext(),name,nPorts,XID,YID,PORT_ID);
+    IPriorityGenerator* pg = new_PG(sc_get_curr_simcontext(),name,nPorts,ROUTER_ID,PORT_ID);
     this->allocatedUnits.push_back(pg);
     return pg;
 }

@@ -20,7 +20,7 @@ TrafficMeter::TrafficMeter(sc_module_name mn, char *workDir, char *fileName)
     this->trafficClassWidth = (unsigned short) ceil(log2(NUMBER_TRAFFIC_CLASSES));
     this->threadIdWidth = (unsigned short) ceil(log2(NUMBER_OF_THREADS));
 
-    u_IFC = PLUGIN_MANAGER->inputFlowControlInstance("IFC_TM",0,0,0);
+    u_IFC = PLUGIN_MANAGER->inputFlowControlInstance("IFC_TM",0,0);
     u_IFC->i_CLK(i_CLK);
     u_IFC->i_RST(i_RST);
     u_IFC->i_DATA(i_DATA);

@@ -38,18 +38,17 @@ public:
     sc_vector<sc_in<bool> >  i_GRANTS;
     sc_vector<sc_out<bool> > o_PRIORITIES;
 
-    unsigned short int XID, YID, PORT_ID;
+    unsigned short int ROUTER_ID, PORT_ID;
 
     // Constructor
     IPriorityGenerator(sc_module_name mn,
                       unsigned short int numReqs_Grants,
-                      unsigned short int XID,
-                      unsigned short int YID,
+                      unsigned short int ROUTER_ID,
                       unsigned short int PORT_ID)
         : SoCINModule(mn),numPorts(numReqs_Grants), i_CLK("PG_CLK"),
           i_RST("PG_RESET"),i_GRANTS("PG_GRANTS",numReqs_Grants),
-          o_PRIORITIES("PG_PRIORITIES",numReqs_Grants),XID(XID),
-          YID(YID),PORT_ID(PORT_ID) {}
+          o_PRIORITIES("PG_PRIORITIES",numReqs_Grants),
+          ROUTER_ID(ROUTER_ID),PORT_ID(PORT_ID) {}
 
     ~IPriorityGenerator() = 0;
 };
@@ -68,16 +67,14 @@ inline IPriorityGenerator::~IPriorityGenerator(){}
  * \param sc_simcontext A pointer of simulation context (required for correct plugins use)
  * \param sc_module_name Name for the module to be instantiated
  * \param numReqs_Grants Number of input Requests and output Grants ports
- * \param XID Column identifier of the router in the network
- * \param YID Row identifier of the router in the network
+ * \param ROUTER_ID Router identifier in the network
  * \param PORT_ID Port identifier of the router
  * \return A method for instantiate a Priority Generator
  */
 typedef IPriorityGenerator* create_PriorityGenerator(sc_simcontext*,
                                         sc_module_name,
                                         unsigned short int numReqs_Grants,
-                                        unsigned short int XID,
-                                        unsigned short int YID,
+                                        unsigned short int ROUTER_ID,
                                         unsigned short int PORT_ID);
 
 /*!
@@ -171,7 +168,7 @@ public:
         destroy_PG = del;
 
         // Instantiate DUT
-        pg = new_pg(sc_get_curr_simcontext(),"PG_DUT",numPorts,0,0,0);
+        pg = new_pg(sc_get_curr_simcontext(),"PG_DUT",numPorts,0,0);
         // Binding DUT with testbench ports and signals
         pg->i_CLK(i_CLK);
         pg->i_RST(w_RST);

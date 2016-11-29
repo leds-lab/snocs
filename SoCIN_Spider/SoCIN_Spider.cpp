@@ -56,12 +56,9 @@ SoCIN_Spider::SoCIN_Spider(sc_module_name mn)
     for( routerId = 0; routerId < numberOfElements; routerId++ ) {
         char rName[15];
         sprintf(rName,"ParIS[%u]",routerId);
-        unsigned short x,y;
-        x = ID_TO_COORDINATE_X(routerId);
-        y = ID_TO_COORDINATE_Y(routerId);
 
         // Instantiating a router
-        IRouter* router = PLUGIN_MANAGER->routerInstance(rName,x,y,4,NUM_VC);
+        IRouter* router = PLUGIN_MANAGER->routerInstance(rName,routerId,4,NUM_VC);
         if(router == NULL) {
             std::cout << "\n\t[SoCIN_Spider] -- ERROR: It was not possible instantiate a router." << std::endl;
             return;

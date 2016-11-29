@@ -43,8 +43,7 @@ public:
     SC_HAS_PROCESS(PG_RoundRobin);
     PG_RoundRobin(sc_module_name mn,
               unsigned int numReqs_Grants,
-              unsigned short int XID,
-              unsigned short int YID,
+              unsigned short int ROUTER_ID,
               unsigned short int PORT_ID);
 
     ModuleType moduleType() const { return SoCINModule::TPriorityGenerator; }

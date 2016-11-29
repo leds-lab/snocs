@@ -5,11 +5,12 @@
 /// \brief IFC_CreditBased::IFC_CreditBased Constructor that register the processes of
 /// Credit-based protocol
 /// \param mn Module name
-/// \param XID X identifier of router in the network
-/// \param YID Y identifier of router in the network
+/// \param ROUTER_ID Router identifier in the network
 /// \param PORT_ID Port identifier in the router
-IFC_CreditBased::IFC_CreditBased(sc_module_name mn,unsigned short XID, unsigned short YID, unsigned short PORT_ID)
-    : IInputFlowControl(mn,XID,YID,PORT_ID)
+IFC_CreditBased::IFC_CreditBased(sc_module_name mn,
+                                 unsigned short ROUTER_ID,
+                                 unsigned short PORT_ID)
+    : IInputFlowControl(mn,ROUTER_ID,PORT_ID)
 {
     SC_METHOD(p_RETURN);
     sensitive << i_CLK.pos() << i_RST;
@@ -53,8 +54,8 @@ void IFC_CreditBased::p_ALERT_PACKET_RECEIVE() {
 
 void IFC_CreditBased::p_DEBUG() {
 
-    if( XID == 1 && YID == 0 && PORT_ID == 2) {
-        printf("\n[IFC_Credit][%u][%u][%u] ",XID, YID,PORT_ID);
+    if( ROUTER_ID == 0 && PORT_ID == 2) {
+        printf("\n[IFC_Credit][%u][%u] ",ROUTER_ID,PORT_ID);
         std::cout  << ", VALID =" << i_VALID.read() \
                    << ", RETURN =" << o_RETURN.read() \
                    << ", WRITE ="  << o_WRITE.read() \
@@ -71,15 +72,13 @@ void IFC_CreditBased::p_DEBUG() {
 /// Credit-based protocol
 /// \param mn Module name
 /// \param numCredits Number of credits of the buffer
-/// \param XID X identifier of router in the network
-/// \param YID Y identifier of router in the network
+/// \param ROUTER_ID Router identifier in the network
 /// \param PORT_ID Port identifier in the router
 OFC_CreditBased::OFC_CreditBased(sc_module_name mn,
                                  unsigned short numCredits,
-                                 unsigned short XID,
-                                 unsigned short YID,
+                                 unsigned short ROUTER_ID,
                                  unsigned short PORT_ID)
-    : IOutputFlowControl(mn,XID,YID,PORT_ID),
+    : IOutputFlowControl(mn,ROUTER_ID,PORT_ID),
       numCredits(numCredits),
       r_COUNTER("OFC_CreditBased_rCOUNTER")
 {
@@ -147,8 +146,8 @@ void OFC_CreditBased::p_OUTPUTS() {
 }
 
 void OFC_CreditBased::p_DEBUG() {
-    if( XID == 0 && YID == 0 && PORT_ID == 0) {
-        printf("\n[OFC_Credit][%u][%u][%u] ",XID, YID,PORT_ID);
+    if( ROUTER_ID == 0 && PORT_ID == 0) {
+        printf("\n[OFC_Credit][%u][%u] ",ROUTER_ID,PORT_ID);
         std::cout  << ", COUNTER=" << r_COUNTER.read() \
                    << ", ROK =" << i_READ_OK.read() \
                    << ", RETURN =" << i_RETURN.read() \
@@ -167,8 +166,7 @@ extern "C" {
 ////////////////// IFC Factory //////////////////
     SS_EXP IInputFlowControl* new_IFC(sc_simcontext* simcontext,
                                       sc_module_name moduleName,
-                                      unsigned short int XID,
-                                      unsigned short int YID,
+                                      unsigned short int ROUTER_ID,
                                       unsigned short int PORT_ID) {
         // Simcontext is needed because in shared library a
         // new and different simcontext will be created if
@@ -179,7 +177,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new IFC_CreditBased(moduleName,XID,YID,PORT_ID);
+        return new IFC_CreditBased(moduleName,ROUTER_ID,PORT_ID);
     }
     SS_EXP void delete_IFC(IInputFlowControl* ifc) {
         delete ifc;
@@ -188,8 +186,7 @@ extern "C" {
 ////////////////// OFC Factory //////////////////
     SS_EXP IOutputFlowControl* new_OFC(sc_simcontext* simcontext,
                                       sc_module_name moduleName,
-                                      unsigned short int XID,
-                                      unsigned short int YID,
+                                      unsigned short int ROUTER_ID,
                                       unsigned short int PORT_ID,
                                       unsigned short int numberOfCredits) {
         // Simcontext is needed because in shared library a
@@ -201,7 +198,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new OFC_CreditBased(moduleName,numberOfCredits,XID,YID,PORT_ID);
+        return new OFC_CreditBased(moduleName,numberOfCredits,ROUTER_ID,PORT_ID);
     }
     SS_EXP void delete_OFC(IOutputFlowControl* ofc) {
         delete ofc;

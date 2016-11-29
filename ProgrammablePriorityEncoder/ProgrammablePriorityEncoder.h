@@ -64,7 +64,7 @@ public:
     sc_signal<bool>             w_IDLE;      // Signal for the idle output
 
     // Internal data structures
-    unsigned short int XID, YID, PORT_ID;
+    unsigned short int ROUTER_ID, PORT_ID;
 
     // Module's processes
     void p_IMED_IN();
@@ -77,8 +77,7 @@ public:
     SC_HAS_PROCESS(ProgrammablePriorityEncoder);
     ProgrammablePriorityEncoder(sc_module_name mn,
                                 unsigned int short nPorts,
-                                unsigned int short XID,
-                                unsigned int short YID,
+                                unsigned int short ROUTER_ID,
                                 unsigned short PORT_ID);
 
     ModuleType moduleType() const { return SoCINModule::TPriorityEncoder; }
@@ -126,13 +125,11 @@ public:
 /// \brief ProgrammablePriorityEncoder::ProgrammablePriorityEncoder Module constructor
 /// \param mn Module name
 /// \param nPorts Number of ports - requests, priorities & grants
-/// \param XID X identifier of router in the network
-/// \param YID Y identifier of router in the network
+/// \param ROUTER_ID Router identifier in the network
 /// \param PORT_ID Port identifier in the router
 inline ProgrammablePriorityEncoder::ProgrammablePriorityEncoder(sc_module_name mn,
                                                          unsigned short nPorts,
-                                                         unsigned short XID,
-                                                         unsigned short YID,
+                                                         unsigned short ROUTER_ID,
                                                          unsigned short PORT_ID)
     : SoCINModule(mn),
       nPorts(nPorts),
@@ -147,8 +144,7 @@ inline ProgrammablePriorityEncoder::ProgrammablePriorityEncoder(sc_module_name m
       w_GRANT("PPE_wGRANT",nPorts),
       r_GRANT("PPE_rGRANT",nPorts),
       w_IDLE("PPE_wIDLE"),
-      XID(XID),
-      YID(YID),
+      ROUTER_ID(ROUTER_ID),
       PORT_ID(PORT_ID)
 {
 
@@ -351,7 +347,7 @@ inline tst_PPE::tst_PPE(sc_module_name mn, unsigned short nPorts)
     w_REQUEST.init(nPorts);
     w_GRANT.init(nPorts);
 
-    u_PPE = new ProgrammablePriorityEncoder("PPE_DUT",nPorts,0,0,0);
+    u_PPE = new ProgrammablePriorityEncoder("PPE_DUT",nPorts,0,0);
     u_PPE->i_CLK(i_CLK);
     u_PPE->i_RST(w_RST);
     u_PPE->i_PRIORITY(w_PRIORITY);

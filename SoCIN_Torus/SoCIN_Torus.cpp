@@ -24,10 +24,10 @@ SoCIN_Torus::SoCIN_Torus(sc_module_name mn)
       w_Y_VC_SELECTOR_TO_NORTH("w_Y_VC_SELECTOR_TO_NORTH")
 {
     // Allocating the number of routers needed
-    u_ROUTER.resize((X_SIZE*Y_SIZE),NULL);
+    u_ROUTER.resize(numInterfaces,NULL);
 
-    unsigned short numberOfXWires = X_SIZE * Y_SIZE;
-    unsigned short numberOfYWires = Y_SIZE * X_SIZE;
+    unsigned short numberOfXWires = numInterfaces;
+    unsigned short numberOfYWires = numInterfaces;
 
     // Allocating wires
     // X direction
@@ -76,7 +76,7 @@ SoCIN_Torus::SoCIN_Torus(sc_module_name mn)
             sprintf(rName,"ParIS[%u][%u]",x,y);
 
             // Instantiating a router
-            IRouter* router = PLUGIN_MANAGER->routerInstance(rName,x,y,5,NUM_VC);
+            IRouter* router = PLUGIN_MANAGER->routerInstance(rName,routerId,5,NUM_VC);
             if(router == NULL) {
                 std::cout << "\n\t[SoCIN_Torus] -- ERROR: It was not possible instantiate a router." << std::endl;
                 return;

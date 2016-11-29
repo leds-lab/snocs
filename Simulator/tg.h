@@ -79,24 +79,6 @@ SC_MODULE(tg) {
             o_VC.init( ceil(log2(NUM_VC)) );
         }
 
-        //////////////////////////////////
-        fg *fg0 = new fg("fg0",TG_ID);
-        //////////////////////////////////
-        fg0->clk(clk);
-        fg0->rst(rst);
-        fg0->clock_cycles(clock_cycles);
-        fg0->snd_data(snd_data_wire);
-        fg0->snd_wr(snd_wr_wire);
-        fg0->snd_wok(snd_wok_wire);
-        fg0->rcv_data(rcv_data_wire);
-        fg0->rcv_rok(rcv_rok_wire);
-        fg0->rcv_rd(rcv_rd_wire);
-        fg0->eot(eot);
-        fg0->number_of_packets_sent(number_of_packets_sent);
-        fg0->number_of_packets_received(number_of_packets_received);
-        if(NUM_VC>1)
-            fg0->o_VC(o_VC);
-
         UnboundedFifo* fifoOut = new UnboundedFifo("FifoOutTG");
         fifoOut->i_CLK(clk);
         fifoOut->i_RST(rst);
@@ -108,7 +90,7 @@ SC_MODULE(tg) {
         fifoOut->o_DATA_OUT(out_data);
 
         //////////////////////////////////////////////
-        u_OFC = PLUGIN_MANAGER->outputFlowControlInstance("TG_OFC",0,0,0,FIFO_IN_DEPTH);
+        u_OFC = PLUGIN_MANAGER->outputFlowControlInstance("TG_OFC",0,0,FIFO_IN_DEPTH);
         //////////////////////////////////////////////
         u_OFC->i_CLK(clk);
         u_OFC->i_RST(rst);
@@ -128,7 +110,7 @@ SC_MODULE(tg) {
         fifoIn->o_DATA_OUT(rcv_data_wire);
 
         //////////////////////////////////////////////
-        u_IFC = PLUGIN_MANAGER->inputFlowControlInstance("TG_IFC",0,0,0);
+        u_IFC = PLUGIN_MANAGER->inputFlowControlInstance("TG_IFC",0,0);
         //////////////////////////////////////////////
         u_IFC->i_CLK(clk);
         u_IFC->i_RST(rst);
@@ -139,6 +121,25 @@ SC_MODULE(tg) {
         u_IFC->i_WRITE_OK(rcv_wok_wire);
         u_IFC->o_WRITE(rcv_wr_wire);
         u_IFC->i_DATA(rcv_data_wire);
+
+        //////////////////////////////////
+        fg *fg0 = new fg("fg0",TG_ID,u_IFC->numberOfCyclesPerFlit());
+        //////////////////////////////////
+        fg0->clk(clk);
+        fg0->rst(rst);
+        fg0->clock_cycles(clock_cycles);
+        fg0->snd_data(snd_data_wire);
+        fg0->snd_wr(snd_wr_wire);
+        fg0->snd_wok(snd_wok_wire);
+        fg0->rcv_data(rcv_data_wire);
+        fg0->rcv_rok(rcv_rok_wire);
+        fg0->rcv_rd(rcv_rd_wire);
+        fg0->eot(eot);
+        fg0->number_of_packets_sent(number_of_packets_sent);
+        fg0->number_of_packets_received(number_of_packets_received);
+        if(NUM_VC>1)
+            fg0->o_VC(o_VC);
+
     }
 
 };

@@ -15,6 +15,7 @@
 #define VAR_IAT_FXD_PCK 4
 #define VAR_BST_FXD_IAT 5
 
+#define HEADER_LENGTH 1
 //#define REQUIRED_BW_POSITION    22
 //#define TRAFFIC_CLASS_POSITION  18
 //#define PACKET_TYPE_POSITION    16
@@ -139,17 +140,10 @@ void fg::f_send_burst_of_packets(sc_uint<RIB_WIDTH> header, unsigned long long c
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 {
     unsigned int i;
-    unsigned int nb_of_cycles_per_flit;
-
-    switch (FC_TYPE) {
-    case 0  : nb_of_cycles_per_flit = 4; break;
-    case 1  : nb_of_cycles_per_flit = 1; break;
-    default : break;
-    }
 
     for (i=0; i<flow.burst_size-1;i++) {
         f_send_packet(header, cycle_to_send, flow, flow.payload_length, NORMAL);
-        cycle_to_send += (flow.payload_length+HEADER_LENGTH) * nb_of_cycles_per_flit;
+        cycle_to_send += (flow.payload_length+HEADER_LENGTH) * nb_cycles_per_flit;
     }
     if (flow.last_payload_length!=0)
         f_send_packet(header, cycle_to_send, flow, flow.last_payload_length, NORMAL);
@@ -169,7 +163,6 @@ void fg::p_send()
     unsigned long cycle_to_send_next_pck; // When the next packet has to be injected
     unsigned long long total_pck_2send;
     unsigned long long pck_counter;
-    unsigned int nb_of_cycles_per_flit;
     unsigned int packet_type;
 
     float r;
@@ -181,14 +174,6 @@ void fg::p_send()
     FILE *fp_in;
     FLOW_TYPE *flow;
 
-
-    // It calculates the number of cycles per flit for the used flow control tech.
-    switch (FC_TYPE) {
-    case 0  : nb_of_cycles_per_flit = 4; break;
-    case 1  : nb_of_cycles_per_flit = 1; break;
-    case 2  : nb_of_cycles_per_flit = 1; break;
-    default : break;
-    }
 
     /////////////////////////////////////////////
     // READING THE FLOWS FROM THE DESCRIPTOR FILE
@@ -319,26 +304,26 @@ void fg::p_send()
                         case VAR_IDL_FXD_PCK: // It determines the number of idle cycles
                             tmp_float = (1.0/flow[flow_index].required_bw - 1.0);
                             flow[flow_index].idle = (unsigned int) ((flow[flow_index].payload_length+HEADER_LENGTH) // NOTE: round is optional
-                                                                    * nb_of_cycles_per_flit * (tmp_float));
+                                                                    * nb_cycles_per_flit * (tmp_float));
                             break;
 
                         case VAR_PCK_FXD_IDL:  // It determines the payload length
                             tmp_float = (1.0/flow[flow_index].required_bw - 1.0);
                             flow[flow_index].payload_length = (unsigned int) (flow[flow_index].idle // NOTE: round() is optional
-                                                                              / (nb_of_cycles_per_flit * (tmp_float))) - 1;
+                                                                              / (nb_cycles_per_flit * (tmp_float))) - 1;
                             break;
 
                         case VAR_PCK_FXD_IAT:  // It determines the payload length and the number of idle cycles
                             flow[flow_index].payload_length = (unsigned int) ((flow[flow_index].iat        // NOTE: round() is optional
-                                                                               *flow[flow_index].required_bw)/nb_of_cycles_per_flit) - 1;
+                                                                               *flow[flow_index].required_bw)/nb_cycles_per_flit) - 1;
                             flow[flow_index].idle = flow[flow_index].iat - (flow[flow_index].payload_length + 1);
                             break;
 
                         case VAR_IAT_FXD_PCK:  // It determines the inter-arrival time and the number of idle cycles
                             tmp_float = (1.0/flow[flow_index].required_bw);
                             flow[flow_index].iat = (unsigned int) ((flow[flow_index].payload_length + 1)   // NOTE: round() is optional
-                                                                   * nb_of_cycles_per_flit*tmp_float);
-                            flow[flow_index].idle = flow[flow_index].iat - (flow[flow_index].payload_length + 1)*nb_of_cycles_per_flit;
+                                                                   * nb_cycles_per_flit*tmp_float);
+                            flow[flow_index].idle = flow[flow_index].iat - (flow[flow_index].payload_length + 1)*nb_cycles_per_flit;
                             break;
 
                         case VAR_BST_FXD_IAT:  // It determines the burst size and the size of the last packet
@@ -348,7 +333,7 @@ void fg::p_send()
                             // packet is determined. Depending on the required bandwidth, the length of
                             // the payload of the last packet can equal 0, 1 or a number <= payload_length
                             tmp_float = ((flow[flow_index].required_bw * flow[flow_index].iat)
-                                         / ((float)((flow[flow_index].payload_length+1) * nb_of_cycles_per_flit)));
+                                         / ((float)((flow[flow_index].payload_length+1) * nb_cycles_per_flit)));
 
                             if (((unsigned int)(100*tmp_float)%100) == 0) { // If decimal part is 0
                                 flow[flow_index].burst_size = (unsigned int) tmp_float;
@@ -356,7 +341,7 @@ void fg::p_send()
                             } else {
                                 flow[flow_index].burst_size = (unsigned int) (roundf(tmp_float+0.5));
                                 tmp_float  = (trunc((fmod( flow[flow_index].required_bw * flow[flow_index].iat,
-                                                           (float)(flow[flow_index].payload_length+1) * nb_of_cycles_per_flit))/ nb_of_cycles_per_flit));
+                                                           (float)(flow[flow_index].payload_length+1) * nb_cycles_per_flit))/ nb_cycles_per_flit));
                                 if (tmp_float < 1)
                                     flow[flow_index].last_payload_length = 0;
                                 else
@@ -367,11 +352,11 @@ void fg::p_send()
                             }
 
                             if (flow[flow_index].last_payload_length == 0)
-                                flow[flow_index].idle = flow[flow_index].iat - nb_of_cycles_per_flit
+                                flow[flow_index].idle = flow[flow_index].iat - nb_cycles_per_flit
                                         * (((flow[flow_index].burst_size-1)*(flow[flow_index].payload_length + 1)));
                             else
                                 flow[flow_index].idle = flow[flow_index].iat
-                                        - nb_of_cycles_per_flit * (((flow[flow_index].burst_size-1)*(flow[flow_index].payload_length + 1))
+                                        - nb_cycles_per_flit * (((flow[flow_index].burst_size-1)*(flow[flow_index].payload_length + 1))
                                                                    + (flow[flow_index].last_payload_length+1));
                             break;
 
@@ -418,8 +403,8 @@ void fg::p_send()
                     flow[flow_index].pck_sent+= flow[flow_index].burst_size;
 
                     // It calculates when the first packet of the next burst of packets have to be injected
-                    cycle_to_send_next_pck += ((flow[flow_index].payload_length+HEADER_LENGTH) * nb_of_cycles_per_flit * (flow[flow_index].burst_size - 1))
-                            + ((flow[flow_index].last_payload_length+HEADER_LENGTH) * nb_of_cycles_per_flit);
+                    cycle_to_send_next_pck += ((flow[flow_index].payload_length+HEADER_LENGTH) * nb_cycles_per_flit * (flow[flow_index].burst_size - 1))
+                            + ((flow[flow_index].last_payload_length+HEADER_LENGTH) * nb_cycles_per_flit);
 //ZEFERINO                            + flow[flow_index].idle;
                 } else {
                     // It increments the packet counters
@@ -427,7 +412,7 @@ void fg::p_send()
                     flow[flow_index].pck_sent+= flow[flow_index].burst_size - 1;
 
                     // It calculates when the first packet of the next burst of packets have to be injected
-                    cycle_to_send_next_pck += ((flow[flow_index].payload_length+HEADER_LENGTH) * nb_of_cycles_per_flit * (flow[flow_index].burst_size - 1));
+                    cycle_to_send_next_pck += ((flow[flow_index].payload_length+HEADER_LENGTH) * nb_cycles_per_flit * (flow[flow_index].burst_size - 1));
 //ZEFERINO                            + flow[flow_index].idle;
                 }
 
@@ -464,7 +449,7 @@ void fg::p_send()
                 flow[flow_index].pck_sent++;
 
                 // It calculates when the next packet have to be injected
-                cycle_to_send_next_pck += ((flow[flow_index].payload_length+HEADER_LENGTH) * nb_of_cycles_per_flit);
+                cycle_to_send_next_pck += ((flow[flow_index].payload_length+HEADER_LENGTH) * nb_cycles_per_flit);
 //ZEFERINO                        + flow[flow_index].idle;
             }
 

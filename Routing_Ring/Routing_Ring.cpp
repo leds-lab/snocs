@@ -4,9 +4,8 @@
 
 Routing_Ring::Routing_Ring(sc_module_name mn,
                            unsigned short nPorts,
-                           unsigned short XID,
-                           unsigned short YID)
-    : IRouting(mn,nPorts,XID,YID),
+                           unsigned short ROUTER_ID)
+    : IRouting(mn,nPorts,ROUTER_ID),
       REQ_NONE(0),
       REQ_LOCAL(1),
       REQ_CLOCKWISE(2),
@@ -46,7 +45,7 @@ void Routing_Ring::p_REQUEST() {
     // It runs the routing algorithm
     if (v_HEADER_PRESENT) {
         unsigned short v_LAST_ID = X_SIZE * Y_SIZE - 1;
-        v_LOCAL = COORDINATE_TO_ID(XID,YID);
+        v_LOCAL = ROUTER_ID;
         v_DEST  = COORDINATE_TO_ID(v_XDEST.to_int(),v_YDEST.to_int());
 
         v_OFFSET = v_DEST - v_LOCAL;
@@ -105,8 +104,7 @@ extern "C" {
     SS_EXP IRouting* new_Routing(sc_simcontext* simcontext,
                               sc_module_name moduleName,
                               unsigned short int nPorts,
-                              unsigned short int XID,
-                              unsigned short int YID) {
+                              unsigned short int ROUTER_ID) {
         // Simcontext is needed because in shared library a
         // new and different simcontext will be created if
         // the main application simcontext is not passed to
@@ -116,7 +114,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new Routing_Ring(moduleName,nPorts,XID,YID);
+        return new Routing_Ring(moduleName,nPorts,ROUTER_ID);
     }
     SS_EXP void delete_Routing(IRouting* routing) {
         delete routing;

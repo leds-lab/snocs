@@ -1,11 +1,15 @@
 #include "PG_RoundRobin.h"
 #include "../export.h"
 
-PG_RoundRobin::PG_RoundRobin(sc_module_name mn,unsigned int numReqs_Grants,unsigned short int XID,
-                     unsigned short int YID, unsigned short int PORT_ID)
-        : IPriorityGenerator(mn,numReqs_Grants,XID,YID,PORT_ID),
-          r_UPDATE("PGRR_update_register"), r_GDELAYED("PGRR_Gdelayed",numReqs_Grants),
-          r_NEXT_PRIORITIES("PGRR_nextP",numReqs_Grants), r_PRIORITIES("PGRR_Preg",numReqs_Grants)
+PG_RoundRobin::PG_RoundRobin(sc_module_name mn,
+                             unsigned int numReqs_Grants,
+                             unsigned short int ROUTER_ID,
+                             unsigned short int PORT_ID)
+        : IPriorityGenerator(mn,numReqs_Grants,ROUTER_ID,PORT_ID),
+          r_UPDATE("PGRR_update_register"),
+          r_GDELAYED("PGRR_Gdelayed",numReqs_Grants),
+          r_NEXT_PRIORITIES("PGRR_nextP",numReqs_Grants),
+          r_PRIORITIES("PGRR_Preg",numReqs_Grants)
 {
 
     unsigned short int i;
@@ -166,7 +170,7 @@ void PG_RoundRobin::p_OUTPUTS()
 extern "C" {
     SS_EXP IPriorityGenerator* new_PG(sc_simcontext* simcontext,
             sc_module_name moduleName,unsigned short int numReqs_Grants,
-            unsigned short int XID,unsigned short int YID,
+            unsigned short int ROUTER_ID,
             unsigned short int PORT_ID) {
         // Simcontext is needed because in shared library a
         // new and different simcontext will be created if
@@ -177,7 +181,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new PG_RoundRobin(moduleName,numReqs_Grants,XID,YID,PORT_ID);
+        return new PG_RoundRobin(moduleName,numReqs_Grants,ROUTER_ID,PORT_ID);
     }
     SS_EXP void delete_PG(IPriorityGenerator* pg) {
         delete pg;

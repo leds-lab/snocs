@@ -41,12 +41,11 @@ public:
     sc_out<bool>             o_IDLE;    // Status
 
     // Internal data structures
-    unsigned short XID, YID, PORT_ID;
+    unsigned short ROUTER_ID, PORT_ID;
 
     IArbiter(sc_module_name mn,
              unsigned short nPorts,
-             unsigned short XID,
-             unsigned short YID,
+             unsigned short ROUTER_ID,
              unsigned short PORT_ID)
         : SoCINModule(mn),
           nPorts(nPorts),
@@ -55,8 +54,7 @@ public:
           i_REQUEST("Arb_REQ",nPorts),
           o_GRANT("Arb_oGRANT",nPorts),
           o_IDLE("Arb_oIDLE"),
-          XID(XID),
-          YID(YID),
+          ROUTER_ID(ROUTER_ID),
           PORT_ID(PORT_ID) {}
 
     ~IArbiter() = 0;
@@ -91,8 +89,7 @@ public:
     DistributedArbiter(sc_module_name mn,
                        unsigned short nPorts,
                        IPriorityGenerator* pg,
-                       unsigned short XID,
-                       unsigned short YID,
+                       unsigned short ROUTER_ID,
                        unsigned short PORT_ID);
 
     ModuleType moduleType() const { return SoCINModule::TArbiter; }
@@ -146,15 +143,14 @@ public:
 inline DistributedArbiter::DistributedArbiter(sc_module_name mn,
                                        unsigned short nPorts,
                                        IPriorityGenerator *pg,
-                                       unsigned short XID,
-                                       unsigned short YID,
+                                       unsigned short ROUTER_ID,
                                        unsigned short PORT_ID)
-        : IArbiter(mn,nPorts,XID,YID,PORT_ID),
+        : IArbiter(mn,nPorts,ROUTER_ID,PORT_ID),
           w_PRIORITY("DistArb_wPRIOR",nPorts),
           u_PG(pg),
           u_PPE(NULL)
 {
-    u_PPE = new ProgrammablePriorityEncoder("PPE",nPorts,XID,YID,PORT_ID);
+    u_PPE = new ProgrammablePriorityEncoder("PPE",nPorts,ROUTER_ID,PORT_ID);
     // Binding ports
     // PPE
     u_PPE->i_CLK(i_CLK);

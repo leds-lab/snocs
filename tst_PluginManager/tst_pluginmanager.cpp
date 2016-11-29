@@ -18,7 +18,7 @@ int sc_main(int argc, char *argv[]) {
     if( pm->parseFile() ) {
         if( pm->loadPlugins() ) {
             std::cout << "Plugins carregados!" << std::endl;
-            IMemory* mem = pm->memoryInstance("FIFO",0,0,0,4);
+            IMemory* mem = pm->memoryInstance("FIFO",0,0,4);
             if(mem) {
                 std::cout << mem->moduleName() << std::endl;
             }

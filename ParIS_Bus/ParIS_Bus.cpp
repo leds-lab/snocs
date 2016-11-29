@@ -1,7 +1,7 @@
 #include "ParIS_Bus.h"
 
 ParIS_none_VC_Bus::ParIS_none_VC_Bus(sc_module_name mn,unsigned short nPorts)
-    : IRouter(mn,nPorts,0,0),
+    : IRouter(mn,nPorts,0),
       w_WRITE_IN("ParIS_none_VC_Bus_wWRITE_IN",nPorts),
       w_WRITE_OK_IN("ParIS_none_VC_Bus_wWRITE_OK_IN",nPorts),
       w_DATA_OUT_FIFO_IN("ParIS_none_VC_Bus_wDATA_OUT_FIFO_IN",nPorts),
@@ -34,31 +34,29 @@ ParIS_none_VC_Bus::ParIS_none_VC_Bus(sc_module_name mn,unsigned short nPorts)
     }
 
     // Instantiating internal modules
-    IPriorityGenerator* pg = PLUGIN_MANAGER->priorityGeneratorInstance("PG_BUS",XID,YID,0,nPorts);
-    u_ARBITER     = new DistributedArbiter("Arbiter_BUS",nPorts,pg,XID,YID,0);
+    IPriorityGenerator* pg = PLUGIN_MANAGER->priorityGeneratorInstance("PG_BUS",ROUTER_ID,0,nPorts);
+    u_ARBITER     = new DistributedArbiter("Arbiter_BUS",nPorts,pg,ROUTER_ID,0);
     u_ODS_MUX     = new OneHotMux<Flit>("ODS_BUS",nPorts);
     u_OWS_MUX     = new OneHotMux<bool>("OWS_INPUT",nPorts);
     u_OWS_DEMUX   = new OneHotDemux<bool>("OWS_OUTPUT",nPorts);
     u_IRS_MUX     = new OneHotMux<bool>("IRS_INPUT",nPorts);
     u_IRS_DEMUX   = new OneHotDemux<bool>("IRS_OUTPUT",nPorts);
     for( i = 0; i < nPorts; i++) {
-        unsigned short tXID = ID_TO_COORDINATE_X(i);
-        unsigned short tYID = ID_TO_COORDINATE_Y(i);
         char strIfc[15];
         sprintf(strIfc,"BUS_IFC(%u)",i);
-        u_IFC[i] = PLUGIN_MANAGER->inputFlowControlInstance(strIfc,tXID,tYID,i);
+        u_IFC[i] = PLUGIN_MANAGER->inputFlowControlInstance(strIfc,ROUTER_ID,i);
         char strMemIn[16];
         sprintf(strMemIn,"BUS_MEM_IN(%u)",i);
-        u_MEM_IN[i] = PLUGIN_MANAGER->memoryInstance(strMemIn,tXID,tYID,i,FIFO_IN_DEPTH);
+        u_MEM_IN[i] = PLUGIN_MANAGER->memoryInstance(strMemIn,ROUTER_ID,i,FIFO_IN_DEPTH);
         char strIc[15];
         sprintf(strIc,"BUS_IC(%u)",i);
-        u_IC[i] = new InputControllerBus(strIc,nPorts,tXID,tYID,i);
+        u_IC[i] = new InputControllerBus(strIc,nPorts,ROUTER_ID,i);
         char strMemOut[17];
         sprintf(strMemOut,"BUS_MEM_OUT(%u)",i);
-        u_MEM_OUT[i] = PLUGIN_MANAGER->memoryInstance(strMemOut,tXID,tYID,i,FIFO_OUT_DEPTH);
+        u_MEM_OUT[i] = PLUGIN_MANAGER->memoryInstance(strMemOut,ROUTER_ID,i,FIFO_OUT_DEPTH);
         char strOfc[15];
         sprintf(strOfc,"BUS_OFC(%u)",i);
-        u_OFC[i] = PLUGIN_MANAGER->outputFlowControlInstance(strOfc,tXID,tYID,i,FIFO_IN_DEPTH);
+        u_OFC[i] = PLUGIN_MANAGER->outputFlowControlInstance(strOfc,ROUTER_ID,i,FIFO_IN_DEPTH);
 
         char strAndROK_ICREQ[35];
         sprintf(strAndROK_ICREQ,"ROK_FIFO_IN_AND_IC_REQUEST(%u)",i);
@@ -205,7 +203,6 @@ extern "C" {
                                sc_module_name moduleName,
                                unsigned short int nPorts,
                                unsigned short int nVirtualChannels,
-                               unsigned short int ,
                                unsigned short int ) {
         // Simcontext is needed because in shared library a
         // new and different simcontext will be created if
@@ -217,7 +214,6 @@ extern "C" {
         sc_default_global_context = simcontext;
 
         if( nVirtualChannels > 1 ) {
-//            return new ParIS_N_VC(moduleName,nPorts,nVirtualChannels,XID,YID);
             std::cout << "\n\n\t\tBus with VC Not implemented!" << std::endl << std::endl;
             return NULL;
         } else {

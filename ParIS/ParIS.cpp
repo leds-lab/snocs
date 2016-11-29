@@ -11,9 +11,8 @@
 ParIS_N_VC::ParIS_N_VC(sc_module_name mn,
              unsigned short nPorts,
              unsigned short nVirtualChannels,
-             unsigned short XID,
-             unsigned short YID)
-    : IRouter_VC(mn,nPorts,nVirtualChannels,XID,YID),
+             unsigned short ROUTER_ID)
+    : IRouter_VC(mn,nPorts,nVirtualChannels,ROUTER_ID),
       w_REQUEST("ParIS_N_VC_wREQUEST",nVirtualChannels),
       w_GRANT("ParIS_N_VC_wGRANT",nVirtualChannels),
       w_READ_OK("ParIS_N_VC_wREAD_OK",nVirtualChannels),
@@ -51,8 +50,8 @@ ParIS_N_VC::ParIS_N_VC(sc_module_name mn,
         sprintf(strXOUT,"XOUT(%u)",i);
 
         // Instantiate internal units
-        u_XIN[i] = new XIN_N_VC(strXIN,nPorts,nVirtualChannels,XID,YID,i);
-        u_XOUT[i] = new XOUT_N_VC(strXOUT,nPorts,nVirtualChannels,XID,YID,i);
+        u_XIN[i] = new XIN_N_VC(strXIN,nPorts,nVirtualChannels,ROUTER_ID,i);
+        u_XOUT[i] = new XOUT_N_VC(strXOUT,nPorts,nVirtualChannels,ROUTER_ID,i);
     }
 
     // Binding ports
@@ -114,8 +113,8 @@ ParIS_N_VC::ParIS_N_VC(sc_module_name mn,
     sensitive << i_CLK.pos();
 #endif
 #ifdef WAVEFORM_PARIS
-    char waveName[15];
-    sprintf(waveName,"ParIS_%u_%u_%u_%u",XID,YID,numVirtualChannels,nPorts);
+    char waveName[20];
+    sprintf(waveName,"ParIS_%u_VC%u_Port-%u",ROUTER_ID,numVirtualChannels,nPorts);
     tf = sc_create_vcd_trace_file(waveName);
 
     sc_trace(tf,i_CLK,"CLK");
@@ -210,10 +209,10 @@ void ParIS_N_VC::p_DEBUG() {
                 bool req = w_REQUEST[v][i][x].read();
                 bool grant = w_GRANT[v][i][x].read();
                 if(req) {
-                    printf("\n[Router] [%u][%u][%u] - time: %s, Req[%u][%u]",XID,YID,v,str.c_str(),i,x);
+                    printf("\n[Router] [%u][%u] - time: %s, Req[%u][%u]",ROUTER_ID,v,str.c_str(),i,x);
                 }
                 if(grant) {
-                    printf("\n[Router] [%u][%u][%u] - time: %s, Grant[%u][%u]",XID,YID,v,str.c_str(),i,x);
+                    printf("\n[Router] [%u][%u] - time: %s, Grant[%u][%u]",ROUTER_ID,v,str.c_str(),i,x);
                 }
 
             }
@@ -222,7 +221,7 @@ void ParIS_N_VC::p_DEBUG() {
 
     for(unsigned short v = 0; v < numVirtualChannels; v++) {
         for( unsigned short i = 0; i < numPorts; i++ ) {
-            if( XID == 0 && YID == 0 ) {
+            if( ROUTER_ID == 0 ) {
                 Flit d = w_DATA[v][i].read();
                 printf("\n[ParIS] VC[%u] PORT[%u] IDLE: %d- RD: %d- ROK: %d- DATA: %s",
                        v,i,w_IDLE[v][i].read(),w_READ[v][i].read(),w_READ_OK[v][i].read(),
@@ -241,9 +240,8 @@ void ParIS_N_VC::p_DEBUG() {
 ///////////////////////////////////////////////////////////////////////////////////////
 ParIS::ParIS(sc_module_name mn,
              unsigned short nPorts,
-             unsigned short XID,
-             unsigned short YID)
-    : IRouter(mn,nPorts,XID,YID),
+             unsigned short ROUTER_ID)
+    : IRouter(mn,nPorts,ROUTER_ID),
       w_REQUEST("ParIS_wREQUEST",nPorts),
       w_GRANT("ParIS_wGRANT",nPorts),
       w_READ_OK("ParIS_wREAD_OK",nPorts),
@@ -273,32 +271,32 @@ ParIS::ParIS(sc_module_name mn,
         // Getting input units
         char strMemIn[20];
         sprintf(strMemIn,"%s_MEM_IN",strXIN);
-        IMemory*  u_i_MEM = PLUGIN_MANAGER->memoryInstance(strMemIn,XID,YID,i,FIFO_IN_DEPTH);
+        IMemory*  u_i_MEM = PLUGIN_MANAGER->memoryInstance(strMemIn,ROUTER_ID,i,FIFO_IN_DEPTH);
         char strRouting[30];
         sprintf(strRouting,"%s_ROUTING",strXIN);
-        IRouting* u_ROUTING = PLUGIN_MANAGER->routingInstance(strRouting,XID,YID,nPorts);
+        IRouting* u_ROUTING = PLUGIN_MANAGER->routingInstance(strRouting,ROUTER_ID,nPorts);
         char strIFC[20];
         sprintf(strIFC,"%s_IFC",strXIN);
-        IInputFlowControl* u_IFC = PLUGIN_MANAGER->inputFlowControlInstance(strIFC,XID,YID,i);
+        IInputFlowControl* u_IFC = PLUGIN_MANAGER->inputFlowControlInstance(strIFC,ROUTER_ID,i);
 
         // Getting output units
         char strMemOut[20];
         sprintf(strMemOut,"%s_MEM_OUT",strXOUT);
-        IMemory*  u_o_MEM = PLUGIN_MANAGER->memoryInstance(strMemOut,XID,YID,i,FIFO_OUT_DEPTH);
+        IMemory*  u_o_MEM = PLUGIN_MANAGER->memoryInstance(strMemOut,ROUTER_ID,i,FIFO_OUT_DEPTH);
         char strPG[20];
         sprintf(strPG,"%s_PG",strXOUT);
-        IPriorityGenerator* u_PG = PLUGIN_MANAGER->priorityGeneratorInstance(strPG,XID,YID,i,nPorts);
+        IPriorityGenerator* u_PG = PLUGIN_MANAGER->priorityGeneratorInstance(strPG,ROUTER_ID,i,nPorts);
         char strArb[35];
         sprintf(strArb,"%s_DIST_ARBITER",strXOUT);
-        IArbiter* u_ARBITER = new DistributedArbiter(strArb,nPorts,u_PG,XID,YID,i);
+        IArbiter* u_ARBITER = new DistributedArbiter(strArb,nPorts,u_PG,ROUTER_ID,i);
         char strOFC[20];
         sprintf(strOFC,"%s_OFC",strXOUT);
         // The last argument is used only in credit-based flow control
-        IOutputFlowControl* u_OFC = PLUGIN_MANAGER->outputFlowControlInstance(strOFC,XID,YID,i,CREDIT);
+        IOutputFlowControl* u_OFC = PLUGIN_MANAGER->outputFlowControlInstance(strOFC,ROUTER_ID,i,CREDIT);
 
         // Instantiate internal units
-        u_XIN[i] = new XIN_none_VC(strXIN,u_i_MEM,u_ROUTING,u_IFC,nPorts,XID,YID,i);
-        u_XOUT[i] = new XOUT_none_VC(strXOUT,u_o_MEM,u_ARBITER,u_OFC,nPorts,XID,YID,i);
+        u_XIN[i] = new XIN_none_VC(strXIN,u_i_MEM,u_ROUTING,u_IFC,nPorts,ROUTER_ID,i);
+        u_XOUT[i] = new XOUT_none_VC(strXOUT,u_o_MEM,u_ARBITER,u_OFC,nPorts,ROUTER_ID,i);
     }
 
     // Binding ports
@@ -352,8 +350,8 @@ ParIS::ParIS(sc_module_name mn,
     sensitive << i_CLK.pos();
 #endif
 #ifdef WAVEFORM_PARIS
-    char waveName[15];
-    sprintf(waveName,"ParIS_%u_%u_%u",XID,YID,nPorts);
+    char waveName[20];
+    sprintf(waveName,"ParIS_%u_%u",ROUTER_ID,nPorts);
     tf = sc_create_vcd_trace_file(waveName);
 
     sc_trace(tf,i_CLK,"CLK");
@@ -442,17 +440,17 @@ void ParIS::p_DEBUG() {
             bool req = w_REQUEST[i][x].read();
             bool grant = w_GRANT[i][x].read();
             if(req) {
-                printf("\n[Router] [%u][%u] - time: %s, Req[%u][%u]",XID,YID,str.c_str(),i,x);
+                printf("\n[Router][%u] - time: %s, Req[%u][%u]",ROUTER_ID,str.c_str(),i,x);
             }
             if(grant) {
-                printf("\n[Router] [%u][%u] - time: %s, Grant[%u][%u]",XID,YID,str.c_str(),i,x);
+                printf("\n[Router][%u] - time: %s, Grant[%u][%u]",ROUTER_ID,str.c_str(),i,x);
             }
 
         }
     }
 
     for( unsigned short i = 0; i < numPorts; i++ ) {
-        if( XID == 0 && YID == 0 ) {
+        if( ROUTER_ID == 0 ) {
             Flit d = w_DATA[i].read();
             printf("\n[ParIS] PORT[%u] IDLE: %d- RD: %d- ROK: %d- DATA: %s",
                    i,w_IDLE[i].read(),w_READ[i].read(),w_READ_OK[i].read(),d.data.to_string(SC_HEX_US).c_str());
@@ -472,8 +470,7 @@ extern "C" {
                                sc_module_name moduleName,
                                unsigned short int nPorts,
                                unsigned short int nVirtualChannels,
-                               unsigned short int XID,
-                               unsigned short int YID) {
+                               unsigned short int ROUTER_ID) {
         // Simcontext is needed because in shared library a
         // new and different simcontext will be created if
         // the main application simcontext is not passed to
@@ -484,9 +481,9 @@ extern "C" {
         sc_default_global_context = simcontext;
 
         if( nVirtualChannels > 1 ) {
-            return new ParIS_N_VC(moduleName,nPorts,nVirtualChannels,XID,YID);
+            return new ParIS_N_VC(moduleName,nPorts,nVirtualChannels,ROUTER_ID);
         } else {
-            return new ParIS(moduleName,nPorts,XID,YID);
+            return new ParIS(moduleName,nPorts,ROUTER_ID);
         }
 
     }

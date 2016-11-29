@@ -38,17 +38,15 @@ public:
     sc_in_clk       i_CLK;      // Clock
     sc_in<bool>     i_RST;      // Reset
 
-    unsigned short int XID, YID, PORT_ID;
+    unsigned short int ROUTER_ID, PORT_ID;
 
     IFlowControl(sc_module_name mn,
-                 unsigned short XID,
-                 unsigned short YID,
+                 unsigned short ROUTER_ID,
                  unsigned short PORT_ID)
         : SoCINModule(mn),
           i_CLK("FC_iCLK"),
           i_RST("FC_iRST"),
-          XID(XID),
-          YID(YID),
+          ROUTER_ID(ROUTER_ID),
           PORT_ID(PORT_ID) {}
 
     ~IFlowControl() = 0;
@@ -90,15 +88,20 @@ public:
      */
     virtual void p_ALERT_PACKET_RECEIVE() = 0;
 
+    /*!
+     * \brief numberOfCyclesPerFlit Return the number of link cycles to send a flit
+     * \return Number of cycles to send a flit
+     */
+    virtual unsigned short numberOfCyclesPerFlit() const = 0;
+
     // Event to emit a notification when a packet is received
     sc_event e_PACKET_RECEIVED;
 
     SC_HAS_PROCESS(IInputFlowControl);
     IInputFlowControl(sc_module_name mn,
-                       unsigned short XID,
-                       unsigned short YID,
+                       unsigned short ROUTER_ID,
                        unsigned short PORT_ID)
-              : IFlowControl(mn,XID,YID,PORT_ID),
+              : IFlowControl(mn,ROUTER_ID,PORT_ID),
                 i_VALID("IFC_iVALID"),
                 o_RETURN("IFC_oRETURN"),
                 o_WRITE("IFC_oWRITE"),
@@ -139,10 +142,9 @@ public:
     sc_in<bool>  i_READ_OK; // FIFO has a data to be read (not empty)
 
     IOutputFlowControl(sc_module_name mn,
-                       unsigned short XID,
-                       unsigned short YID,
+                       unsigned short ROUTER_ID,
                        unsigned short PORT_ID)
-              : IFlowControl(mn,XID,YID,PORT_ID),
+              : IFlowControl(mn,ROUTER_ID,PORT_ID),
                 o_VALID("OFC_oVALID"),
                 i_RETURN("OFC_iRETURN"),
                 o_READ("OFC_oREAD"),
@@ -166,15 +168,13 @@ inline IOutputFlowControl::~IOutputFlowControl() {}
  * Input Flow Controller
  * \param sc_simcontext A pointer of simulation context (required for correct plugins use)
  * \param sc_module_name Name for the module to be instantiated
- * \param XID Column identifier of the router in the network
- * \param YID Row identifier of the router in the network
+ * \param ROUTER_ID Router identifier in the network
  * \param PORT_ID Port identifier of the router
  * \return A method for instantiate a Input Flow Controller
  */
 typedef IInputFlowControl* create_InputFlowControl(sc_simcontext*,
                                                    sc_module_name,
-                                                   unsigned short int XID,
-                                                   unsigned short int YID,
+                                                   unsigned short int ROUTER_ID,
                                                    unsigned short int PORT_ID);
 
 /*!
@@ -194,16 +194,14 @@ typedef void destroy_InputFlowControl(IInputFlowControl*);
  * Output Flow Controller with buffers depth
  * \param sc_simcontext A pointer of simulation context (required for correct plugins use)
  * \param sc_module_name Name for the module to be instantiated
- * \param XID Column identifier of the router in the network
- * \param YID Row identifier of the router in the network
+ * \param ROUTER_ID Router identifier in the network
  * \param PORT_ID Port identifier of the router
  * \param bufferDepth Buffers depth - used in credit-based flow control (number of credits)
  * \return A method for instantiate a Output Flow Controller
  */
 typedef IOutputFlowControl* create_OutputFlowControl(sc_simcontext*,
                                                      sc_module_name,
-                                                     unsigned short int XID,
-                                                     unsigned short int YID,
+                                                     unsigned short int ROUTER_ID,
                                                      unsigned short int PORT_ID,
                                                      unsigned short int bufferDepth);
 

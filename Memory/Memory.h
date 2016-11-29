@@ -46,12 +46,11 @@ public:
     sc_in<Flit>  i_DATA;     // Input data channel
     sc_out<Flit> o_DATA;     // Output data channel
 
-    unsigned short int XID, YID, PORT_ID;
+    unsigned short int ROUTER_ID, PORT_ID;
 
     IMemory(sc_module_name mn,
             unsigned short int memSize,
-            unsigned short int XID,
-            unsigned short int YID,
+            unsigned short int ROUTER_ID,
             unsigned short int PORT_ID)
         : SoCINModule(mn),
           memSize(memSize),
@@ -63,8 +62,7 @@ public:
           i_WRITE("MEM_iWRITE"),
           i_DATA("MEM_iDATA"),
           o_DATA("MEM_oDATA"),
-          XID(XID),
-          YID(YID),
+          ROUTER_ID(ROUTER_ID),
           PORT_ID(PORT_ID) {}
     ~IMemory() = 0;
 };
@@ -82,16 +80,14 @@ inline IMemory::~IMemory() {}
  * \brief create_Memory Typedef for instantiate a Memory
  * \param sc_simcontext A pointer of simulation context (required for correct plugins use)
  * \param sc_module_name Name for the module to be instantiated
- * \param XID Column identifier of the router in the network
- * \param YID Row identifier of the router in the network
+ * \param ROUTER_ID Router identifier in the network
  * \param PORT_ID Port identifier of the router
  * \param memSize Capacity of the memory to be instantiated - if is 0: no memory
  * \return A method for instantiate a Memory
  */
 typedef IMemory* create_Memory(sc_simcontext*,
                                sc_module_name,
-                               unsigned short int XID,
-                               unsigned short int YID,
+                               unsigned short int ROUTER_ID,
                                unsigned short int PORT_ID,
                                unsigned short int memSize);
 

@@ -5,15 +5,13 @@
 /// register the processes of the FIFO
 /// \param mn Module name
 /// \param memSize Memory size - capacity of the FIFO
-/// \param XID X identifier of router in the network
-/// \param YID Y identifier of router in the network
+/// \param ROUTER_ID Router identifier in the network
 /// \param PORT_ID Port identifier in the router
 FIFO::FIFO(sc_module_name mn,
            unsigned short memSize,
-           unsigned short XID,
-           unsigned short YID,
+           unsigned short ROUTER_ID,
            unsigned short PORT_ID)
-    : IMemory(mn,memSize,XID,YID,PORT_ID),
+    : IMemory(mn,memSize,ROUTER_ID,PORT_ID),
       r_CUR_STATE("FIFO_rCUR_STATE"),
       w_NEXT_STATE("FIFO_wNEXT_STATE"),
       r_READ_POINTER("FIFO_rREAD_POINTER"),
@@ -228,14 +226,14 @@ void FIFO::p_NULL() {
 ////////////////////////////////////////////////////////////////////////////////
 void FIFO::p_DEBUG_CONTROL() {
 
-    printf("\n[FIFO] - Router[%u][%u]-Port[%u] @ %s",XID,YID,PORT_ID,sc_time_stamp().to_string().c_str());
+    printf("\n[FIFO] - Router[%u]-Port[%u] @ %s",ROUTER_ID,PORT_ID,sc_time_stamp().to_string().c_str());
     std::cout << " NEXT_STATE= " << w_NEXT_STATE.read() \
               << " CURRENT_STATE= " << r_CUR_STATE.read();
 
 }
 
 void FIFO::p_DEBUG_DATAPATH() {
-    printf("\n[FIFO] - Router[%u][%u]-Port[%u] @ %s",XID,YID,PORT_ID,sc_time_stamp().to_string().c_str());
+    printf("\n[FIFO] - Router[%u]-Port[%u] @ %s",ROUTER_ID,PORT_ID,sc_time_stamp().to_string().c_str());
     std::cout << " CURRENT_STATE= "<< r_CUR_STATE.read();
 
     std::cout << " FIFO[" << (memSize-1) << "..0]=";
@@ -263,8 +261,7 @@ extern "C" {
 ////////////////// FIFO Factory //////////////////
     SS_EXP IMemory* new_Memory(sc_simcontext* simcontext,
                                sc_module_name moduleName,
-                               unsigned short int XID,
-                               unsigned short int YID,
+                               unsigned short int ROUTER_ID,
                                unsigned short int PORT_ID,
                                unsigned short int memSize) {
         // Simcontext is needed because in shared library a
@@ -276,7 +273,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new FIFO(moduleName,memSize,XID,YID,PORT_ID);
+        return new FIFO(moduleName,memSize,ROUTER_ID,PORT_ID);
     }
     SS_EXP void delete_Memory(IMemory* mem) {
         delete mem;

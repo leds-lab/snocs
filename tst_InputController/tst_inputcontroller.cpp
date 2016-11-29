@@ -47,11 +47,10 @@ int sc_main(int argc, char *argv[]) {
         return -1;
     }
 
-    unsigned short nPorts, XID, YID, PORT_ID;
+    unsigned short nPorts, ROUTER_ID, PORT_ID;
     // Get number of ports
     nPorts = atoi(argv[2]);
-    XID = 1;
-    YID = 0;
+    ROUTER_ID = 0;
     PORT_ID = 0; // LOCAL port
 
     printf("\nNumber of Ports: %u",nPorts);
@@ -61,9 +60,9 @@ int sc_main(int argc, char *argv[]) {
 
     ////////////// Instantiate system components //////////////
     // Routing
-    IRouting* routing = new_Routing_t(sc_get_curr_simcontext(),"Routing",nPorts,XID,YID);
+    IRouting* routing = new_Routing_t(sc_get_curr_simcontext(),"Routing",nPorts,ROUTER_ID);
     // Tester (Driver) - testbench
-    tst_InputController* ic = new tst_InputController("Testbench",routing,nPorts,XID,YID,PORT_ID);
+    tst_InputController* ic = new tst_InputController("Testbench",routing,nPorts,ROUTER_ID,PORT_ID);
     ic->i_CLK(w_CLK);
 
     clock_t t = clock();

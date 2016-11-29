@@ -158,44 +158,44 @@ public:
 #define SIM // Used to isolate non-synthesizable code
 ////////////////////////////// ROUTER PARAMETERS ///////////////////////////////
 // MECHANISMS TYPES
-#define ROUTING_TYPE        0
-#define FC_TYPE             1 // 0: Handshake | 1: Credit-based
-#define ARBITER_TYPE        0
-#define SWITCH_TYPE         0
+//#define ROUTING_TYPE        0
+//#define FC_TYPE             1 // 0: Handshake | 1: Credit-based
+//#define ARBITER_TYPE        0
+//#define SWITCH_TYPE         0
 
 // PACKET FORMAT
 //#define FLIT_WIDTH          34 	// Width of the flit
 //#define SIDEBAND_WIDTH      2 	// Width of the sideband field(framing bits)
 //#define DATA_WIDTH          32 	// Width of the data field
 //#define RIB_WIDTH           8 	// Width of the addressing field (RIB) in the header
-#define FLIT_TYPE_WIDTH     2  	// Width of the header field that specifies the flit type
-#define HEADER_LENGTH       1	// Length of the header
-#define PAYLOAD_FRAME       0	// Frame for payload flits
-#define HEADER_FRAME        1	// Frame for header  flits
-#define TRAILER_FRAME       2	// Frame for trailer flits
+//#define FLIT_TYPE_WIDTH     2  	// Width of the header field that specifies the flit type
+//#define HEADER_LENGTH       1	// Length of the header
+//#define PAYLOAD_FRAME       0	// Frame for payload flits
+//#define HEADER_FRAME        1	// Frame for header  flits
+//#define TRAILER_FRAME       2	// Frame for trailer flits
 
 // MASKS FOR EXTRACTION OF FIELDS FROM A PACKET
-#define DATA_MASK           0xFFFFFFFF
-#define X_SRC_MASK          0xF000
-#define Y_SRC_MASK          0xF00
-#define X_DEST_MASK         0xF0
-#define Y_DEST_MASK         0xF
+//#define DATA_MASK           0xFFFFFFFF
+//#define X_SRC_MASK          0xF000
+//#define Y_SRC_MASK          0xF00
+//#define X_DEST_MASK         0xF0
+//#define Y_DEST_MASK         0xF
 
 // BUFFERING
 //#define FIFO_WIDTH          34 	// Width of the buffer words (= FLIT_WIDTH)
 //#define FIFO_IN_DEPTH       4 	// Number of positions of the input buffers
-#define FIFO_IN_LOG2_DEPTH  2 	// Log2 of INPUT_FIFO_DEPTH
+//#define FIFO_IN_LOG2_DEPTH  2 	// Log2 of INPUT_FIFO_DEPTH
 //#define FIFO_OUT_DEPTH      0 	// Number of positions of the output buffers
-#define FIFO_OUT_LOG2_DEPTH 0 	// Log2 of OUTPUT_FIFO_DEPTH
+//#define FIFO_OUT_LOG2_DEPTH 0 	// Log2 of OUTPUT_FIFO_DEPTH
 
 // ARBITRATION
 //#define N                   4  	// Number of requests received by an arbiter
 //#define LOG2_N              2  	// Log2 of N
 
 // FLOW CONTROL
-enum fsm_state {S0,S1,S2};     	// States of the FSMs of handshake-type ifc and ofc
+//enum fsm_state {S0,S1,S2};     	// States of the FSMs of handshake-type ifc and ofc
 //#define CREDIT              4 	// Number of credits at power up
-#define CREDIT_COUNTER_SIZE 3 	// Size of the credit counter
+//#define CREDIT_COUNTER_SIZE 3 	// Size of the credit counter
 
 // TRAFFIC CLASSES
 //#define RT0                 0

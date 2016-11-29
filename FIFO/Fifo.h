@@ -66,8 +66,7 @@ public:
     SC_HAS_PROCESS(FIFO);
     FIFO(sc_module_name mn,
          unsigned short memSize,
-         unsigned short XID,
-         unsigned short YID,
+         unsigned short ROUTER_ID,
          unsigned short PORT_ID);
 
     inline ModuleType moduleType() const { return SoCINModule::TMemory; }

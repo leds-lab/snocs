@@ -12,8 +12,7 @@ public:
     SC_HAS_PROCESS(Routing_Crossbar);
     Routing_Crossbar(sc_module_name mn,
                      unsigned short nPorts,
-                     unsigned short XID,
-                     unsigned short YID);
+                     unsigned short ROUTER_ID);
 
     const char* moduleName() const { return "Routing_Crossbar"; }
 };

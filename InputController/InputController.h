@@ -57,7 +57,7 @@ public:
     // Internal signals - data variables which implement connectors
     sc_vector<sc_signal<bool> > w_REQUEST; // Request wires between routing and request register
 
-    unsigned short XID, YID, PORT_ID;
+    unsigned short ROUTER_ID, PORT_ID;
 
     // Internal Units
     RequestRegister* u_REQ_REG;
@@ -66,8 +66,7 @@ public:
     InputController(sc_module_name mn,
              unsigned short nPorts,
              IRouting* routing,
-             unsigned short XID,
-             unsigned short YID,
+             unsigned short ROUTER_ID,
              unsigned short PORT_ID);
 
     ModuleType moduleType() const { return SoCINModule::TInputController; }
@@ -86,15 +85,13 @@ public:
  * \param mn Module name
  * \param nPorts Number of ports
  * \param routing Routing module to be used
- * \param XID X identifier in the network
- * \param YID Y identifier in the network
+ * \param ROUTER_ID Router identifier in the network
  * \param PORT_ID Port identifier
  */
 inline InputController::InputController(sc_module_name mn,
                                  unsigned short nPorts,
                                  IRouting *routing,
-                                 unsigned short XID,
-                                 unsigned short YID,
+                                 unsigned short ROUTER_ID,
                                  unsigned short PORT_ID)
     : SoCINModule(mn) , numPorts(nPorts),
       i_CLK("InputController_iCLK"),
@@ -106,7 +103,7 @@ inline InputController::InputController(sc_module_name mn,
       o_REQUEST("InputController_oREQUEST",nPorts),
       o_REQUESTING("InputController_oREQUESTING"),
       w_REQUEST("InputController_wREQUEST",nPorts),
-      XID(XID), YID(YID), PORT_ID(PORT_ID),
+      ROUTER_ID(ROUTER_ID), PORT_ID(PORT_ID),
       u_REQ_REG(NULL), u_ROUTING(routing)
 {
     // Binding ports
@@ -117,7 +114,7 @@ inline InputController::InputController(sc_module_name mn,
     u_ROUTING->o_REQUEST(w_REQUEST);
 
     // Request register
-    u_REQ_REG = new RequestRegister("ReqReg",nPorts,XID,YID,PORT_ID);
+    u_REQ_REG = new RequestRegister("ReqReg",nPorts,ROUTER_ID,PORT_ID);
     u_REQ_REG->i_CLK(i_CLK);
     u_REQ_REG->i_RST(i_RST);
     u_REQ_REG->i_DATA(i_DATA);
@@ -172,7 +169,7 @@ public:
     sc_out<bool>             o_REQUEST;     // Request to arbiter
     sc_vector<sc_out<bool> > o_DESTINATION; // Destination address in one hot fashion port request
 
-    unsigned short XID, YID, PORT_ID;
+    unsigned short ROUTER_ID, PORT_ID;
 
     // Module's process
     void p_OUTPUTS();
@@ -180,8 +177,7 @@ public:
     SC_HAS_PROCESS(InputControllerBus);
     InputControllerBus(sc_module_name mn,
                        unsigned short nPorts,
-                       unsigned short XID,
-                       unsigned short YID,
+                       unsigned short ROUTER_ID,
                        unsigned short PORT_ID);
 
     ModuleType moduleType() const { return SoCINModule::TInputController; }
@@ -199,14 +195,12 @@ public:
  * register the process.
  * \param mn Module name
  * \param nPorts Number of ports
- * \param XID X identifier in the network
- * \param YID Y identifier in the network
+ * \param ROUTER_ID Router identifier in the network
  * \param PORT_ID Port identifier
  */
 inline InputControllerBus::InputControllerBus(sc_module_name mn,
                                               unsigned short nPorts,
-                                              unsigned short XID,
-                                              unsigned short YID,
+                                              unsigned short ROUTER_ID,
                                               unsigned short PORT_ID)
     : SoCINModule(mn) , numPorts(nPorts),
       i_CLK("InputControllerBus_iCLK"),
@@ -217,7 +211,7 @@ inline InputControllerBus::InputControllerBus(sc_module_name mn,
       i_IDLE("InputControllerBus_iIDLE"),
       o_REQUEST("InputControllerBus_oREQUEST"),
       o_DESTINATION("InputControllerBus_oDESTINATION",nPorts),
-      XID(XID), YID(YID), PORT_ID(PORT_ID)
+      ROUTER_ID(ROUTER_ID), PORT_ID(PORT_ID)
 {
     SC_METHOD(p_OUTPUTS);
     sensitive << i_CLK.pos() << i_RST;
@@ -316,14 +310,13 @@ public:
 
     void p_STIMULUS();
 
-    unsigned short XID, YID, PORT_ID;
+    unsigned short ROUTER_ID, PORT_ID;
 
     SC_HAS_PROCESS(tst_InputController);
     tst_InputController(sc_module_name mn,
                         IRouting* routing,
                         unsigned short nPorts,
-                        unsigned short XID,
-                        unsigned short YID,
+                        unsigned short ROUTER_ID,
                         unsigned short PORT_ID);
     ~tst_InputController();
 };
@@ -337,8 +330,7 @@ public:
 inline tst_InputController::tst_InputController(sc_module_name mn,
                                          IRouting *routing,
                                          unsigned short nPorts,
-                                         unsigned short XID,
-                                         unsigned short YID,
+                                         unsigned short ROUTER_ID,
                                          unsigned short PORT_ID)
     : sc_module(mn),
       nPorts(nPorts),
@@ -350,9 +342,9 @@ inline tst_InputController::tst_InputController(sc_module_name mn,
       w_IDLE("tst_IC_wIDLE",nPorts),
       w_REQUEST("tst_IC_wREQUEST",nPorts),
       w_REQUESTING("tst_IC_wREQUESTING"),
-      XID(XID),YID(YID),PORT_ID(PORT_ID)
+      ROUTER_ID(ROUTER_ID),PORT_ID(PORT_ID)
 {
-    u_IC = new InputController("IC",nPorts,routing,XID,YID,PORT_ID);
+    u_IC = new InputController("IC",nPorts,routing,ROUTER_ID,PORT_ID);
     u_IC->i_CLK(i_CLK);
     u_IC->i_RST(w_RST);
     u_IC->i_DATA(w_DATA);
@@ -405,7 +397,7 @@ inline void tst_InputController::p_STIMULUS() {
     UIntVar flit;
 
     framing[FLIT_WIDTH-2] = 1; // BOP
-    v_SRC = (XID << RIB_WIDTH/2) | YID;
+    v_SRC = ROUTER_ID;
     v_DEST = 0x00;
 
     // Assemble a header packet with specified src and dst addresses

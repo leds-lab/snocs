@@ -26,8 +26,7 @@ public:
     SC_HAS_PROCESS(PG_Static);
     PG_Static(sc_module_name mn, unsigned int priority,
               unsigned short int numReqs_Grants,
-              unsigned short int XID,
-              unsigned short int YID,
+              unsigned short int ROUTER_ID,
               unsigned short int PORT_ID);
 
     ModuleType moduleType() const { return SoCINModule::TPriorityGenerator; }

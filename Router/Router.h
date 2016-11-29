@@ -47,12 +47,11 @@ public:
     sc_vector<sc_in<bool> >  i_RETURN_OUT;  // Return of output channels
 
     // Internal data structures
-    unsigned short XID,YID;
+    unsigned short ROUTER_ID;
 
     IRouter(sc_module_name mn,
             unsigned short nPorts,
-            unsigned short XID,
-            unsigned short YID);
+            unsigned short ROUTER_ID);
 
    ModuleType moduleType() const { return SoCINModule::TRouter; }
     ~IRouter() = 0;
@@ -62,8 +61,7 @@ inline IRouter::~IRouter(){}
 
 inline IRouter::IRouter(sc_module_name mn,
                         unsigned short nPorts,
-                        unsigned short XID,
-                        unsigned short YID)
+                        unsigned short ROUTER_ID)
     : SoCINModule(mn),
       numPorts(nPorts),
       i_CLK("IRouter_iCLK"),
@@ -74,7 +72,7 @@ inline IRouter::IRouter(sc_module_name mn,
       o_DATA_OUT("IRouter_oDATA_OUT",nPorts),
       o_VALID_OUT("IRouter_oVALID_OUT",nPorts),
       i_RETURN_OUT("IRouter_iRETURN_OUT",nPorts),
-      XID(XID),YID(YID) {}
+      ROUTER_ID(ROUTER_ID) {}
 
 
 
@@ -94,8 +92,7 @@ public:
     IRouter_VC(sc_module_name mn,
                unsigned short nPorts,
                unsigned short nVirtualChannels,
-               unsigned short XID,
-               unsigned short YID);
+               unsigned short ROUTER_ID);
     ~IRouter_VC() = 0;
 
 };
@@ -105,9 +102,8 @@ inline IRouter_VC::~IRouter_VC(){}
 inline IRouter_VC::IRouter_VC(sc_module_name mn,
                               unsigned short nPorts,
                               unsigned short nVirtualChannels,
-                              unsigned short XID,
-                              unsigned short YID)
-    : IRouter(mn,nPorts,XID,YID),
+                              unsigned short ROUTER_ID)
+    : IRouter(mn,nPorts,ROUTER_ID),
       numVirtualChannels(nVirtualChannels),
       widthVcSelector( (unsigned short)ceil(log2(nVirtualChannels)) ),
       i_VC_IN("IRouter_VC_iVC_IN"),
@@ -134,16 +130,14 @@ inline IRouter_VC::IRouter_VC(sc_module_name mn,
  * \param sc_module_name Name for the module to be instantiated
  * \param nPorts Number of ports of the Router
  * \param nVirtualChannels Number of virtual channels in the router
- * \param XID Column identifier of the router in the network
- * \param YID Row identifier of the router in the network
+ * \param ROUTER_ID Router identifier in the network
  * \return A method for instantiate a Router
  */
 typedef IRouter* create_Router(sc_simcontext*,
                                sc_module_name,
                                unsigned short int nPorts,
                                unsigned short int nVirtualChannels,
-                               unsigned short int XID,
-                               unsigned short int YID);
+                               unsigned short int ROUTER_ID);
 
 /*!
  * \brief destroy_Router Typedef for deallocating a Router

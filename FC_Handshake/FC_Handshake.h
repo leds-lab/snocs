@@ -45,10 +45,11 @@ public:
     // Packet monitoring - only to traffic meter use
     void p_ALERT_PACKET_RECEIVE();
 
+    unsigned short numberOfCyclesPerFlit() const { return 4; } // Handshake forward a flit in the link in 4 cycles
+
     SC_HAS_PROCESS(IFC_Handshake);
     IFC_Handshake(sc_module_name mn,
-                  unsigned short XID,
-                  unsigned short YID,
+                  unsigned short ROUTER_ID,
                   unsigned short PORT_ID);
 
     inline ModuleType moduleType() const { return SoCINModule::TInputFlowControl; }
@@ -83,8 +84,7 @@ public:
 
     SC_HAS_PROCESS(OFC_Handshake);
     OFC_Handshake(sc_module_name mn,
-                  unsigned short XID,
-                  unsigned short YID,
+                  unsigned short ROUTER_ID,
                   unsigned short PORT_ID);
 
     inline ModuleType moduleType() const { return SoCINModule::TOutputFlowControl; }

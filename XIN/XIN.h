@@ -81,14 +81,13 @@ public:
     SC_HAS_PROCESS(XIN_Virtual);
     XIN_Virtual(sc_module_name mn,
                 unsigned short nPorts,
-                unsigned short XID,
-                unsigned short YID,
+                unsigned short ROUTER_ID,
                 unsigned short PORT_ID);
 
     ~XIN_Virtual();
 
     // Internal data structures
-    unsigned short XID, YID, PORT_ID;
+    unsigned short ROUTER_ID, PORT_ID;
 
     ModuleType moduleType() const { return SoCINModule::TInputModule; }
     const char* moduleName() const { return "XIN_Virtual"; }
@@ -99,8 +98,7 @@ public:
 //////////////////////////////////////////////////////////////////////////////////////
 inline XIN_Virtual::XIN_Virtual(sc_module_name mn,
                          unsigned short nPorts,
-                         unsigned short XID,
-                         unsigned short YID,
+                         unsigned short ROUTER_ID,
                          unsigned short PORT_ID)
     : SoCINModule(mn),numPorts(nPorts),
      i_CLK("XIN_Virtual_iCLK"),
@@ -118,13 +116,13 @@ inline XIN_Virtual::XIN_Virtual(sc_module_name mn,
      w_READ_OK("XIN_Virtual_wREAD_OK"),
      w_X_READ("XIN_Virtual_wX_READ"),
      w_REQUESTING("XIN_Virtual_wREQUESTING"),
-     XID(XID), YID(YID), PORT_ID(PORT_ID)
+     ROUTER_ID(ROUTER_ID), PORT_ID(PORT_ID)
 {
     // Instantiating sub-modules
     // Assumption: None NULL module is generated here
-    IRouting* routing = PLUGIN_MANAGER->routingInstance("Routing",XID,YID,nPorts);
-    u_MEMORY      = PLUGIN_MANAGER->memoryInstance("XIN_Virtual_Memory",XID,YID,PORT_ID,FIFO_IN_DEPTH);
-    u_IC          = new InputController("XIN_Virtual_IC",nPorts,routing,XID,YID,PORT_ID);
+    IRouting* routing = PLUGIN_MANAGER->routingInstance("Routing",ROUTER_ID,nPorts);
+    u_MEMORY      = PLUGIN_MANAGER->memoryInstance("XIN_Virtual_Memory",ROUTER_ID,PORT_ID,FIFO_IN_DEPTH);
+    u_IC          = new InputController("XIN_Virtual_IC",nPorts,routing,ROUTER_ID,PORT_ID);
     u_AND_READ    = new And("XIN_Virtual_AND_READ",2);
     u_AND_READ_OK = new And("XIN_Virtual_AND_READ_OK",2);
     u_IRS         = new OneHotMux<bool>("XIN_Virtual_IRS",nPorts);
@@ -227,7 +225,7 @@ public:
     sc_vector<sc_signal<bool> > w_VC_WRITE_OK;// Write Ok     - Virtual channels
 
     // Internal data structures
-    unsigned short int XID, YID, PORT_ID;
+    unsigned short int ROUTER_ID, PORT_ID;
 
     // Internal units - sub-modules
     IInputFlowControl*        u_IFC;
@@ -246,15 +244,13 @@ public:
      * \param mn XIN module name
      * \param nPorts Number of ports of the router
      * \param nVirtualChannels Number of virtual channels
-     * \param XID Network X-coordinate router that contains this module
-     * \param YID Network Y-coordinate router that contains this module
+     * \param ROUTER_ID Network router identifier that contains this module
      * \param PORT_ID Port identificator inside the router
      */
     XIN_N_VC(sc_module_name mn,
         unsigned short nPorts,
         unsigned short nVirtualChannels,
-        unsigned short XID,
-        unsigned short YID,
+        unsigned short ROUTER_ID,
         unsigned short PORT_ID);
 
     ModuleType moduleType() const { return SoCINModule::TInputModule; }
@@ -269,8 +265,7 @@ public:
 inline XIN_N_VC::XIN_N_VC(sc_module_name mn,
                           unsigned short nPorts,
                           unsigned short nVirtualChannels,
-                          unsigned short XID,
-                          unsigned short YID,
+                          unsigned short ROUTER_ID,
                           unsigned short PORT_ID)
     : SoCINModule(mn), numPorts(nPorts),
       numVirtualChannels(nVirtualChannels),
@@ -294,7 +289,7 @@ inline XIN_N_VC::XIN_N_VC(sc_module_name mn,
       w_VC_WRITE("XIN_N_VC_wVC_WRITE",nVirtualChannels),
       w_VC_READ("XIN_N_VC_wVC_READ",nVirtualChannels),
       w_VC_WRITE_OK("XIN_N_VC_wVC_WRITE_OK",nVirtualChannels),
-      XID(XID),YID(YID),PORT_ID(PORT_ID),
+      ROUTER_ID(ROUTER_ID),PORT_ID(PORT_ID),
       u_XIN_VC(nVirtualChannels,NULL)
 {
     unsigned short i;
@@ -310,7 +305,7 @@ inline XIN_N_VC::XIN_N_VC(sc_module_name mn,
     }
 
     // Instantiating modules
-    u_IFC = PLUGIN_MANAGER->inputFlowControlInstance("XIN_N_VC_IFC",XID,YID,PORT_ID);
+    u_IFC = PLUGIN_MANAGER->inputFlowControlInstance("XIN_N_VC_IFC",ROUTER_ID,PORT_ID);
     u_DEMUX_WRITE = new BinaryDemux<bool>("XIN_N_VC_demux_WRITE",nVirtualChannels);
     u_MUX_READ_OK = new BinaryMux<bool>("XIN_N_VC_mux_READ_OK",nVirtualChannels);
     u_MUX_READ = new BinaryMux<bool>("XIN_N_VC_mux_READ",nVirtualChannels);
@@ -319,7 +314,7 @@ inline XIN_N_VC::XIN_N_VC(sc_module_name mn,
     for(i = 0; i < nVirtualChannels; i++) {
         char strXinVC[17];
         sprintf(strXinVC,"XIN_u_VC(%u)",i);
-        u_XIN_VC[i] = new XIN_Virtual(strXinVC,nPorts,XID,YID,PORT_ID);
+        u_XIN_VC[i] = new XIN_Virtual(strXinVC,nPorts,ROUTER_ID,PORT_ID);
     }
 
     //=============== Binding ports ===============//
@@ -434,7 +429,7 @@ public:
     sc_signal<bool> w_REQUESTING; // There exists someone requesting
 
     // Internal data structures
-    unsigned short int XID, YID, PORT_ID;
+    unsigned short int ROUTER_ID, PORT_ID;
 
     // Internal units - sub-modules
     IMemory*            u_MEMORY;
@@ -453,8 +448,7 @@ public:
      * \param routing Routing to be used by the module
      * \param ifc Input flow control to be used by the module
      * \param nPorts Number of ports of the router
-     * \param XID Network X-coordinate router that contains this module
-     * \param YID Network Y-coordinate router that contains this module
+     * \param ROUTER_ID Network router identifier that contains this module
      * \param PORT_ID Port identificator inside the router
      */
     XIN_none_VC(sc_module_name mn,
@@ -462,8 +456,7 @@ public:
         IRouting* routing,
         IInputFlowControl* ifc,
         unsigned short nPorts,
-        unsigned short XID,
-        unsigned short YID,
+        unsigned short ROUTER_ID,
         unsigned short PORT_ID);
 
     ModuleType moduleType() const { return SoCINModule::TInputModule; }
@@ -480,8 +473,7 @@ inline XIN_none_VC::XIN_none_VC(sc_module_name mn,
                 IRouting *routing,
                 IInputFlowControl *ifc,
                 unsigned short nPorts,
-                unsigned short XID,
-                unsigned short YID,
+                unsigned short ROUTER_ID,
                 unsigned short PORT_ID)
     : SoCINModule(mn), numPorts(nPorts),
       i_CLK("XIN_iCLK"),
@@ -501,12 +493,12 @@ inline XIN_none_VC::XIN_none_VC(sc_module_name mn,
       w_READ("XIN_wREAD"),
       w_WRITE("XIN_wWRITE"),
       w_REQUESTING("XIN_wREQUESTING"),
-      XID(XID), YID(YID), PORT_ID(PORT_ID)
+      ROUTER_ID(ROUTER_ID), PORT_ID(PORT_ID)
 {
     // Assign or instantiate sub-modules
     // Assumption: None NULL module is received here
     u_MEMORY      = mem;
-    u_IC          = new InputController("IC",nPorts,routing,XID,YID,PORT_ID);
+    u_IC          = new InputController("IC",nPorts,routing,ROUTER_ID,PORT_ID);
     u_IFC         = ifc;
     u_AND_READ    = new And("AND_READ",2);
     u_AND_READ_OK = new And("AND_READ_OK",2);

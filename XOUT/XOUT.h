@@ -69,7 +69,7 @@ public:
     sc_signal<bool> w_WRITE;    // Command to write a data into the FIFO
 
     // Internal data structures
-    unsigned short XID, YID, PORT_ID;
+    unsigned short ROUTER_ID, PORT_ID;
 
     // Internal Units - sub-modules
     IMemory*            u_MEMORY;
@@ -87,14 +87,12 @@ public:
      * \brief XOUT_Virtual Circuitry of output virtual channel
      * \param mn XOUT_Virtual module name
      * \param nPorts Number of ports of the router
-     * \param XID Network X-coordinate router that contains this module
-     * \param YID Network Y-coordinate router that contains this module
+     * \param ROUTER_ID Network router identifier that contains this module
      * \param PORT_ID Port identificator inside the router
      */
     XOUT_Virtual(sc_module_name mn,
          unsigned short nPorts,
-         unsigned short XID,
-         unsigned short YID,
+         unsigned short ROUTER_ID,
          unsigned short PORT_ID);
 
     ModuleType moduleType() const { return SoCINModule::TOutputModule; }
@@ -108,8 +106,7 @@ public:
 //////////////////////////////////////////////////////////////////////////////////////
 inline XOUT_Virtual::XOUT_Virtual(sc_module_name mn,
                   unsigned short nPorts,
-                  unsigned short XID,
-                  unsigned short YID,
+                  unsigned short ROUTER_ID,
                   unsigned short PORT_ID)
     : SoCINModule(mn),numPorts(nPorts),
       i_CLK("XOUT_iCLK"),
@@ -128,14 +125,14 @@ inline XOUT_Virtual::XOUT_Virtual(sc_module_name mn,
       w_READ_OK("XOUT_wREAD_OK"),
       w_WRITE_OK("XOUT_wWRITE_OK"),
       w_WRITE("XOUT_wWRITE"),
-      XID(XID),YID(YID),PORT_ID(PORT_ID)
+      ROUTER_ID(ROUTER_ID),PORT_ID(PORT_ID)
 {
     // Assign or instantiate sub-modules
     // Assumption: None NULL module is generated here - from plugin manager
-    IPriorityGenerator* pg = PLUGIN_MANAGER->priorityGeneratorInstance("PG",XID,YID,PORT_ID,nPorts);
-    IArbiter* arb = new DistributedArbiter("Arbiter",nPorts,pg,XID,YID,PORT_ID);
-    u_MEMORY = PLUGIN_MANAGER->memoryInstance("XOUT_Virtual_Memory",XID,YID,PORT_ID,FIFO_OUT_DEPTH);
-    u_OC     = new OutputController("OC",nPorts,arb,XID,YID,PORT_ID);
+    IPriorityGenerator* pg = PLUGIN_MANAGER->priorityGeneratorInstance("PG",ROUTER_ID,PORT_ID,nPorts);
+    IArbiter* arb = new DistributedArbiter("Arbiter",nPorts,pg,ROUTER_ID,PORT_ID);
+    u_MEMORY = PLUGIN_MANAGER->memoryInstance("XOUT_Virtual_Memory",ROUTER_ID,PORT_ID,FIFO_OUT_DEPTH);
+    u_OC     = new OutputController("OC",nPorts,arb,ROUTER_ID,PORT_ID);
     u_OWS    = new OneHotMux<bool>("OWS",nPorts);
     u_ODS    = new OneHotMux<Flit>("ODS",nPorts);
 
@@ -229,7 +226,7 @@ public:
     sc_vector<sc_signal<bool> > w_PRIORITY; // Output channel priority selector
 
     // Internal data structures
-    unsigned short XID, YID, PORT_ID;
+    unsigned short ROUTER_ID, PORT_ID;
 
     // Internal Units - sub-modules
     IOutputFlowControl*        u_OFC;
@@ -254,15 +251,13 @@ public:
      * \param mn XOUT_N_VC module name
      * \param nPorts Number of ports of the router
      * \param nVirtualChannels Number of virtual channels
-     * \param XID Network X-coordinate router that contains this module
-     * \param YID Network Y-coordinate router that contains this module
+     * \param ROUTER_ID Network router identifier that contains this module
      * \param PORT_ID Port identificator inside the router
      */
     XOUT_N_VC(sc_module_name mn,
          unsigned short nPorts,
          unsigned short nVirtualChannels,
-         unsigned short XID,
-         unsigned short YID,
+         unsigned short ROUTER_ID,
          unsigned short PORT_ID);
 
     ModuleType moduleType() const { return SoCINModule::TOutputModule; }
@@ -277,8 +272,7 @@ public:
 inline XOUT_N_VC::XOUT_N_VC(sc_module_name mn,
                   unsigned short nPorts,
                   unsigned short nVirtualChannels,
-                  unsigned short XID,
-                  unsigned short YID,
+                  unsigned short ROUTER_ID,
                   unsigned short PORT_ID)
     : SoCINModule(mn),numPorts(nPorts),
       numVirtualChannels(nVirtualChannels),
@@ -301,7 +295,7 @@ inline XOUT_N_VC::XOUT_N_VC(sc_module_name mn,
       w_READ_OK("XOUT_N_VC_wREAD_OK"),
       w_READ("XOUT_N_VC_wREAD"),
       w_PRIORITY("XOUT_wPRIORITY"),
-      XID(XID),YID(YID),PORT_ID(PORT_ID),
+      ROUTER_ID(ROUTER_ID),PORT_ID(PORT_ID),
       u_XOUT_VC(nVirtualChannels,NULL)
 {
     unsigned short i;
@@ -318,7 +312,7 @@ inline XOUT_N_VC::XOUT_N_VC(sc_module_name mn,
 
     // Instantiating sub-modules
     // Assumption: None NULL module is received here by plugin manager
-    u_OFC = PLUGIN_MANAGER->outputFlowControlInstance("XOUT_N_VC_OFC",XID,YID,PORT_ID,FIFO_IN_DEPTH);
+    u_OFC = PLUGIN_MANAGER->outputFlowControlInstance("XOUT_N_VC_OFC",ROUTER_ID,PORT_ID,FIFO_IN_DEPTH);
     u_MUX_READ_OK = new BinaryMux<bool>("XOUT_N_VC_mux_READ_OK",nVirtualChannels);
     u_DEMUX_READ = new BinaryDemux<bool>("XOUT_N_VC_demux_READ",nVirtualChannels);
     u_MUX_DATA = new BinaryMux<Flit>("XOUT_N_VC_mux_DATA",nVirtualChannels);
@@ -326,7 +320,7 @@ inline XOUT_N_VC::XOUT_N_VC(sc_module_name mn,
     for( i = 0; i < nVirtualChannels; i++) {
         char strXoutVc[18];
         sprintf(strXoutVc,"XOUT_u_VC(%u)",i);
-        u_XOUT_VC[i] = new XOUT_Virtual(strXoutVc,nPorts,XID,YID,PORT_ID);
+        u_XOUT_VC[i] = new XOUT_Virtual(strXoutVc,nPorts,ROUTER_ID,PORT_ID);
     }
 
 
@@ -440,7 +434,7 @@ public:
     sc_signal<bool> w_WRITE;    // Command to write a data into the FIFO
 
     // Internal data structures
-    unsigned short XID, YID, PORT_ID;
+    unsigned short ROUTER_ID, PORT_ID;
 
     // Internal Units - sub-modules
     IMemory*            u_MEMORY;
@@ -462,8 +456,7 @@ public:
      * \param arb Arbiter to be used by the module
      * \param ofc Output flow control to be used by the module
      * \param nPorts Number of ports of the router
-     * \param XID Network X-coordinate router that contains this module
-     * \param YID Network Y-coordinate router that contains this module
+     * \param ROUTER_ID Network router identifier that contains this module
      * \param PORT_ID Port identificator inside the router
      */
     XOUT_none_VC(sc_module_name mn,
@@ -471,8 +464,7 @@ public:
          IArbiter* arb,
          IOutputFlowControl* ofc,
          unsigned short nPorts,
-         unsigned short XID,
-         unsigned short YID,
+         unsigned short ROUTER_ID,
          unsigned short PORT_ID);
 
     ModuleType moduleType() const { return SoCINModule::TOutputModule; }
@@ -489,8 +481,7 @@ inline XOUT_none_VC::XOUT_none_VC(sc_module_name mn,
                   IArbiter *arb,
                   IOutputFlowControl *ofc,
                   unsigned short nPorts,
-                  unsigned short XID,
-                  unsigned short YID,
+                  unsigned short ROUTER_ID,
                   unsigned short PORT_ID)
     : SoCINModule(mn),numPorts(nPorts),
       i_CLK("XOUT_iCLK"),
@@ -511,12 +502,12 @@ inline XOUT_none_VC::XOUT_none_VC(sc_module_name mn,
       w_WRITE_OK("XOUT_wWRITE_OK"),
       w_READ("XOUT_wREAD"),
       w_WRITE("XOUT_wWRITE"),
-      XID(XID),YID(YID),PORT_ID(PORT_ID)
+      ROUTER_ID(ROUTER_ID),PORT_ID(PORT_ID)
 {
     // Assign or instantiate sub-modules
     // Assumption: None NULL module is received here
     u_MEMORY = mem;
-    u_OC     = new OutputController("OC",nPorts,arb,XID,YID,PORT_ID);
+    u_OC     = new OutputController("OC",nPorts,arb,ROUTER_ID,PORT_ID);
     u_OFC    = ofc;
     u_OWS    = new OneHotMux<bool>("OWS",nPorts);
     u_ODS    = new OneHotMux<Flit>("ODS",nPorts);
