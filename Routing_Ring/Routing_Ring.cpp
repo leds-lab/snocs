@@ -46,7 +46,7 @@ void Routing_Ring::p_REQUEST() {
     if (v_HEADER_PRESENT) {
         unsigned short v_LAST_ID = X_SIZE * Y_SIZE - 1;
         v_LOCAL = ROUTER_ID;
-        v_DEST  = COORDINATE_TO_ID(v_XDEST.to_int(),v_YDEST.to_int());
+        v_DEST  = COORDINATE_2D_TO_ID(v_XDEST.to_int(),v_YDEST.to_int());
 
         v_OFFSET = v_DEST - v_LOCAL;
 

@@ -77,11 +77,11 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     }
 
     // It calculates the address of the source and destination from id to coordinates
-    unsigned short xSrc  = ID_TO_COORDINATE_X(nodeId);
-    unsigned short ySrc  = ID_TO_COORDINATE_Y(nodeId);
+    unsigned short xSrc  = ID_TO_COORDINATE_2D_X(nodeId);
+    unsigned short ySrc  = ID_TO_COORDINATE_2D_Y(nodeId);
     src = (sc_uint<RIB_WIDTH>) (xSrc << (RIB_WIDTH/2) | ySrc);
-    unsigned short xDest = ID_TO_COORDINATE_X(flow.destination);
-    unsigned short yDest = ID_TO_COORDINATE_Y(flow.destination);
+    unsigned short xDest = ID_TO_COORDINATE_2D_X(flow.destination);
+    unsigned short yDest = ID_TO_COORDINATE_2D_Y(flow.destination);
     dest = (sc_uint<RIB_WIDTH>)(xDest << (RIB_WIDTH/2) | yDest);
 
     if( src == dest ) {

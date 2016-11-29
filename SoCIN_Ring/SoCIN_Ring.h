@@ -24,6 +24,7 @@ public:
     SoCIN_Ring(sc_module_name mn);
 
     const char* moduleName() const { return "SoCIN_Ring"; }
+    bool isTopology3D() const { return false; }
 
     ~SoCIN_Ring();
 };

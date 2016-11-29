@@ -236,7 +236,7 @@ inline void InputControllerBus::p_OUTPUTS() {
     v_X_DEST  = v_DATA.range(RIB_WIDTH-1,RIB_WIDTH/2);
     v_Y_DEST  = v_DATA.range(RIB_WIDTH/2-1,0);
 
-    v_DESTINATION = COORDINATE_TO_ID(v_X_DEST.to_uint(),v_Y_DEST.to_uint());
+    v_DESTINATION = COORDINATE_2D_TO_ID(v_X_DEST.to_uint(),v_Y_DEST.to_uint());
 
     // If RST == 1 disable arbiter request
     if( i_RST.read() == 1 ) {

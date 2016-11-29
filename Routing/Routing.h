@@ -99,8 +99,8 @@ public:
           REQ_W(0),     // Initialize ALL communication requests on 0
           REQ_NONE(0)   // None request - always 0
     {
-        XID = ID_TO_COORDINATE_X(ROUTER_ID);
-        YID = ID_TO_COORDINATE_Y(ROUTER_ID);
+        XID = ID_TO_COORDINATE_2D_X(ROUTER_ID);
+        YID = ID_TO_COORDINATE_2D_Y(ROUTER_ID);
 
         // Regular ParIS router with all ports - LOCAL, NORTH, EAST, SOUTH, WEST
         if( nPorts == 5 ) {

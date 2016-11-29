@@ -69,6 +69,8 @@ public:
     std::vector<IRouter *> u_ROUTER; // ATTENTION: Initialize the vector size (use resize) or use
                                      // append|insert for the routers instantiated
 
+    virtual bool isTopology3D() const = 0; // Identify if the NoC topology is 3-dimensional
+
     INoC(sc_module_name mn,unsigned short nInterfaces);
 
     ModuleType moduleType() const { return SoCINModule::TNoC; }

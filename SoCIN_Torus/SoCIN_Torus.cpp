@@ -70,7 +70,7 @@ SoCIN_Torus::SoCIN_Torus(sc_module_name mn)
     for( x = 0; x < X_SIZE; x++ ) {
         for( y = 0; y < Y_SIZE; y++ ) {
 
-            routerId = COORDINATE_TO_ID(x,y);
+            routerId = COORDINATE_2D_TO_ID(x,y);
 
             char rName[15];
             sprintf(rName,"ParIS[%u][%u]",x,y);

@@ -49,7 +49,7 @@ void Routing_Crossfirst::p_REQUEST() {
     // It runs the routing algorithm
     if (v_HEADER_PRESENT) {
         v_LOCAL = ROUTER_ID;
-        v_DEST  = COORDINATE_TO_ID(v_XDEST.to_int(),v_YDEST.to_int());
+        v_DEST  = COORDINATE_2D_TO_ID(v_XDEST.to_int(),v_YDEST.to_int());
 
         v_OFFSET = v_DEST - v_LOCAL;
 

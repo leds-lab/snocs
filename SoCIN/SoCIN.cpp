@@ -88,7 +88,7 @@ SoCINfp_VC::SoCINfp_VC(sc_module_name mn)
             // Calculate the number of ports needed to the router to be instantiated
             nPorts = useLocal + useNorth + useEast + useSouth + useWest;
 
-            routerId = COORDINATE_TO_ID(x,y);
+            routerId = COORDINATE_2D_TO_ID(x,y);
 
             char rName[15];
             sprintf(rName,"ParIS[%u][%u]",x,y);
@@ -423,7 +423,7 @@ SoCINfp::SoCINfp(sc_module_name mn)
             // Calculate the number of ports needed to the router to be instantiated
             nPorts = useLocal + useNorth + useEast + useSouth + useWest;
 
-            routerId = COORDINATE_TO_ID(x,y);
+            routerId = COORDINATE_2D_TO_ID(x,y);
 
             char rName[15];
             sprintf(rName,"ParIS[%u][%u]",x,y);

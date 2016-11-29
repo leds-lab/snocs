@@ -34,7 +34,7 @@ void Routing_Crossbar::p_REQUEST() {
 
     // It runs the routing algorithm
     if (v_HEADER_PRESENT) {
-        unsigned short portId = COORDINATE_TO_ID(v_XDEST.to_uint(),v_YDEST.to_uint());
+        unsigned short portId = COORDINATE_2D_TO_ID(v_XDEST.to_uint(),v_YDEST.to_uint());
         v_REQUEST[portId] = 1;
     } else {
         v_REQUEST = 0;

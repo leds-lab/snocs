@@ -12,6 +12,7 @@ public:
     SoCIN_Unit(sc_module_name mn);
 
     const char* moduleName() const { return "SoCIN_SingleUnit"; }
+    bool isTopology3D() const { return false; }
 
     ~SoCIN_Unit();
 };
