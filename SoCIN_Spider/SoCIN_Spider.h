@@ -7,17 +7,17 @@ class SoCIN_Spider : public INoC_VC {
 public:
 
     // SIGNALS
-    // Sinals for the links on the LEFT direction
+    // Signals for the links on the LEFT direction
     sc_vector<sc_signal<Flit> > w_DATA_TO_LEFT;
     sc_vector<sc_signal<bool> > w_VALID_TO_LEFT;
     sc_vector<sc_signal<bool> > w_RETURN_TO_LEFT;
     sc_vector<sc_vector<sc_signal<bool> > > w_VC_SELECTOR_TO_LEFT; // VC Link
-    // Sinals for the links on the RIGHT direction
+    // Signals for the links on the RIGHT direction
     sc_vector<sc_signal<Flit> > w_DATA_TO_RIGHT;
     sc_vector<sc_signal<bool> > w_VALID_TO_RIGHT;
     sc_vector<sc_signal<bool> > w_RETURN_TO_RIGHT;
     sc_vector<sc_vector<sc_signal<bool> > > w_VC_SELECTOR_TO_RIGHT;// VC link
-    // Sinals for the links on the ACROSS direction
+    // Signals for the links on the ACROSS direction
     sc_vector<sc_signal<Flit> > w_DATA_ACROSS;
     sc_vector<sc_signal<bool> > w_VALID_ACROSS;
     sc_vector<sc_signal<bool> > w_RETURN_ACROSS;

@@ -86,8 +86,8 @@ void showHelp() {
               << "                      Default=4, Min: 2" << std::endl
               << "  -ysize value        Network Y dimension. Value > 1" << std::endl
               << "                      Default=4, Min: 2" << std::endl
-              << "  -zsize value        Network Z dimension. Value > 1" << std::endl
-              << "                      Default=0 (no Z dimension), Min: 2" << std::endl
+              << "  -zsize value        Network Z dimension. 1 < Value <= 4" << std::endl
+              << "                      Default=0 (no Z dimension), Min: 2, Max: 4" << std::endl
               << "  -datawidth value    Number of bits of the data channel. Value >= 32" << std::endl
               << "                      Default=32, Min: 32, Max: 510" << std::endl
               << "  -fifoin value       Routers input buffers depth (flits). 1 < Value <= 1024." << std::endl
@@ -160,7 +160,6 @@ int sc_main(int argc, char* argv[]) {
     }
 
     printConfiguration();
-    //// [1] Configuration
 
     /// [2] Network models building
     INoC* u_NOC = PLUGIN_MANAGER->nocInstance("NoC");
@@ -521,7 +520,7 @@ unsigned int setupSimulator(int argc, char* argv[], InputParser &opt) {
 
     X_SIZE = getIntArg(opt,"-xsize",4,2);
     Y_SIZE = getIntArg(opt,"-ysize",4,2);
-    Z_SIZE = getIntArg(opt,"-zsize",0,2);
+    Z_SIZE = getIntArg(opt,"-zsize",0,2,4);
     FLIT_WIDTH = getIntArg(opt,"-datawidth",32,32,510) + 2; // Data Width + 2-bit framming (EOP & BOP)
     NUM_VC = getIntArg(opt,"-vc",0,0,32);
     FIFO_IN_DEPTH = getIntArg(opt,"-fifoin",4,2,1024);

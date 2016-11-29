@@ -7,7 +7,7 @@ class SoCIN_Ring : public INoC_VC {
 public:
 
     // SIGNALS
-    // Sinals for the links on the X direction
+    // Signals for the links on the X direction
     sc_vector<sc_signal<Flit> > w_DATA_TO_LEFT;
     sc_vector<sc_signal<bool> > w_VALID_TO_LEFT;
     sc_vector<sc_signal<bool> > w_RETURN_TO_LEFT;

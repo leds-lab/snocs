@@ -1,11 +1,10 @@
-#ifndef __SOCIN_TORUS_H__
-#define __SOCIN_TORUS_H__
+#ifndef __SOCIN_3D_H__
+#define __SOCIN_3D_H__
 
 #include "../NoC/NoC.h"
 
-class SoCIN_Torus : public INoC_VC {
+class SoCIN_3D : public INoC_VC {
 public:
-
     // SIGNALS
     // Signals for the links on the X direction
     sc_vector<sc_signal<Flit> > w_X_DATA_TO_LEFT;
@@ -27,15 +26,24 @@ public:
     sc_vector<sc_signal<bool> > w_Y_RETURN_TO_NORTH;
     sc_vector<sc_vector<sc_signal<bool> > > w_Y_VC_SELECTOR_TO_NORTH;// VC link
 
-    // Waveform for debug proposal
+    // Signals for the links on the Z direction
+    sc_vector<sc_signal<Flit> > w_Z_DATA_TO_UP;
+    sc_vector<sc_signal<bool> > w_Z_VALID_TO_UP;
+    sc_vector<sc_signal<bool> > w_Z_RETURN_TO_UP;
+    sc_vector<sc_vector<sc_signal<bool> > > w_Z_VC_SELECTOR_TO_UP;// VC link
+    sc_vector<sc_signal<Flit> > w_Z_DATA_TO_DOWN;
+    sc_vector<sc_signal<bool> > w_Z_VALID_TO_DOWN;
+    sc_vector<sc_signal<bool> > w_Z_RETURN_TO_DOWN;
+    sc_vector<sc_vector<sc_signal<bool> > > w_Z_VC_SELECTOR_TO_DOWN;// VC link
+
     sc_trace_file* tf;
 
-    SC_HAS_PROCESS(SoCIN_Torus);
-    SoCIN_Torus(sc_module_name mn);
+    SC_HAS_PROCESS(SoCIN_3D);
+    SoCIN_3D(sc_module_name mn);
 
-    const char* moduleName() const { return "SoCIN_Torus"; }
+    const char* moduleName() const { return "SoCIN-3D"; }
 
-    ~SoCIN_Torus();
+    ~SoCIN_3D();
 };
 
-#endif // __SOCIN_TORUS_H__
+#endif // SOCIN_3D_H

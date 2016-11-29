@@ -22,6 +22,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 
 // Forward declaration
 class IRouter;
+class IRouter_VC;
 
 /////////////////////////////////////////////////////////////////////////////////
 /// NoC interface without virtual channels

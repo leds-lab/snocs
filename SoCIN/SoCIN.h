@@ -12,7 +12,7 @@ class SoCINfp_VC : public INoC_VC {
 public:
 
     // SIGNALS
-    // Sinals for the links on the X direction
+    // Signals for the links on the X direction
     sc_vector<sc_signal<Flit> > w_X_DATA_TO_LEFT;
     sc_vector<sc_signal<bool> > w_X_VALID_TO_LEFT;
     sc_vector<sc_signal<bool> > w_X_RETURN_TO_LEFT;
@@ -22,7 +22,7 @@ public:
     sc_vector<sc_signal<bool> > w_X_RETURN_TO_RIGHT;
     sc_vector<sc_vector<sc_signal<bool> > > w_X_VC_SELECTOR_TO_RIGHT;// VC link
 
-    // Sinals for the links on the Y direction
+    // Signals for the links on the Y direction
     sc_vector<sc_signal<Flit> > w_Y_DATA_TO_SOUTH;
     sc_vector<sc_signal<bool> > w_Y_VALID_TO_SOUTH;
     sc_vector<sc_signal<bool> > w_Y_RETURN_TO_SOUTH;
@@ -53,7 +53,7 @@ class SoCINfp : public INoC {
 public:
 
     // SIGNALS
-    // Sinals for the links on the X direction
+    // Signals for the links on the X direction
     sc_vector<sc_signal<Flit> > w_X_DATA_TO_LEFT;
     sc_vector<sc_signal<bool> > w_X_VALID_TO_LEFT;
     sc_vector<sc_signal<bool> > w_X_RETURN_TO_LEFT;
@@ -61,7 +61,7 @@ public:
     sc_vector<sc_signal<bool> > w_X_VALID_TO_RIGHT;
     sc_vector<sc_signal<bool> > w_X_RETURN_TO_RIGHT;
 
-    // Sinals for the links on the Y direction
+    // Signals for the links on the Y direction
     sc_vector<sc_signal<Flit> > w_Y_DATA_TO_SOUTH;
     sc_vector<sc_signal<bool> > w_Y_VALID_TO_SOUTH;
     sc_vector<sc_signal<bool> > w_Y_RETURN_TO_SOUTH;

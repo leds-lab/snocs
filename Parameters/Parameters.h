@@ -42,6 +42,7 @@ class PluginManager;
 #define COORDINATE_TO_ID(x,y) (y * X_SIZE + x)
 #define ID_TO_COORDINATE_X(i) (i % X_SIZE)
 #define ID_TO_COORDINATE_Y(i) (i / X_SIZE)
+#define COORDINATE_3D_TO_ID(x,y,z) ( COORDINATE_TO_ID(x,y) + (X_SIZE * Y_SIZE * z) )
 
 /*!
   Packet Format for the Mesh 2D SoCIN
@@ -155,7 +156,7 @@ public:
 
 /////// OLD ///////
 
-#define SIM // Used to isolate non-synthesizable code
+//#define SIM // Used to isolate non-synthesizable code
 ////////////////////////////// ROUTER PARAMETERS ///////////////////////////////
 // MECHANISMS TYPES
 //#define ROUTING_TYPE        0
