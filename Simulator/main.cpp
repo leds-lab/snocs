@@ -6,7 +6,7 @@
 #include "../PluginManager/PluginManager.h"
 
 // TEMP
-#include "tg.h"
+#include "TerminalInstrumentation.h"
 
 // SystemC
 #include <systemc>
@@ -245,7 +245,7 @@ int sc_main(int argc, char* argv[]) {
         char strTgName[10];
         sprintf(strTgName,"TG_%u",elementId);
         // Instantiate TG
-        tg* u_TG = new tg(strTgName,elementId);
+        TerminalInstrumentation* u_TG = new TerminalInstrumentation(strTgName,elementId,u_NOC->isTopology3D());
 
         // Assembling TM name
         char strTmName[10];
@@ -254,7 +254,7 @@ int sc_main(int argc, char* argv[]) {
         char* outFilename = new char[20];
         sprintf(outFilename,"ext_%u_out",elementId);
         // Instantiate TM
-        TrafficMeter* u_TM = new TrafficMeter(strTmName,WORK_DIR,outFilename);
+        TrafficMeter* u_TM = new TrafficMeter(strTmName,WORK_DIR,outFilename,u_NOC->isTopology3D());
         u_TMs[elementId] = u_TM;
 
         //------------- Binding signals -------------//

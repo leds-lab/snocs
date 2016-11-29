@@ -19,7 +19,7 @@
 SC_MODULE(fg)
 {
     unsigned short vcWidth;
-
+    bool packetFormat3D;
     // INTERFACE
     // System signals
     sc_in<bool>               clk;
@@ -80,8 +80,10 @@ SC_MODULE(fg)
     //////////////////////////////////////////////////////////////////////////////
     fg(sc_module_name nm,
        unsigned short int FG_ID,
+       bool packetFormat3D,
        unsigned short nb_cycles_per_flit) :
         sc_module(nm),
+        packetFormat3D(packetFormat3D),
         FG_ID(FG_ID),
         nb_cycles_per_flit(nb_cycles_per_flit)
     //////////////////////////////////////////////////////////////////////////////

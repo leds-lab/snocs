@@ -1,10 +1,14 @@
 #include "TrafficMeter.h"
 #include "../PluginManager/PluginManager.h"
 
-TrafficMeter::TrafficMeter(sc_module_name mn, char *workDir, char *fileName)
+TrafficMeter::TrafficMeter(sc_module_name mn,
+                           char *workDir,
+                           char *fileName,
+                           bool packetFormat3D)
     : SoCINModule(mn),
       pckId(1),// TEMP
       workDir(workDir),outFileName(fileName), outFile(NULL),
+      packetFormat3D(packetFormat3D),
       i_CLK("TrafficMeter_iCLK"),
       i_RST("TrafficMeter_iRST"),
       i_EOS("TrafficMeter_iEOS"),

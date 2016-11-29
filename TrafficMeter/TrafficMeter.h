@@ -41,6 +41,7 @@ protected:
     UIntVar packetHeader;
     unsigned long cycleOfArriving;
 
+    bool packetFormat3D;
 public:
     // Interface
     // System signals
@@ -76,7 +77,8 @@ public:
     SC_HAS_PROCESS(TrafficMeter);
     TrafficMeter(sc_module_name mn,
                  char* workDir,
-                 char* fileName);
+                 char* fileName,
+                 bool packetFormat3D);
 
     ModuleType moduleType() const { return SoCINModule::TTrafficMeter; }
     const char* moduleName() const { return "TrafficMeter"; }

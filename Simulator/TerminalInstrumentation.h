@@ -1,5 +1,5 @@
-#ifndef __TG_H__
-#define __TG_H__
+#ifndef __TERMINAL_INSTRUMENTATION_H__
+#define __TERMINAL_INSTRUMENTATION_H__
 
 #include <systemc.h>
 #include "fg.h"
@@ -9,12 +9,12 @@
 #include "../PluginManager/PluginManager.h"
 #include "UnboundedFifo.h"
 
-SC_MODULE(tg) {
-
+class TerminalInstrumentation : public sc_module {
+public:
     // INTERFACE
     // System signals
-    sc_in_clk       	 clk;
-    sc_in<bool>       	 rst;
+    sc_in<bool>          clk;
+    sc_in<bool>          rst;
     sc_in<unsigned long> clock_cycles;
 
     // Link signals
@@ -50,6 +50,8 @@ SC_MODULE(tg) {
 
     IInputFlowControl*  u_IFC;
     IOutputFlowControl* u_OFC;
+    UnboundedFifo* u_FIFO_IN;
+    UnboundedFifo* u_FIFO_OUT;
 
     void p_debug(void) {
         if ((TG_ID)==0) {
@@ -65,29 +67,27 @@ SC_MODULE(tg) {
         }
     }
 
-    SC_HAS_PROCESS(tg);
+    SC_HAS_PROCESS(TerminalInstrumentation);
     //////////////////////////////////////////////////////////////////////////////
-    tg(sc_module_name nm,
-        unsigned short int TG_ID) :
+    TerminalInstrumentation(sc_module_name nm,
+        unsigned short int TG_ID, bool packetFormat3D) :
         sc_module(nm),
         TG_ID(TG_ID)
     //////////////////////////////////////////////////////////////////////////////
     {
-//        SC_METHOD(p_debug);
-//        sensitive << clk.pos();
         if(NUM_VC>1) {
             o_VC.init( ceil(log2(NUM_VC)) );
         }
 
-        UnboundedFifo* fifoOut = new UnboundedFifo("FifoOutTG");
-        fifoOut->i_CLK(clk);
-        fifoOut->i_RST(rst);
-        fifoOut->i_DATA_IN(snd_data_wire);
-        fifoOut->i_WR(snd_wr_wire);
-        fifoOut->i_RD(snd_rd_wire);
-        fifoOut->o_WR_OK(snd_wok_wire);
-        fifoOut->o_RD_OK(snd_rok_wire);
-        fifoOut->o_DATA_OUT(out_data);
+        u_FIFO_OUT = new UnboundedFifo("FifoOutTG");
+        u_FIFO_OUT->i_CLK(clk);
+        u_FIFO_OUT->i_RST(rst);
+        u_FIFO_OUT->i_DATA_IN(snd_data_wire);
+        u_FIFO_OUT->i_WR(snd_wr_wire);
+        u_FIFO_OUT->i_RD(snd_rd_wire);
+        u_FIFO_OUT->o_WR_OK(snd_wok_wire);
+        u_FIFO_OUT->o_RD_OK(snd_rok_wire);
+        u_FIFO_OUT->o_DATA_OUT(out_data);
 
         //////////////////////////////////////////////
         u_OFC = PLUGIN_MANAGER->outputFlowControlInstance("TG_OFC",0,0,FIFO_IN_DEPTH);
@@ -99,15 +99,15 @@ SC_MODULE(tg) {
         u_OFC->i_READ_OK(snd_rok_wire);
         u_OFC->o_READ(snd_rd_wire);
 
-        UnboundedFifo* fifoIn = new UnboundedFifo("FifoInTG");
-        fifoIn->i_CLK(clk);
-        fifoIn->i_RST(rst);
-        fifoIn->i_DATA_IN(in_data);
-        fifoIn->i_WR(rcv_wr_wire);
-        fifoIn->i_RD(rcv_rd_wire);
-        fifoIn->o_WR_OK(rcv_wok_wire);
-        fifoIn->o_RD_OK(rcv_rok_wire);
-        fifoIn->o_DATA_OUT(rcv_data_wire);
+        u_FIFO_IN = new UnboundedFifo("FifoInTG");
+        u_FIFO_IN->i_CLK(clk);
+        u_FIFO_IN->i_RST(rst);
+        u_FIFO_IN->i_DATA_IN(in_data);
+        u_FIFO_IN->i_WR(rcv_wr_wire);
+        u_FIFO_IN->i_RD(rcv_rd_wire);
+        u_FIFO_IN->o_WR_OK(rcv_wok_wire);
+        u_FIFO_IN->o_RD_OK(rcv_rok_wire);
+        u_FIFO_IN->o_DATA_OUT(rcv_data_wire);
 
         //////////////////////////////////////////////
         u_IFC = PLUGIN_MANAGER->inputFlowControlInstance("TG_IFC",0,0);
@@ -123,7 +123,7 @@ SC_MODULE(tg) {
         u_IFC->i_DATA(rcv_data_wire);
 
         //////////////////////////////////
-        fg *fg0 = new fg("fg0",TG_ID,u_IFC->numberOfCyclesPerFlit());
+        fg *fg0 = new fg("fg0",TG_ID,packetFormat3D,u_IFC->numberOfCyclesPerFlit());
         //////////////////////////////////
         fg0->clk(clk);
         fg0->rst(rst);
@@ -143,4 +143,4 @@ SC_MODULE(tg) {
     }
 
 };
-#endif // __TG_H__
+#endif // __TERMINAL_INSTRUMENTATION_H__

@@ -20,8 +20,8 @@ HEADERS += \
     ../StopSim/StopSim.h \
     ../TrafficMeter/TrafficMeter.h \
     fg.h \
-    tg.h \
-    UnboundedFifo.h
+    UnboundedFifo.h \
+    TerminalInstrumentation.h
 #    tm_single.h
 
 OTHER_FILES += simconf.conf
