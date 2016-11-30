@@ -43,7 +43,7 @@ SoCIN_3D::SoCIN_3D(sc_module_name mn)
       w_Z_VC_SELECTOR_TO_DOWN("w_Z_VC_SELECTOR_TO_DOWN")
 {
     if(numInterfaces == 0) {
-        throw std::runtime_error("Number of interfaces is 0, verify X, Y and Z sizes.");
+        throw std::runtime_error("Number of interfaces is 0, verify Z size.");
     }
 
     unsigned short i; // Loop iterator

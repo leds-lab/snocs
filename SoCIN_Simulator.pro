@@ -50,7 +50,8 @@ SUBDIRS += \
     Routing_Ring \
     SoCIN_Spider \
     Routing_Crossfirst \
-    SoCIN_3D
+    SoCIN_3D \
+    Routing_XYZ
 
 OTHER_FILES += \
     app.pri \

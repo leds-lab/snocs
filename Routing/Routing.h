@@ -69,11 +69,11 @@ inline IRouting::~IRouting() {}
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////
-/// Interface for Mesh 2D topology routing
+/// Interface for Orthogonal 2D topology routing
 /////////////////////////////////////////////////////////////
 /*!
- * \brief The IMesh2DRouting class is an interface
- * (abstract class) for Mesh 2D routing implementations
+ * \brief The IOrthoginal2DRouting class is an interface
+ * (abstract class) for Orthogonal 2D routing implementations
  */
 class IOrthogonal2DRouting : public IRouting {
 protected:
@@ -140,7 +140,101 @@ public:
 };
 inline IOrthogonal2DRouting::~IOrthogonal2DRouting() {}
 /////////////////////////////////////////////////////////////
-/// END Interface for Mesh topology routing
+/// END Interface for Orthogonal 2D topology routing
+/////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////
+/// Interface for Orthogonal 3D topology routing
+/////////////////////////////////////////////////////////////
+/*!
+ * \brief The IOrthogonal3DRouting class is an interface
+ * (abstract class) for Orthogonal 3D routing implementations
+ */
+class IOrthogonal3DRouting : public IRouting {
+protected:
+    // Request encoding - char used to minimize the num of bytes used - 1 byte - max. requests one-hot style: 8 (2^8)
+    unsigned char REQ_L;    // Local
+    unsigned char REQ_N;    // North
+    unsigned char REQ_E;    // East
+    unsigned char REQ_S;    // South
+    unsigned char REQ_W;    // West
+    unsigned char REQ_U;    // Up
+    unsigned char REQ_D;    // Down
+    unsigned char REQ_NONE; // None
+
+    unsigned short XID,YID, ZID;
+public:
+
+    IOrthogonal3DRouting(sc_module_name mn,
+             unsigned short nPorts,
+             unsigned short ROUTER_ID)
+        : IRouting(mn,nPorts,ROUTER_ID),
+          REQ_L(1),     // Local port is always the first requisition - 0b00001
+          REQ_N(0),     // Initialize ALL communication requests on 0
+          REQ_E(0),     // Initialize ALL communication requests on 0
+          REQ_S(0),     // Initialize ALL communication requests on 0
+          REQ_W(0),     // Initialize ALL communication requests on 0
+          REQ_U(0),
+          REQ_D(0),
+          REQ_NONE(0)   // None request - always 0
+    {
+        XID = ID_TO_COORDINATE_3D_X(ROUTER_ID);
+        YID = ID_TO_COORDINATE_3D_Y(ROUTER_ID);
+        ZID = ID_TO_COORDINATE_3D_Z(ROUTER_ID);
+
+        // Regular ParIS router to 3D topology with all ports - LOCAL, NORTH, EAST, SOUTH, WEST, UP and DOWN
+        if( nPorts == 7 ) {
+            REQ_N = 2;
+            REQ_E = 4;
+            REQ_S = 8;
+            REQ_W = 16;
+            REQ_U = 32;
+            REQ_D = 64;
+        } else {
+            // Aux. to identify which port must be used according the network position
+            unsigned short useNorth, useEast, useSouth, useWest, useUp, useDown;
+
+            // Set the use of ports according with the network position
+            useNorth = ( YID < Y_SIZE-1 ) ? 1 : 0;   // North port is not used on the top    border
+            useEast  = ( XID < X_SIZE-1 ) ? 1 : 0;   // East  port is not used on the right  border
+            useSouth = ( YID > 0 ) ? 1 : 0;          // South port is not used on the botton border
+            useWest  = ( XID > 0 ) ? 1 : 0;          // West  port is not used on the left   border
+            useUp    = ( ZID < Z_SIZE-1 ) ? 1 : 0;   // Up    port is not used on the upper  layer
+            useDown  = ( ZID > 0 ) ? 1 : 0;          // Down  port is not used on the bottom layer
+
+            if(useNorth) {
+                REQ_N = 2;
+            }
+
+            if(useEast) {
+                REQ_E = (unsigned char) pow(2,(useNorth+useEast));
+            }
+
+            if(useSouth) {
+                REQ_S = (unsigned char) pow(2,(useNorth+useEast+useSouth));
+            }
+
+            if(useWest) {
+                REQ_W = (unsigned char) pow(2,(useNorth+useEast+useSouth+useWest));
+            }
+
+            if(useUp) {
+                REQ_U = (unsigned char) pow(2,(useNorth+useEast+useSouth+useWest+useUp));
+            }
+
+            if(useDown) {
+                REQ_D = (unsigned char) pow(2,(useNorth+useEast+useSouth+useWest+useUp+useDown));
+            }
+        }
+    }
+
+    ~IOrthogonal3DRouting() = 0;
+};
+inline IOrthogonal3DRouting::~IOrthogonal3DRouting() {}
+/////////////////////////////////////////////////////////////
+/// END Interface for Orthogonal 3D topology routing
 /////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////
