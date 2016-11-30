@@ -82,10 +82,10 @@ void showHelp() {
               << "   * To all options there are a default value                    *" << std::endl
               << "   * Not all options are used depending the system configuration *" << std::endl
               << "   * There are limits values (i.e. min and max) to the options   *" << std::endl;
-    std::cout << "  -xsize value        Network X dimension. Value > 1" << std::endl
-              << "                      Default=4, Min: 2" << std::endl
-              << "  -ysize value        Network Y dimension. Value > 1" << std::endl
-              << "                      Default=4, Min: 2" << std::endl
+    std::cout << "  -xsize value        Network X dimension. 2 =< Value =< (16 for 2D and 8 for 3D)" << std::endl
+              << "                      Default=4, Min: 2, Max: [16 (2D) | 8 (3D)]" << std::endl
+              << "  -ysize value        Network Y dimension. 2 =< Value =< (16 for 2D and 8 for 3D)" << std::endl
+              << "                      Default=4, Min: 2, Max: [16 (2D) | 8 (3D)]" << std::endl
               << "  -zsize value        Network Z dimension. 1 < Value <= 4" << std::endl
               << "                      Default=0 (no Z dimension), Min: 2, Max: 4" << std::endl
               << "  -datawidth value    Number of bits of the data channel. Value >= 32" << std::endl
@@ -101,7 +101,7 @@ void showHelp() {
     std::cout << "\nIMPORTANT: <xsize> and <ysize> options define the system size\n"
                  "(i.e. number of elements). Not only for 2D orthogonal topologies,\n"
                  "but also to some others, like ring (xsize * ysize = NumberOfElements).\n"
-                 "The option <zsize> is used only for 3D topologies!" << std::endl;
+                 "The option <zsize> must be used only for 3D topologies!" << std::endl;
 
 }
 
@@ -245,7 +245,7 @@ int sc_main(int argc, char* argv[]) {
         char strTgName[10];
         sprintf(strTgName,"TG_%u",elementId);
         // Instantiate TG
-        TerminalInstrumentation* u_TG = new TerminalInstrumentation(strTgName,elementId,u_NOC->isTopology3D());
+        TerminalInstrumentation* u_TG = new TerminalInstrumentation(strTgName,elementId,u_NOC->topologyType());
 
         // Assembling TM name
         char strTmName[10];
@@ -254,7 +254,7 @@ int sc_main(int argc, char* argv[]) {
         char* outFilename = new char[20];
         sprintf(outFilename,"ext_%u_out",elementId);
         // Instantiate TM
-        TrafficMeter* u_TM = new TrafficMeter(strTmName,WORK_DIR,outFilename,u_NOC->isTopology3D());
+        TrafficMeter* u_TM = new TrafficMeter(strTmName,WORK_DIR,outFilename,u_NOC->topologyType(),true);
         u_TMs[elementId] = u_TM;
 
         //------------- Binding signals -------------//
@@ -518,9 +518,13 @@ unsigned int setupSimulator(int argc, char* argv[], InputParser &opt) {
         PLUGINS_DIR = argv[3];
     }
 
-    X_SIZE = getIntArg(opt,"-xsize",4,2);
-    Y_SIZE = getIntArg(opt,"-ysize",4,2);
     Z_SIZE = getIntArg(opt,"-zsize",0,2,4);
+    int max2Daxis = 16;
+    if(Z_SIZE > 0) {
+        max2Daxis = 8;
+    }
+    X_SIZE = getIntArg(opt,"-xsize",4,2,max2Daxis);
+    Y_SIZE = getIntArg(opt,"-ysize",4,2,max2Daxis);
     FLIT_WIDTH = getIntArg(opt,"-datawidth",32,32,510) + 2; // Data Width + 2-bit framming (EOP & BOP)
     NUM_VC = getIntArg(opt,"-vc",0,0,32);
     FIFO_IN_DEPTH = getIntArg(opt,"-fifoin",4,2,1024);

@@ -48,6 +48,7 @@ class PluginManager;
 #define ID_TO_COORDINATE_3D_X(id) ( ID_TO_COORDINATE_2D_X(id - (X_SIZE*Y_SIZE*ID_TO_COORDINATE_3D_Z(id))) )
 #define ID_TO_COORDINATE_3D_Y(id) ( ID_TO_COORDINATE_2D_Y(id - (X_SIZE*Y_SIZE*ID_TO_COORDINATE_3D_Z(id))) )
 /*!
+  TODO: IMPORTANT> Update
   Packet Format for the Mesh 2D SoCIN
   e.g. 32-bit data width.
   The flit width (FLIT_WIDTH) is 34-bit because 2 bits are framing:
@@ -93,13 +94,12 @@ class PluginManager;
     NOTE: X and Y are shifted to left and Z field is added for until 4 layers
 
 */
-#define FLIT_WIDTH PARAMS->wordWidth                        // Width of the flit (dataWidth + framing)
-#define RIB_WIDTH PARAMS->ribWidth                          // Width of the addressing field (RIB) in the header
-#define NUMBER_TRAFFIC_CLASSES PARAMS->numberOfClasses      // Number of traffic classes
-#define TRAFFIC_CLASS_POSITION PARAMS->trafficClassPosition // Position of the traffic class in the header
-#define NUMBER_OF_THREADS PARAMS->numberOfThreads           // Number of threads supported by the simulator
-#define THREAD_ID_POSITION PARAMS->threadIdPosition         // Position of the thread id in the header
-#define PACKET_TYPE_POSITION 16                             // Position of packet type: TYPE: 0
+#define FLIT_WIDTH PARAMS->wordWidth           // Width of the flit (dataWidth + framing)
+#define RIB_WIDTH PARAMS->ribWidth             // Width of the addressing field (RIB) in the header
+#define N_CLASSES PARAMS->numberOfClasses      // Number of traffic classes
+#define CLS_POS PARAMS->trafficClassPosition   // Position of the traffic class in the header
+#define CMD_POSITION PARAMS->commandPosition   // Position of the command in the header
+#define FID_POS 25
 
 // Buffering
 #define FIFO_IN_DEPTH PARAMS->fifoInDepth   // Input buffers depth
@@ -139,8 +139,7 @@ public:
 
     unsigned short trafficClassPosition;
     unsigned short numberOfClasses;
-    unsigned short threadIdPosition;
-    unsigned short numberOfThreads;
+    unsigned short commandPosition;
     // Buffering
     unsigned short numVirtualChannels;
     unsigned short fifoInDepth;

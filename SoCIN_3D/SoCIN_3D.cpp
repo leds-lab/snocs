@@ -43,7 +43,14 @@ SoCIN_3D::SoCIN_3D(sc_module_name mn)
       w_Z_VC_SELECTOR_TO_DOWN("w_Z_VC_SELECTOR_TO_DOWN")
 {
     if(numInterfaces == 0) {
-        throw std::runtime_error("Number of interfaces is 0, verify Z size.");
+        throw std::runtime_error("[SoCIN-3D]Number of interfaces is 0, verify Z size.");
+    }
+
+    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
+    if(tester != NULL) {
+        if( tester->supportedTopology() != this->topologyType() ) {
+            throw std::runtime_error("[SoCINfp-3D] Routing incompatible with the topology");
+        }
     }
 
     unsigned short i; // Loop iterator
@@ -162,21 +169,22 @@ SoCIN_3D::SoCIN_3D(sc_module_name mn)
                 if( useNorth ) {
                     yWireId = routerId - (X_SIZE*z); // Always the same id of the router
                     rPortId = useNorth;
-                    router_VC->i_DATA_IN[rPortId](w_Y_DATA_TO_SOUTH[yWireId]);
-                    router_VC->i_VALID_IN[rPortId](w_Y_VALID_TO_SOUTH[yWireId]);
-                    router_VC->o_RETURN_IN[rPortId](w_Y_RETURN_TO_SOUTH[yWireId]);
-                    router_VC->o_DATA_OUT[rPortId](w_Y_DATA_TO_NORTH[yWireId]);
-                    router_VC->o_VALID_OUT[rPortId](w_Y_VALID_TO_NORTH[yWireId]);
-                    router_VC->i_RETURN_OUT[rPortId](w_Y_RETURN_TO_NORTH[yWireId]);
+                    router->i_DATA_IN[rPortId](w_Y_DATA_TO_SOUTH[yWireId]);
+                    router->i_VALID_IN[rPortId](w_Y_VALID_TO_SOUTH[yWireId]);
+                    router->o_RETURN_IN[rPortId](w_Y_RETURN_TO_SOUTH[yWireId]);
+                    router->o_DATA_OUT[rPortId](w_Y_DATA_TO_NORTH[yWireId]);
+                    router->o_VALID_OUT[rPortId](w_Y_VALID_TO_NORTH[yWireId]);
+                    router->i_RETURN_OUT[rPortId](w_Y_RETURN_TO_NORTH[yWireId]);
                     if( NUM_VC > 1 ) {
                         if( router_VC != NULL ) {
-                            router_VC->i_VC_IN[rPortId](i_VC_SELECTOR[yWireId]);
-                            router_VC->o_VC_OUT[rPortId](o_VC_SELECTOR[yWireId]);
+                            router_VC->i_VC_IN[rPortId](w_Y_VC_SELECTOR_TO_SOUTH[yWireId]);
+                            router_VC->o_VC_OUT[rPortId](w_Y_VC_SELECTOR_TO_NORTH[yWireId]);
                         } else {
                             throw std::runtime_error("[SoCIN-3D] -- ERROR: The router instantiated is not a VC router.");
                         }
                     }
                 }
+
                 // If EAST is used, it is the port 2 in the router,
                 // except in the top border routers that is the port 1,
                 // because they don't have north port.
@@ -184,12 +192,12 @@ SoCIN_3D::SoCIN_3D(sc_module_name mn)
                 if( useEast ) {
                     xWireId = routerId - y - (Y_SIZE*z);
                     rPortId = useNorth + useEast;
-                    router_VC->i_DATA_IN[rPortId](w_X_DATA_TO_LEFT[xWireId]);
-                    router_VC->i_VALID_IN[rPortId](w_X_VALID_TO_LEFT[xWireId]);
-                    router_VC->o_RETURN_IN[rPortId](w_X_RETURN_TO_LEFT[xWireId]);
-                    router_VC->o_DATA_OUT[rPortId](w_X_DATA_TO_RIGHT[xWireId]);
-                    router_VC->o_VALID_OUT[rPortId](w_X_VALID_TO_RIGHT[xWireId]);
-                    router_VC->i_RETURN_OUT[rPortId](w_X_RETURN_TO_RIGHT[xWireId]);
+                    router->i_DATA_IN[rPortId](w_X_DATA_TO_LEFT[xWireId]);
+                    router->i_VALID_IN[rPortId](w_X_VALID_TO_LEFT[xWireId]);
+                    router->o_RETURN_IN[rPortId](w_X_RETURN_TO_LEFT[xWireId]);
+                    router->o_DATA_OUT[rPortId](w_X_DATA_TO_RIGHT[xWireId]);
+                    router->o_VALID_OUT[rPortId](w_X_VALID_TO_RIGHT[xWireId]);
+                    router->i_RETURN_OUT[rPortId](w_X_RETURN_TO_RIGHT[xWireId]);
                     if( NUM_VC > 1 ) {
                         if( router_VC != NULL ) {
                             router_VC->i_VC_IN[rPortId](w_X_VC_SELECTOR_TO_LEFT[xWireId]);
@@ -204,12 +212,12 @@ SoCIN_3D::SoCIN_3D(sc_module_name mn)
                 if( useSouth ) {
                     yWireId = routerId - X_SIZE - (X_SIZE*z);
                     rPortId = useNorth + useEast + useSouth;
-                    router_VC->i_DATA_IN[rPortId](w_Y_DATA_TO_NORTH[yWireId]);
-                    router_VC->i_VALID_IN[rPortId](w_Y_VALID_TO_NORTH[yWireId]);
-                    router_VC->o_RETURN_IN[rPortId](w_Y_RETURN_TO_NORTH[yWireId]);
-                    router_VC->o_DATA_OUT[rPortId](w_Y_DATA_TO_SOUTH[yWireId]);
-                    router_VC->o_VALID_OUT[rPortId](w_Y_VALID_TO_SOUTH[yWireId]);
-                    router_VC->i_RETURN_OUT[rPortId](w_Y_RETURN_TO_SOUTH[yWireId]);
+                    router->i_DATA_IN[rPortId](w_Y_DATA_TO_NORTH[yWireId]);
+                    router->i_VALID_IN[rPortId](w_Y_VALID_TO_NORTH[yWireId]);
+                    router->o_RETURN_IN[rPortId](w_Y_RETURN_TO_NORTH[yWireId]);
+                    router->o_DATA_OUT[rPortId](w_Y_DATA_TO_SOUTH[yWireId]);
+                    router->o_VALID_OUT[rPortId](w_Y_VALID_TO_SOUTH[yWireId]);
+                    router->i_RETURN_OUT[rPortId](w_Y_RETURN_TO_SOUTH[yWireId]);
                     if(NUM_VC > 1) {
                         if( router_VC != NULL) {
                             router_VC->i_VC_IN[rPortId](w_Y_VC_SELECTOR_TO_NORTH[yWireId]);
@@ -223,12 +231,12 @@ SoCIN_3D::SoCIN_3D(sc_module_name mn)
                 if( useWest ) {
                     xWireId = routerId - y - 1 - (Y_SIZE*z);
                     rPortId = useNorth + useEast + useSouth + useWest;
-                    router_VC->i_DATA_IN[rPortId](w_X_DATA_TO_RIGHT[xWireId]);
-                    router_VC->i_VALID_IN[rPortId](w_X_VALID_TO_RIGHT[xWireId]);
-                    router_VC->o_RETURN_IN[rPortId](w_X_RETURN_TO_RIGHT[xWireId]);
-                    router_VC->o_DATA_OUT[rPortId](w_X_DATA_TO_LEFT[xWireId]);
-                    router_VC->o_VALID_OUT[rPortId](w_X_VALID_TO_LEFT[xWireId]);
-                    router_VC->i_RETURN_OUT[rPortId](w_X_RETURN_TO_LEFT[xWireId]);
+                    router->i_DATA_IN[rPortId](w_X_DATA_TO_RIGHT[xWireId]);
+                    router->i_VALID_IN[rPortId](w_X_VALID_TO_RIGHT[xWireId]);
+                    router->o_RETURN_IN[rPortId](w_X_RETURN_TO_RIGHT[xWireId]);
+                    router->o_DATA_OUT[rPortId](w_X_DATA_TO_LEFT[xWireId]);
+                    router->o_VALID_OUT[rPortId](w_X_VALID_TO_LEFT[xWireId]);
+                    router->i_RETURN_OUT[rPortId](w_X_RETURN_TO_LEFT[xWireId]);
                     if( NUM_VC > 1 ) {
                         if( router_VC != NULL ) {
                             router_VC->i_VC_IN[rPortId](w_X_VC_SELECTOR_TO_RIGHT[xWireId]);
@@ -242,12 +250,12 @@ SoCIN_3D::SoCIN_3D(sc_module_name mn)
                 if( useUp ) {
                     zWireId =  routerId;
                     rPortId = useNorth + useEast + useSouth + useWest + useUp;
-                    router_VC->i_DATA_IN[rPortId](w_Z_DATA_TO_DOWN[zWireId]);
-                    router_VC->i_VALID_IN[rPortId](w_Z_VALID_TO_DOWN[zWireId]);
-                    router_VC->o_RETURN_IN[rPortId](w_Z_RETURN_TO_DOWN[zWireId]);
-                    router_VC->o_DATA_OUT[rPortId](w_Z_DATA_TO_UP[zWireId]);
-                    router_VC->o_VALID_OUT[rPortId](w_Z_VALID_TO_UP[zWireId]);
-                    router_VC->i_RETURN_OUT[rPortId](w_Z_RETURN_TO_UP[zWireId]);
+                    router->i_DATA_IN[rPortId](w_Z_DATA_TO_DOWN[zWireId]);
+                    router->i_VALID_IN[rPortId](w_Z_VALID_TO_DOWN[zWireId]);
+                    router->o_RETURN_IN[rPortId](w_Z_RETURN_TO_DOWN[zWireId]);
+                    router->o_DATA_OUT[rPortId](w_Z_DATA_TO_UP[zWireId]);
+                    router->o_VALID_OUT[rPortId](w_Z_VALID_TO_UP[zWireId]);
+                    router->i_RETURN_OUT[rPortId](w_Z_RETURN_TO_UP[zWireId]);
                     if( NUM_VC > 1 ) {
                         if( router_VC != NULL ) {
                             router_VC->i_VC_IN[rPortId](w_Z_VC_SELECTOR_TO_DOWN[zWireId]);
@@ -261,12 +269,12 @@ SoCIN_3D::SoCIN_3D(sc_module_name mn)
                 if( useDown ) {
                     zWireId =  routerId - (X_SIZE*Y_SIZE);
                     rPortId = useNorth + useEast + useSouth + useWest + useUp + useDown;
-                    router_VC->i_DATA_IN[rPortId](w_Z_DATA_TO_UP[zWireId]);
-                    router_VC->i_VALID_IN[rPortId](w_Z_VALID_TO_UP[zWireId]);
-                    router_VC->o_RETURN_IN[rPortId](w_Z_RETURN_TO_UP[zWireId]);
-                    router_VC->o_DATA_OUT[rPortId](w_Z_DATA_TO_DOWN[zWireId]);
-                    router_VC->o_VALID_OUT[rPortId](w_Z_VALID_TO_DOWN[zWireId]);
-                    router_VC->i_RETURN_OUT[rPortId](w_Z_RETURN_TO_DOWN[zWireId]);
+                    router->i_DATA_IN[rPortId](w_Z_DATA_TO_UP[zWireId]);
+                    router->i_VALID_IN[rPortId](w_Z_VALID_TO_UP[zWireId]);
+                    router->o_RETURN_IN[rPortId](w_Z_RETURN_TO_UP[zWireId]);
+                    router->o_DATA_OUT[rPortId](w_Z_DATA_TO_DOWN[zWireId]);
+                    router->o_VALID_OUT[rPortId](w_Z_VALID_TO_DOWN[zWireId]);
+                    router->i_RETURN_OUT[rPortId](w_Z_RETURN_TO_DOWN[zWireId]);
                     if( NUM_VC > 1 ) {
                         if( router_VC != NULL ) {
                             router_VC->i_VC_IN[rPortId](w_Z_VC_SELECTOR_TO_UP[zWireId]);

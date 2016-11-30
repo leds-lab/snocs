@@ -20,10 +20,9 @@ Parameters::Parameters() {
 
     wordWidth = 34;
     ribWidth = 8;
-    trafficClassPosition = 18;
+    trafficClassPosition = 30;
     numberOfClasses = 8;
-    threadIdPosition = 30;
-    numberOfThreads = 4;
+    commandPosition = 27;
 
     numVirtualChannels = 0;
     fifoInDepth = 4;

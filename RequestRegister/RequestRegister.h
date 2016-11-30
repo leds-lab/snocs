@@ -158,8 +158,8 @@ inline void RequestRegister::p_INTERNAL_SIGNALS() {
     v_EOP = v_DATA[FLIT_WIDTH-1];   //v_data[FLIT_TYPE_WIDTH-1]  and (not v_data[FLIT_TYPE_WIDTH-2]);
 
     // It decodes the CS command (allocate and release)
-    v_CS_COMMAND[1] = v_DATA[RIB_WIDTH*2+1];
-    v_CS_COMMAND[0] = v_DATA[RIB_WIDTH*2];
+    v_CS_COMMAND[1] = v_DATA[CMD_POSITION];
+    v_CS_COMMAND[0] = v_DATA[CMD_POSITION-1];
     v_ALLOCATE      = (not v_CS_COMMAND[1]) and      v_CS_COMMAND[0];
     v_RELEASE       = (    v_CS_COMMAND[1]) and  not v_CS_COMMAND[0];
 
@@ -223,16 +223,6 @@ inline void RequestRegister::p_CIRCUIT_SET() {
     if (i_RST.read() == 1) {
         r_CIRCUIT_SET.write(0);
     } else {
-        // TODO: Verificar se esta implementação é mais adequada
-        /*
-        if( w_CIRCUIT_ALLOCATE.read() == 1 ) {
-            r_CIRCUIT_SET.write(1);
-        } else if( w_CIRCUIT_RELEASE.read() == 1 ) {
-            r_CIRCUIT_SET.write(0);
-        } else {
-            r_CIRCUIT_SET.write( r_CIRCUIT_SET.read() );
-        } */
-
         if ((w_CIRCUIT_ALLOCATE.read()==1) || (w_CIRCUIT_RELEASE.read()==1)) {
             if (w_CIRCUIT_ALLOCATE.read()==1) {
                 // If there is a CS_ALLOCATE command, it sets   the circuit

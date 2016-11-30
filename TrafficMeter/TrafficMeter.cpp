@@ -4,11 +4,13 @@
 TrafficMeter::TrafficMeter(sc_module_name mn,
                            char *workDir,
                            char *fileName,
-                           bool packetFormat3D)
+                           INoC::TopologyType topologyType,
+                           bool isExternal)
     : SoCINModule(mn),
       pckId(1),// TEMP
       workDir(workDir),outFileName(fileName), outFile(NULL),
-      packetFormat3D(packetFormat3D),
+      topologyType(topologyType),
+      isExternal(isExternal),
       i_CLK("TrafficMeter_iCLK"),
       i_RST("TrafficMeter_iRST"),
       i_EOS("TrafficMeter_iEOS"),
@@ -21,8 +23,7 @@ TrafficMeter::TrafficMeter(sc_module_name mn,
     this->initialize();
 
     unsigned short widthVcSelector = (unsigned short) ceil(log2(NUM_VC));
-    this->trafficClassWidth = (unsigned short) ceil(log2(NUMBER_TRAFFIC_CLASSES));
-    this->threadIdWidth = (unsigned short) ceil(log2(NUMBER_OF_THREADS));
+    this->trafficClassWidth = (unsigned short) ceil(log2(N_CLASSES));
 
     u_IFC = PLUGIN_MANAGER->inputFlowControlInstance("IFC_TM",0,0);
     u_IFC->i_CLK(i_CLK);
@@ -39,9 +40,6 @@ TrafficMeter::TrafficMeter(sc_module_name mn,
     if( NUM_VC > 1 ) {
         i_VC_SEL.init(widthVcSelector);
     }
-
-//    SC_CTHREAD(p_PROBE,i_CLK.pos());
-//    sensitive << i_CLK.pos() << i_RST.pos();
 
     SC_METHOD(p_PROBE);
     sensitive << u_IFC->e_PACKET_RECEIVED;
@@ -116,26 +114,15 @@ void TrafficMeter::writeInfo() {
     if( v_EOP ) {
         Packet* packet = dataFlit.packet_ptr;
         if(packet != NULL) { // For safe packet access
-            unsigned short xSrc  = (unsigned short) packetHeader(RIB_WIDTH*2-1, (RIB_WIDTH*2)-(RIB_WIDTH/2) ).to_uint();
-            unsigned short ySrc  = (unsigned short) packetHeader((RIB_WIDTH*2)-(RIB_WIDTH/2)-1,RIB_WIDTH).to_uint();
-            unsigned short src = COORDINATE_2D_TO_ID(xSrc,ySrc);
-            unsigned short xDest = (unsigned short) packetHeader(RIB_WIDTH-1,RIB_WIDTH/2).to_uint();
-            unsigned short yDest = (unsigned short) packetHeader(RIB_WIDTH/2-1,0).to_uint();
-            unsigned short dest = COORDINATE_2D_TO_ID(xDest,yDest);
-            unsigned short msbThreadId = (unsigned short) threadIdWidth != 0 ? THREAD_ID_POSITION + threadIdWidth-1 : THREAD_ID_POSITION;
-            unsigned short threadId = (unsigned short) packetHeader(msbThreadId,THREAD_ID_POSITION).to_uint();
-            unsigned short msbTrafficClassPos = trafficClassWidth != 0 ? TRAFFIC_CLASS_POSITION+trafficClassWidth-1 : TRAFFIC_CLASS_POSITION;
-            unsigned short trafficClass = (unsigned short) packetHeader(msbTrafficClassPos,TRAFFIC_CLASS_POSITION).to_uint();
-
+            unsigned short src  = this->getPacketSource();
+            unsigned short dest = this->getPacketDestination();
+            unsigned short trafficClass = (unsigned short) packetHeader(CLS_POS,CLS_POS-2).to_uint();
+            unsigned short flowId = (unsigned short) packetHeader(25,24).to_uint();
 //            fprintf(outFile,"%10lu\t"  , packet->packetId); // TEMP
             fprintf(outFile,"%10lu\t"  , pckId++);   // TEMP
-//            fprintf(outFile,"%2u\t"    , xSrc);
-//            fprintf(outFile,"%2u\t"    , ySrc);
             fprintf(outFile,"%4u\t"    , src);
-//            fprintf(outFile,"%2u\t"    , xDest);
-//            fprintf(outFile,"%2u\t"    , yDest);
             fprintf(outFile,"%4u\t"    , dest);
-            fprintf(outFile,"  %2u\t"  , threadId);
+            fprintf(outFile,"  %2u\t"  , flowId);
             fprintf(outFile,"  %2u\t"  , trafficClass);
             fprintf(outFile,"%10lu\t"  , packet->deadline);
             fprintf(outFile,"%10lu\t"  , packet->packetCreationCycle);
@@ -144,11 +131,50 @@ void TrafficMeter::writeInfo() {
             fprintf(outFile,"%5u\t"    , packet->payloadLength);
             fprintf(outFile,"  %.2f\t" , round(packet->requiredBW) );
             fprintf(outFile,"\n");
-            delete packet;
+            if(isExternal) {
+                delete packet;
+                packet = NULL;
+            }
         } else {
             std::cout << "Flit received without a valid packet reference." << std::endl
                       << "Please verify if in the flow generator on sending flit\n"
                          "if a packet is referenced (pointer assignment)" << std::endl;
         }
     }
+}
+
+unsigned short TrafficMeter::getPacketSource() {
+    switch ( topologyType ) {
+        case INoC::TT_Non_Orthogonal:
+            return packetHeader.range(RIB_WIDTH*2-1,RIB_WIDTH).to_uint();
+        case INoC::TT_Orthogonal2D: {
+            unsigned xSrc = packetHeader.range(RIB_WIDTH*2-1,RIB_WIDTH*2-RIB_WIDTH/2).to_uint();
+            unsigned ySrc = packetHeader.range(RIB_WIDTH*2-RIB_WIDTH/2-1,RIB_WIDTH).to_uint();
+            return COORDINATE_2D_TO_ID(xSrc,ySrc);
+        }
+        case INoC::TT_Orthogonal3D:
+            unsigned xSrc = packetHeader.range(15,13).to_uint();
+            unsigned ySrc = packetHeader.range(12,10).to_uint();
+            unsigned zSrc = packetHeader.range( 9, 8).to_uint();
+            return COORDINATE_3D_TO_ID(xSrc,ySrc,zSrc);
+    }
+    return 0;
+}
+
+unsigned short TrafficMeter::getPacketDestination() {
+    switch ( topologyType ) {
+        case INoC::TT_Non_Orthogonal:
+            return packetHeader.range(RIB_WIDTH-1,0).to_uint();
+        case INoC::TT_Orthogonal2D: {
+            unsigned xDst = packetHeader.range(RIB_WIDTH-1,RIB_WIDTH/2).to_uint();
+            unsigned yDst = packetHeader.range(RIB_WIDTH/2-1,0).to_uint();
+            return COORDINATE_2D_TO_ID(xDst,yDst);
+        }
+        case INoC::TT_Orthogonal3D:
+            unsigned xDst = packetHeader.range(7,5).to_uint();
+            unsigned yDst = packetHeader.range(4,2).to_uint();
+            unsigned zDst = packetHeader.range(1,0).to_uint();
+            return COORDINATE_3D_TO_ID(xDst,yDst,zDst);
+    }
+    return 0;
 }

@@ -221,10 +221,8 @@ inline void InputControllerBus::p_OUTPUTS() {
     UIntVar v_DATA;     // Used to extract fields from DATA_IN
     bool    v_BOP;      // Packet framing bit: Begin of packet
     bool    v_EOP;      // Packet framing bit: End of packet
-    UIntVar v_X_DEST(0,RIB_WIDTH);  // X-coordinate to destination
-    UIntVar v_Y_DEST(0,RIB_WIDTH);  // Y-coordinate to destination
 
-    UIntVar v_DESTINATION(0,numPorts); // The translated address from Mesh 2D to bus
+    UIntVar v_DESTINATION(0,numPorts); // IP Destionation address
 
     // It copies the data input to extract the framing and circuit switching commands/bits
     Flit f = i_DATA.read();
@@ -233,10 +231,6 @@ inline void InputControllerBus::p_OUTPUTS() {
     // It decodes the framing commands (bits)
     v_BOP = v_DATA[FLIT_WIDTH-2];
     v_EOP = v_DATA[FLIT_WIDTH-1];
-    v_X_DEST  = v_DATA.range(RIB_WIDTH-1,RIB_WIDTH/2);
-    v_Y_DEST  = v_DATA.range(RIB_WIDTH/2-1,0);
-
-    v_DESTINATION = COORDINATE_2D_TO_ID(v_X_DEST.to_uint(),v_Y_DEST.to_uint());
 
     // If RST == 1 disable arbiter request
     if( i_RST.read() == 1 ) {
@@ -249,6 +243,7 @@ inline void InputControllerBus::p_OUTPUTS() {
         // then enable request and get the destination address
         if( (i_READ_OK.read() == 1) && (v_BOP == 1) && (o_REQUEST.read() == 0) ) {
             o_REQUEST.write(1);
+            v_DESTINATION = v_DATA.range(RIB_WIDTH-1,0);
             for(unsigned short i = 0; i < numPorts; i++) {
                 if( i == v_DESTINATION ) {
                     o_DESTINATION[i].write(1);

@@ -11,25 +11,29 @@ Routing_XYZ::Routing_XYZ(sc_module_name mn,
     sensitive << i_READ_OK << i_DATA;
 }
 
+/*!
+ * \brief Routing_XYZ::p_REQUEST
+ * Routing XYZXY.
+ * Routes first Xtsv, second Ytsv, third Z, fourth Xdest, fifth Ydest.
+ */
 void Routing_XYZ::p_REQUEST() {
 
     UIntVar   v_DATA;                   // Used to extract fields from data
-    UIntVar   v_XDEST(0,RIB_WIDTH/2);   // x-coordinate
-    UIntVar   v_YDEST(0,RIB_WIDTH/2);   // y-coordinate
-    UIntVar   v_ZDEST(0,2);             // z-coordinate
+    UIntVar   v_X_DEST(0,3);            // x destination coordinate
+    UIntVar   v_Y_DEST(0,3);            // y destination coordinate
+    UIntVar   v_Z_DEST(0,2);            // z destination coordinate
+    UIntVar   v_X_TSV(0,3);             // x through silicon via coordinate
+    UIntVar   v_Y_TSV(0,3);             // y through silicon via coordinate
     bool      v_BOP;                    // packet framing bit: begin of packet
     bool      v_HEADER_PRESENT;         // A header is in the FIFO's output
     UIntVar   v_REQUEST(0,numPorts);    // Encoded request
-    short int v_X_offset, v_Y_offset,v_Z_offset;   // Aux. variables used for routing
+    short int v_X_TSV_offset,v_Y_TSV_offset,
+            v_X_offset, v_Y_offset,v_Z_offset;   // Aux. variables used for routing
 
-    // TODO Verificar extração dos campos - adicionar Z
     Flit f = i_DATA.read();
     v_DATA = f.data;
 
     // It extracts the RIB fields and the framing bits
-    v_XDEST = v_DATA.range(RIB_WIDTH-1+2, RIB_WIDTH/2+2);
-    v_YDEST = v_DATA.range(RIB_WIDTH/2-1+2,2);
-    v_ZDEST = v_DATA.range(1,0);
     v_BOP   = v_DATA[FLIT_WIDTH-2];
 
     // It determines if a header is present
@@ -41,26 +45,49 @@ void Routing_XYZ::p_REQUEST() {
 
     // It runs the routing algorithm
     if (v_HEADER_PRESENT) {
-        v_X_offset = (int) v_XDEST.to_int() - (int) XID;
-        v_Y_offset = (int) v_YDEST.to_int() - (int) YID;
-        v_Z_offset = (int) v_ZDEST.to_int() - (int) ZID;
-        if (v_X_offset != 0) {
+        // Extract the X, Y and Z address
+        v_X_TSV  = v_DATA.range(21,19);
+        v_Y_TSV  = v_DATA.range(18,16);
+        v_X_DEST = v_DATA.range(7,5);
+        v_Y_DEST = v_DATA.range(4,2);
+        v_Z_DEST = v_DATA.range(1,0);
+
+        v_X_TSV_offset = v_X_TSV.to_int() - (int) XID;
+        v_Y_TSV_offset = v_Y_TSV.to_int() - (int) YID;
+
+        v_X_offset = (int) v_X_DEST.to_int() - (int) XID;
+        v_Y_offset = (int) v_Y_DEST.to_int() - (int) YID;
+        v_Z_offset = (int) v_Z_DEST.to_int() - (int) ZID;
+
+        if (v_X_TSV_offset != 0) { // First X tsv
+            if (v_X_TSV_offset > 0) {
+                v_REQUEST = REQ_E;
+            } else {
+                v_REQUEST = REQ_W;
+            }
+        } else if (v_Y_TSV_offset != 0) { // Second Y tsv
+            if (v_Y_TSV_offset > 0) {
+                v_REQUEST = REQ_N;
+            } else {
+                v_REQUEST = REQ_S;
+            }
+        } else if(v_Z_offset != 0) { // Third Z
+            if(v_Z_offset > 0) {
+                v_REQUEST = REQ_U;
+            } else {
+                v_REQUEST = REQ_D;
+            }
+        } else if (v_X_offset != 0) { // Fourth X
             if (v_X_offset > 0) {
                 v_REQUEST = REQ_E;
             } else {
                 v_REQUEST = REQ_W;
             }
-        } else if (v_Y_offset != 0) {
+        } else if (v_Y_offset != 0) { // Fifth Y
             if (v_Y_offset > 0) {
                 v_REQUEST = REQ_N;
             } else {
                 v_REQUEST = REQ_S;
-            }
-        } else if(v_Z_offset != 0) {
-            if(v_Z_offset > 0) {
-                v_REQUEST = REQ_U;
-            } else {
-                v_REQUEST = REQ_D;
             }
         } else { // X == Y == Z == 0
             v_REQUEST = REQ_L;
@@ -70,7 +97,9 @@ void Routing_XYZ::p_REQUEST() {
     }
 #ifdef DEBUG_ROUTING
         std::cout << "\n[Routing_XYZ]"
-                  << " Local(" << XID << "," << YID << "," << ZID << ") -> Dest(" << v_XDEST << "," << v_YDEST << "," << v_ZDEST << ") "
+                  << " Local(" << XID << "," << YID << "," << ZID
+                  << ") -> DestTSV(" << v_X_TSV << "," << v_Y_TSV
+                  << ") - Dest(" << v_X_DEST << "," << v_Y_DEST << "," << v_Z_DEST << ") "
                   << ", Req: ";
         if(v_REQUEST == REQ_L) {
             std::cout << "LOCAL";

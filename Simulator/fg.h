@@ -10,6 +10,8 @@
 #include <systemc.h>
 #include "../SoCINDefines.h"
 
+#include "../NoC/NoC.h"
+
 #ifdef RIB_WIDTH
 #undef RIB_WIDTH
 #define RIB_WIDTH 8
@@ -18,8 +20,9 @@
 
 SC_MODULE(fg)
 {
+    INoC::TopologyType topologyType;
+
     unsigned short vcWidth;
-    bool packetFormat3D;
     // INTERFACE
     // System signals
     sc_in<bool>               clk;
@@ -71,8 +74,10 @@ SC_MODULE(fg)
 
     // Member functions
     void f_send_flit(Flit , unsigned int);
-    void f_send_packet(sc_uint<RIB_WIDTH> , unsigned long long, FLOW_TYPE, unsigned long long, unsigned int);
-    void f_send_burst_of_packets(sc_uint<RIB_WIDTH> , unsigned long long, FLOW_TYPE);
+    void f_send_packet(unsigned short nodeId, unsigned long long, FLOW_TYPE, unsigned long long, unsigned int);
+    void f_send_burst_of_packets(unsigned short nodeId , unsigned long long, FLOW_TYPE);
+
+    UIntVar getHeaderAddresses(unsigned short src, unsigned short destination);
 
     unsigned short nb_cycles_per_flit;
 
@@ -80,10 +85,10 @@ SC_MODULE(fg)
     //////////////////////////////////////////////////////////////////////////////
     fg(sc_module_name nm,
        unsigned short int FG_ID,
-       bool packetFormat3D,
+       INoC::TopologyType topologyType,
        unsigned short nb_cycles_per_flit) :
         sc_module(nm),
-        packetFormat3D(packetFormat3D),
+        topologyType(topologyType),
         FG_ID(FG_ID),
         nb_cycles_per_flit(nb_cycles_per_flit)
     //////////////////////////////////////////////////////////////////////////////

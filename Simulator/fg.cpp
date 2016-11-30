@@ -16,11 +16,6 @@
 #define VAR_BST_FXD_IAT 5
 
 #define HEADER_LENGTH 1
-//#define REQUIRED_BW_POSITION    22
-//#define TRAFFIC_CLASS_POSITION  18
-//#define PACKET_TYPE_POSITION    16
-//#define FLOW_ID_POSITION        FLIT_WIDTH-4
-//#define MIN_PAYLOAD_LENGTH      4
 
 // Switching types
 #define WH 0
@@ -33,6 +28,48 @@
 #define GRANT   3
 
 //#define DEBUG
+
+UIntVar fg::getHeaderAddresses(unsigned short src,unsigned short dst) {
+
+    UIntVar rib;
+
+    // Can be used absolute positions as 3D
+    switch ( topologyType ) {
+        case INoC::TT_Non_Orthogonal:
+            rib.range(RIB_WIDTH*2-1,RIB_WIDTH) = src;
+            rib.range(RIB_WIDTH-1,0) = dst;
+            break;
+        case INoC::TT_Orthogonal2D: {
+            unsigned xSrc = ID_TO_COORDINATE_2D_X(src);
+            unsigned ySrc = ID_TO_COORDINATE_2D_Y(src);
+            unsigned xDst = ID_TO_COORDINATE_2D_X(dst);
+            unsigned yDst = ID_TO_COORDINATE_2D_Y(dst);
+            rib.range(RIB_WIDTH*2-1,RIB_WIDTH*2-RIB_WIDTH/2) = xSrc;
+            rib.range(RIB_WIDTH*2-RIB_WIDTH/2-1,RIB_WIDTH) = ySrc;
+            rib.range(RIB_WIDTH-1,RIB_WIDTH/2) = xDst;
+            rib.range(RIB_WIDTH/2-1,0) = yDst;
+            break;
+        }
+        case INoC::TT_Orthogonal3D:
+            unsigned xSrc = ID_TO_COORDINATE_3D_X(src);
+            unsigned ySrc = ID_TO_COORDINATE_3D_Y(src);
+            unsigned zSrc = ID_TO_COORDINATE_3D_Z(src);
+            unsigned xDst = ID_TO_COORDINATE_3D_X(dst);
+            unsigned yDst = ID_TO_COORDINATE_3D_Y(dst);
+            unsigned zDst = ID_TO_COORDINATE_3D_Z(dst);
+            rib.range(21,19) = xDst;    // TSV - The same X dst because consider that all routers have TSV
+            rib.range(18,16) = yDst;    // TSV - The same Y dst ...
+            rib.range(15,13) = xSrc;
+            rib.range(12,10) = ySrc;
+            rib.range( 9, 8) = zSrc;
+            rib.range( 7, 5) = xDst;
+            rib.range( 4, 2) = yDst;
+            rib.range( 1, 0) = zDst;
+            break;
+    }
+
+    return rib;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 void fg::f_send_flit(Flit flit, unsigned int traffic_class)
@@ -62,31 +99,22 @@ void fg::f_send_flit(Flit flit, unsigned int traffic_class)
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send, FLOW_TYPE flow,
+void fg::f_send_packet(unsigned short nodeId, unsigned long long cycle_to_send, FLOW_TYPE flow,
                        unsigned long long payload_length, unsigned int packet_type)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 {
-    UIntVar flit;           // Auxiliary variable to build the flit to be sent (FLIT_WIDTH is defined in parameters.h)
-
-    unsigned short nodeId = rib.to_uint(); // Node id
-    UIntVar src,dest;                      // Address of the srd and destination node
-
     if ( (FLIT_WIDTH-2) < (2*RIB_WIDTH + 7)) {
         printf("\n\t[fg.cpp] ERROR: Data channel width should be greater or equal to %d bits\t",2*RIB_WIDTH + 7);
         exit(1);
     }
 
-    // It calculates the address of the source and destination from id to coordinates
-    unsigned short xSrc  = ID_TO_COORDINATE_2D_X(nodeId);
-    unsigned short ySrc  = ID_TO_COORDINATE_2D_Y(nodeId);
-    src = (sc_uint<RIB_WIDTH>) (xSrc << (RIB_WIDTH/2) | ySrc);
-    unsigned short xDest = ID_TO_COORDINATE_2D_X(flow.destination);
-    unsigned short yDest = ID_TO_COORDINATE_2D_Y(flow.destination);
-    dest = (sc_uint<RIB_WIDTH>)(xDest << (RIB_WIDTH/2) | yDest);
-
-    if( src == dest ) {
-        std::cout << "\n[FlowGenerator] WARNING: The packet source and destination are the same - FG: " << FG_ID;
+    if( nodeId == flow.destination ) { // The destination is the same as source address
+        std::cout << "\n[FlowGenerator] WARNING: The packet source and destination are the same - FG: "
+                  << FG_ID << "\n. \t\t Aborting the simulation!" << std::endl;
+        sc_stop();
     }
+
+    UIntVar flit(0,FLIT_WIDTH); // Auxiliary variable to build the flit to be sent (FLIT_WIDTH is defined in Parameters.h)
 
     Packet* packet = new Packet;
     packet->requiredBW = flow.required_bw;
@@ -95,21 +123,18 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     packet->packetId = PARAMS->pckId++;
     packet->payloadLength = payload_length;
 
-    UIntVar framing = 0;
-    framing[ FLIT_WIDTH-2 ] = 1;
-
     /////////////////// Header ///////////////////
-    // It sends the header
-    flit =  ( (framing)
-              | ((flow.flow_id &0x3) << (THREAD_ID_POSITION) )
-              | ((flow.traffic_class & 0x7) << TRAFFIC_CLASS_POSITION)
-              | ((packet_type & 0x3) << PACKET_TYPE_POSITION)
-              | (src << RIB_WIDTH)
-              | dest );
+    flit = getHeaderAddresses(nodeId,flow.destination);    // Get Addressing according the topology type
+    flit[FLIT_WIDTH-2] = 1;                                // BOP high - Header
+    flit.range(CMD_POSITION,CMD_POSITION-1) = packet_type; // Switching (NORMAL, ALLOC, RELEASE, GRANT)
+    flit.range(CLS_POS,CLS_POS-2) = flow.traffic_class;    // Traffic Class
+    flit.range(FID_POS,FID_POS-1) = flow.flow_id;          // Flow id
 
+    // It sends the header
     Flit headerFlit;
     headerFlit.data = flit;
     headerFlit.packet_ptr = packet;
+    std::cout << "\n[FG] Sending Header flit: " << headerFlit;
     f_send_flit(headerFlit, flow.traffic_class); // Send header
 
     /////////////////// Payload ///////////////////
@@ -123,10 +148,8 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
     /////////////////// Trailer ///////////////////
     // It sends the trailer flit: the lowest word with "Bye" string
     char msg[4] = "Bye"; // 4 bytes -> [0]: B , [1]: y, [2]: e, [3]: \0
-    framing = 0;
-    framing[FLIT_WIDTH-1] = 1;
-    //   =   Trailer | ASCI:  B       |        y       |       e       |   \0
-    flit = ( framing | (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
+    //   =         Trailer       | ASCI:  B       |        y       |       e       |   \0
+    flit = ( (1 << (FLIT_WIDTH-1)) | (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
 
     Flit trailer;
     trailer.data = flit;
@@ -136,17 +159,17 @@ void fg::f_send_packet(sc_uint<RIB_WIDTH> rib, unsigned long long cycle_to_send,
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void fg::f_send_burst_of_packets(sc_uint<RIB_WIDTH> header, unsigned long long cycle_to_send, FLOW_TYPE flow)
+void fg::f_send_burst_of_packets(unsigned short nodeId, unsigned long long cycle_to_send, FLOW_TYPE flow)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 {
     unsigned int i;
 
     for (i=0; i<flow.burst_size-1;i++) {
-        f_send_packet(header, cycle_to_send, flow, flow.payload_length, NORMAL);
+        f_send_packet(nodeId, cycle_to_send, flow, flow.payload_length, NORMAL);
         cycle_to_send += (flow.payload_length+HEADER_LENGTH) * nb_cycles_per_flit;
     }
     if (flow.last_payload_length!=0)
-        f_send_packet(header, cycle_to_send, flow, flow.last_payload_length, NORMAL);
+        f_send_packet(nodeId, cycle_to_send, flow, flow.last_payload_length, NORMAL);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

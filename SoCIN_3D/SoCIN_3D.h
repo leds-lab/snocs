@@ -42,7 +42,7 @@ public:
     SoCIN_3D(sc_module_name mn);
 
     const char* moduleName() const { return "SoCIN-3D"; }
-    bool isTopology3D() const { return true; }
+    TopologyType topologyType() const { return INoC::TT_Orthogonal3D; }
 
     ~SoCIN_3D();
 };

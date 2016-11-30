@@ -16,8 +16,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 --------------------------------------------------------------------------------
 */
 
-#ifndef SOCINDEFINES_H
-#define SOCINDEFINES_H
+#ifndef __SOCINDEFINES_H__
+#define __SOCINDEFINES_H__
 
 #include <systemc>
 #include "Parameters/Parameters.h"
@@ -314,4 +314,4 @@ public:
 /////////////////////////////////////////////////////////////////////////
 
 
-#endif // SOCINDEFINES_H
+#endif // __SOCINDEFINES_H__

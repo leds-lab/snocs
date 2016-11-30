@@ -22,6 +22,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #include "../SoCINModule.h"
 #include "../SoCINDefines.h"
 
+#include "../NoC/NoC.h"
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////
@@ -35,6 +37,7 @@ class IRouting : public SoCINModule {
 protected:
     unsigned short numPorts;
 public:
+
     // FIFO interface
     sc_in<bool> i_READ_OK;  // FIFO has a data to be read (not empty)
     sc_in<Flit> i_DATA;     // FIFO data output
@@ -58,6 +61,7 @@ public:
           ROUTER_ID(ROUTER_ID) {}
 
     ModuleType moduleType() const { return SoCINModule::TRouting; }
+    virtual INoC::TopologyType supportedTopology() const = 0;
 
     ~IRouting() = 0;
 };
@@ -135,6 +139,8 @@ public:
             }
         }
     }
+
+    INoC::TopologyType supportedTopology() const { return INoC::TT_Orthogonal2D; }
 
     ~IOrthogonal2DRouting() = 0;
 };
@@ -229,6 +235,8 @@ public:
             }
         }
     }
+
+    INoC::TopologyType supportedTopology() const { return INoC::TT_Orthogonal3D; }
 
     ~IOrthogonal3DRouting() = 0;
 };

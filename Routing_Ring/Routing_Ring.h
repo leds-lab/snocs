@@ -20,6 +20,7 @@ public:
                  unsigned short ROUTER_ID);
 
     const char* moduleName() const { return "Routing_Ring"; }
+    INoC::TopologyType supportedTopology() const { return INoC::TT_Non_Orthogonal; }
 };
 
 #endif // __ROUTING_RING_H__

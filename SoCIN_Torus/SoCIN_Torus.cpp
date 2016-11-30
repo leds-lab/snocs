@@ -23,6 +23,12 @@ SoCIN_Torus::SoCIN_Torus(sc_module_name mn)
       w_Y_RETURN_TO_NORTH("w_Y_RETURN_TO_NORTH"),
       w_Y_VC_SELECTOR_TO_NORTH("w_Y_VC_SELECTOR_TO_NORTH")
 {
+    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
+    if(tester != NULL) {
+        if( tester->supportedTopology() != this->topologyType() ) {
+            throw std::runtime_error("[SoCIN_Torus] Routing incompatible with the topology");
+        }
+    }
     // Allocating the number of routers needed
     u_ROUTER.resize(numInterfaces,NULL);
 
@@ -78,7 +84,7 @@ SoCIN_Torus::SoCIN_Torus(sc_module_name mn)
             // Instantiating a router
             IRouter* router = PLUGIN_MANAGER->routerInstance(rName,routerId,5,NUM_VC);
             if(router == NULL) {
-                std::cout << "\n\t[SoCIN_Torus] -- ERROR: It was not possible instantiate a router." << std::endl;
+                throw std::runtime_error("[SoCIN_Torus] -- ERROR: It was not possible instantiate a router.");
                 return;
             }
             IRouter_VC* router_VC = dynamic_cast<IRouter_VC *>(router);
@@ -100,8 +106,7 @@ SoCIN_Torus::SoCIN_Torus(sc_module_name mn)
                     router_VC->i_VC_IN[0](i_VC_SELECTOR[routerId]);
                     router_VC->o_VC_OUT[0](o_VC_SELECTOR[routerId]);
                 } else {
-                    std::cout << "\n\t[SoCIN_Torus] -- ERROR: The router instantiated is not a VC router." << std::endl;
-                    return;
+                    throw std::runtime_error("[SoCIN_Torus] -- ERROR: The router instantiated is not a VC router.");
                 }
             }
 
@@ -120,8 +125,7 @@ SoCIN_Torus::SoCIN_Torus(sc_module_name mn)
                     router_VC->i_VC_IN[rPortId](w_Y_VC_SELECTOR_TO_SOUTH[yWireId]);
                     router_VC->o_VC_OUT[rPortId](w_Y_VC_SELECTOR_TO_NORTH[yWireId]);
                 } else {
-                    std::cout << "\n\t[SoCIN_Torus] -- ERROR: The router instantiated is not a VC router." << std::endl;
-                    return;
+                    throw std::runtime_error("[SoCIN_Torus] -- ERROR: The router instantiated is not a VC router.");
                 }
             }
 
@@ -139,8 +143,7 @@ SoCIN_Torus::SoCIN_Torus(sc_module_name mn)
                     router_VC->i_VC_IN[rPortId](w_X_VC_SELECTOR_TO_LEFT[xWireId]);
                     router_VC->o_VC_OUT[rPortId](w_X_VC_SELECTOR_TO_RIGHT[xWireId]);
                 } else {
-                    std::cout << "\n\t[SoCIN_Torus] -- ERROR: The router instantiated is not a VC router." << std::endl;
-                    return;
+                    throw std::runtime_error("[SoCIN_Torus] -- ERROR: The router instantiated is not a VC router.");
                 }
             }
 
@@ -158,8 +161,7 @@ SoCIN_Torus::SoCIN_Torus(sc_module_name mn)
                     router_VC->i_VC_IN[rPortId](w_Y_VC_SELECTOR_TO_NORTH[yWireId]);
                     router_VC->o_VC_OUT[rPortId](w_Y_VC_SELECTOR_TO_SOUTH[yWireId]);
                 } else {
-                    std::cout << "\n\t[SoCIN_Torus] -- ERROR: The router instantiated is not a VC router." << std::endl;
-                    return;
+                    throw std::runtime_error("[SoCIN_Torus] -- ERROR: The router instantiated is not a VC router.");
                 }
             }
 
@@ -177,8 +179,7 @@ SoCIN_Torus::SoCIN_Torus(sc_module_name mn)
                     router_VC->i_VC_IN[rPortId](w_X_VC_SELECTOR_TO_RIGHT[xWireId]);
                     router_VC->o_VC_OUT[rPortId](w_X_VC_SELECTOR_TO_LEFT[xWireId]);
                 } else {
-                    std::cout << "\n\t[SoCIN_Torus] -- ERROR: The router instantiated is not a VC router." << std::endl;
-                    return;
+                    throw std::runtime_error("[SoCIN_Torus] -- ERROR: The router instantiated is not a VC router.");
                 }
             }
 
@@ -344,7 +345,12 @@ extern "C" {
         // done before component instantiation.
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
-        return new SoCIN_Torus(moduleName);
+        try {
+            return new SoCIN_Torus(moduleName);
+        } catch(const std::runtime_error& error) {
+            std::cout << "Error to allocate the NoC: " << error.what() << std::endl;
+            return NULL;
+        }
     }
     SS_EXP void delete_NoC(INoC* noc) {
         delete noc;

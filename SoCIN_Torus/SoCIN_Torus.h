@@ -34,7 +34,7 @@ public:
     SoCIN_Torus(sc_module_name mn);
 
     const char* moduleName() const { return "SoCIN_Torus"; }
-    bool isTopology3D() const { return false; }
+    TopologyType topologyType() const { return INoC::TT_Orthogonal2D; }
 
     ~SoCIN_Torus();
 };

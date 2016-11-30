@@ -40,7 +40,7 @@ public:
     SoCINfp_VC(sc_module_name mn);
 
     const char* moduleName() const { return "SoCINfp_VC"; }
-    bool isTopology3D() const { return false; }
+    TopologyType topologyType() const { return INoC::TT_Orthogonal2D; }
     ~SoCINfp_VC();
 };
 
@@ -77,7 +77,7 @@ public:
     SoCINfp(sc_module_name mn);
 
     const char* moduleName() const { return "SoCINfp"; }
-    bool isTopology3D() const { return false; }
+    TopologyType topologyType() const { return INoC::TT_Orthogonal2D; }
 
     ~SoCINfp();
 };

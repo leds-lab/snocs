@@ -1,9 +1,10 @@
 CONFIG -= qt
 CONFIG -= app_bundle
 CONFIG += console
+CONFIG += exceptions
 CONFIG += c++11
 
-SYSTEMC_PATH = C:/SystemC
+SYSTEMC_PATH =
 isEmpty(SYSTEMC_PATH) {
     error("SYSTEMC_PATH not defined. Please fix it (file: common.pri)")
 }

@@ -19,20 +19,17 @@ Routing_Ring::Routing_Ring(sc_module_name mn,
  * \brief Routing_Ring::p_REQUEST Process that generate the requests
  */
 void Routing_Ring::p_REQUEST() {
-    UIntVar   v_DATA;                   // Used to extract fields from data
-    UIntVar   v_XDEST(0,RIB_WIDTH/2);   // x-coordinate
-    UIntVar   v_YDEST(0,RIB_WIDTH/2);   // y-coordinate
-    bool      v_BOP;                    // packet framing bit: begin of packet
-    bool      v_HEADER_PRESENT;         // A header is in the FIFO's output
-    UIntVar   v_REQUEST(0,numPorts);    // Encoded request
-    short int v_LOCAL, v_DEST, v_OFFSET;// Aux. variables used for routing
+    UIntVar   v_DATA;               // Used to extract fields from data
+    UIntVar   v_DEST(0,RIB_WIDTH);  // Destination address
+    bool      v_BOP;                // packet framing bit: begin of packet
+    bool      v_HEADER_PRESENT;     // A header is in the FIFO's output
+    UIntVar   v_REQUEST(0,numPorts);// Encoded request
+    int v_LOCAL, v_OFFSET;    // Aux. variables used for routing
 
     Flit f = i_DATA.read();
     v_DATA = f.data;
 
     // It extracts the RIB fields and the framing bits
-    v_XDEST = v_DATA.range(RIB_WIDTH-1, RIB_WIDTH/2);
-    v_YDEST = v_DATA.range(RIB_WIDTH/2-1,0);
     v_BOP   = v_DATA[FLIT_WIDTH-2];
 
     // It determines if a header is present
@@ -45,10 +42,11 @@ void Routing_Ring::p_REQUEST() {
     // It runs the routing algorithm
     if (v_HEADER_PRESENT) {
         unsigned short v_LAST_ID = X_SIZE * Y_SIZE - 1;
-        v_LOCAL = ROUTER_ID;
-        v_DEST  = COORDINATE_2D_TO_ID(v_XDEST.to_int(),v_YDEST.to_int());
 
-        v_OFFSET = v_DEST - v_LOCAL;
+        v_LOCAL = ROUTER_ID;
+        v_DEST = v_DATA.range(RIB_WIDTH-1, 0);
+
+        v_OFFSET = v_DEST.to_int() - v_LOCAL;
 
         if (v_OFFSET != 0) {
             if (v_OFFSET > 0) {

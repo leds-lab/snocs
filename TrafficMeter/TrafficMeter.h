@@ -20,6 +20,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #include "../SoCINModule.h"
 #include "../SoCINDefines.h"
 #include "../FlowControl/FlowControl.h"
+#include "../NoC/NoC.h"
 
 /*!
  * \brief The TrafficMeter class implements a link traffic meter
@@ -36,12 +37,12 @@ protected:
     FILE* outFile;          // File of the log
 
     unsigned short trafficClassWidth;    // Width of the field traffic class in the header flit
-    unsigned short threadIdWidth;        // Width of the fielad thread id in the header flit
 
     UIntVar packetHeader;
     unsigned long cycleOfArriving;
 
-    bool packetFormat3D;
+    INoC::TopologyType topologyType;
+    bool isExternal;                    // Flag to indicates if the traffic meter is external of the network.
 public:
     // Interface
     // System signals
@@ -74,11 +75,15 @@ public:
     sc_signal<bool> w_RETURN;
     sc_signal<bool> w_WRITE;
 
+    unsigned short getPacketSource();
+    unsigned short getPacketDestination();
+
     SC_HAS_PROCESS(TrafficMeter);
     TrafficMeter(sc_module_name mn,
                  char* workDir,
                  char* fileName,
-                 bool packetFormat3D);
+                 INoC::TopologyType topologyType,
+                 bool isExternal);
 
     ModuleType moduleType() const { return SoCINModule::TTrafficMeter; }
     const char* moduleName() const { return "TrafficMeter"; }

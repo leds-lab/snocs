@@ -35,6 +35,13 @@ SoCINfp_VC::SoCINfp_VC(sc_module_name mn)
       w_Y_RETURN_TO_NORTH("w_Y_RETURN_TO_NORTH"),
       w_Y_VC_SELECTOR_TO_NORTH("w_Y_VC_SELECTOR_TO_NORTH")
 {
+    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
+    if(tester != NULL) {
+        if( tester->supportedTopology() != this->topologyType() ) {
+            throw std::runtime_error("[SoCINfp_VC] Routing incompatible with the topology");
+        }
+    }
+
     // Allocating the number of routers needed
     u_ROUTER.resize( (X_SIZE*Y_SIZE) , NULL);
     unsigned short numberOfXWires = (X_SIZE-1) * Y_SIZE;
@@ -96,13 +103,11 @@ SoCINfp_VC::SoCINfp_VC(sc_module_name mn)
             // Instantiating a router
             IRouter* router = PLUGIN_MANAGER->routerInstance(rName,routerId,nPorts,NUM_VC);
             if( router == NULL ) {
-                std::cout << "\n\t[SoCINfp_VC] -- ERROR: It was not possible instantiate a router." << std::endl;
-                return;
+                throw std::runtime_error("[SoCINfp_VC] -- ERROR: It was not possible instantiate a router.");
             }
             IRouter_VC* router_VC = dynamic_cast<IRouter_VC *>(router);
             if( router_VC == NULL ) {
-                std::cout << "\n\t[SoCINfp_VC] -- ERROR: the router instantiated is not a VC router." << std::endl;
-                return;
+                throw std::runtime_error("[SoCINfp_VC] -- ERROR: the router instantiated is not a VC router.");
             }
 
             // Binding ports of the router
@@ -381,6 +386,12 @@ SoCINfp::SoCINfp(sc_module_name mn)
       w_Y_VALID_TO_NORTH("w_Y_VALID_OUT"),
       w_Y_RETURN_TO_NORTH("w_Y_RETURN_OUT")
 {
+    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
+    if(tester != NULL) {
+        if( tester->supportedTopology() != this->topologyType() ) {
+            throw std::runtime_error("[SoCINfp] Routing incompatible with the topology");
+        }
+    }
     // Allocating the number of routers needed
     u_ROUTER.resize( (X_SIZE*Y_SIZE) , NULL);
 
@@ -431,8 +442,7 @@ SoCINfp::SoCINfp(sc_module_name mn)
             // Instantiating a router
             IRouter* router = PLUGIN_MANAGER->routerInstance(rName,routerId,nPorts,0);
             if( router == NULL ) {
-                std::cout << "\n\t[SoCINfp_VC] -- ERROR: Not possible instantiate a router." << std::endl;
-                return;
+                throw std::runtime_error("[SoCINfp] -- ERROR: Not possible instantiate a router.");
             }
 
             // Binding ports of the router
@@ -642,9 +652,19 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
         if( NUM_VC > 1 ) {
-            return new SoCINfp_VC(moduleName);
+            try {
+                return new SoCINfp_VC(moduleName);
+            } catch (const std::runtime_error& error) {
+                std::cout << "Error to allocate the NoC: " << error.what() << std::endl;
+                return NULL;
+            }
         } else {
-            return new SoCINfp(moduleName);
+            try {
+                return new SoCINfp(moduleName);
+            } catch(const std::runtime_error& error) {
+                std::cout << "Error to allocate the NoC: " << error.what() << std::endl;
+                return NULL;
+            }
         }
 
     }

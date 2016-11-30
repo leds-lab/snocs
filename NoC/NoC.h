@@ -51,6 +51,11 @@ class INoC : public SoCINModule {
 protected:
     unsigned short numInterfaces;
 public:
+
+    enum TopologyType { TT_Non_Orthogonal = 0,
+                        TT_Orthogonal2D,
+                        TT_Orthogonal3D };
+
     inline unsigned short getNumberOfInterfaces() const { return this->numInterfaces; }
     // INTERFACE
     // System signals
@@ -69,7 +74,7 @@ public:
     std::vector<IRouter *> u_ROUTER; // ATTENTION: Initialize the vector size (use resize) or use
                                      // append|insert for the routers instantiated
 
-    virtual bool isTopology3D() const = 0; // Identify if the NoC topology is 3-dimensional
+    virtual TopologyType topologyType() const = 0; // Identify the NoC topology type
 
     INoC(sc_module_name mn,unsigned short nInterfaces);
 

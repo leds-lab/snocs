@@ -12,7 +12,7 @@ public:
     SoCIN_Unit(sc_module_name mn);
 
     const char* moduleName() const { return "SoCIN_SingleUnit"; }
-    bool isTopology3D() const { return false; }
+    TopologyType topologyType() const { return INoC::TT_Non_Orthogonal; }
 
     ~SoCIN_Unit();
 };

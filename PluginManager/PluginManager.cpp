@@ -20,7 +20,6 @@ std::string removeChar(std::string& str, char toRemove) {
 ///////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////// Plugin Loader ////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
-// TODO: Verificar necessidade de passar o contexto de simulação do SystemC sc_curr_simcontext
 PluginLoader::PluginLoader(std::string fileName, std::string pluginName)
     : libHandler(0),fileName(fileName),pluginName(pluginName),loaded(false)
 {}
@@ -219,7 +218,6 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::TNoC: {
                 INoC* n = dynamic_cast<INoC* >(module);
                 if( n != NULL) {
-//                    std::cout << "Free - NoC" << std::endl;
                     this->destroyNoC(n);
                 }
                 break;
@@ -227,7 +225,6 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::TRouter: {
                 IRouter* r = dynamic_cast<IRouter*>(module);
                 if( r != NULL ) {
-//                    std::cout << "Free - Router" << std::endl;
                     this->destroyRouter(r);
                 }
                 break;
@@ -235,7 +232,6 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::TRouting:{
                 IRouting* r = dynamic_cast<IRouting*>(module);
                 if( r != NULL ) {
-//                    std::cout << "Free - Routing" << std::endl;
                     this->destroyRouting(r);
                 }
                 break;
@@ -243,7 +239,6 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::TInputFlowControl: {
                 IInputFlowControl* ifc = dynamic_cast<IInputFlowControl*>(module);
                 if( ifc != NULL ) {
-//                    std::cout << "Free - IFC" << std::endl;
                     this->destroyInputFlowControl(ifc);
                 }
                 break;
@@ -251,7 +246,6 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::TOutputFlowControl:{
                 IOutputFlowControl* ofc = dynamic_cast<IOutputFlowControl*>(module);
                 if( ofc != NULL ) {
-//                    std::cout << "Free - OFC" << std::endl;
                     this->destroyOutputFlowControl(ofc);
                 }
                 break;
@@ -259,7 +253,6 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::TMemory: {
                 IMemory* mem = dynamic_cast<IMemory*>(module);
                 if( mem != NULL ) {
-//                    std::cout << "Free - Memory" << std::endl;
                     this->destroyMemory(mem);
                 }
                 break;
@@ -267,7 +260,6 @@ void PluginManager::deallocateUnits() {
             case SoCINModule::TPriorityGenerator: {
                 IPriorityGenerator* pg = dynamic_cast<IPriorityGenerator*>(module);
                 if( pg != NULL ) {
-//                    std::cout << "Free - PG" << std::endl;
                     this->destroyPriorityGenerator(pg);
                 }
                 break;
@@ -294,7 +286,9 @@ INoC* PluginManager::nocInstance(sc_module_name name) {
         return NULL;
     }
     INoC* n = new_NoC(sc_get_curr_simcontext(),name);
-    this->allocatedUnits.push_back(n);
+    if(n) {
+        this->allocatedUnits.push_back(n);
+    }
     return n;
 }
 
@@ -314,7 +308,9 @@ IRouter* PluginManager::routerInstance(sc_module_name name,
        return NULL;
     }
     IRouter* r = new_Router(sc_get_curr_simcontext(),name,nPorts,nVirtualChannels,ROUTER_ID);
-    this->allocatedUnits.push_back(r);
+    if(r) {
+        this->allocatedUnits.push_back(r);
+    }
     return r;
 }
 
@@ -333,7 +329,9 @@ IRouting* PluginManager::routingInstance(sc_core::sc_module_name name,
        return NULL;
     }
     IRouting* r = new_Routing(sc_get_curr_simcontext(),name,nPorts,ROUTER_ID);
-    this->allocatedUnits.push_back(r);
+    if(r) {
+        this->allocatedUnits.push_back(r);
+    }
     return r;
 }
 
@@ -352,7 +350,9 @@ IInputFlowControl* PluginManager::inputFlowControlInstance(sc_core::sc_module_na
        return NULL;
     }
     IInputFlowControl* ifc = new_IFC(sc_get_curr_simcontext(),name,ROUTER_ID,PORT_ID);
-    this->allocatedUnits.push_back(ifc);
+    if(ifc) {
+        this->allocatedUnits.push_back(ifc);
+    }
     return ifc;
 }
 
@@ -372,7 +372,9 @@ IOutputFlowControl* PluginManager::outputFlowControlInstance(sc_core::sc_module_
        return NULL;
     }
     IOutputFlowControl* ofc = new_OFC(sc_get_curr_simcontext(),name,ROUTER_ID,PORT_ID,bufferDepth);
-    this->allocatedUnits.push_back(ofc);
+    if( ofc ) {
+        this->allocatedUnits.push_back(ofc);
+    }
     return ofc;
 }
 
@@ -392,7 +394,9 @@ IMemory* PluginManager::memoryInstance(sc_core::sc_module_name name,
        return NULL;
     }
     IMemory* mem = new_Memory(sc_get_curr_simcontext(),name,ROUTER_ID,PORT_ID,memSize);
-    this->allocatedUnits.push_back(mem);
+    if(mem) {
+        this->allocatedUnits.push_back(mem);
+    }
     return mem;
 }
 
@@ -412,7 +416,9 @@ IPriorityGenerator* PluginManager::priorityGeneratorInstance(sc_core::sc_module_
        return NULL;
     }
     IPriorityGenerator* pg = new_PG(sc_get_curr_simcontext(),name,nPorts,ROUTER_ID,PORT_ID);
-    this->allocatedUnits.push_back(pg);
+    if(pg) {
+        this->allocatedUnits.push_back(pg);
+    }
     return pg;
 }
 

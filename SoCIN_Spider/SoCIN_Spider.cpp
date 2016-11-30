@@ -19,6 +19,12 @@ SoCIN_Spider::SoCIN_Spider(sc_module_name mn)
       w_RETURN_ACROSS("w_X_RETURN_TO_ACROSS"),
       w_VC_SELECTOR_ACROSS("w_X_VC_SELECTOR_TO_ACROSS")
 {
+    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
+    if(tester != NULL) {
+        if( tester->supportedTopology() != this->topologyType() ) {
+            throw std::runtime_error("[SoCIN_Spider] Routing incompatible with the topology");
+        }
+    }
     unsigned short numberOfElements = numInterfaces;
 
     // Allocate the number of routers needed
@@ -60,8 +66,7 @@ SoCIN_Spider::SoCIN_Spider(sc_module_name mn)
         // Instantiating a router
         IRouter* router = PLUGIN_MANAGER->routerInstance(rName,routerId,4,NUM_VC);
         if(router == NULL) {
-            std::cout << "\n\t[SoCIN_Spider] -- ERROR: It was not possible instantiate a router." << std::endl;
-            return;
+            throw std::runtime_error("[SoCIN_Spider] -- ERROR: It was not possible instantiate a router.");
         }
 
         IRouter_VC* router_VC = dynamic_cast<IRouter_VC *>(router);
@@ -84,8 +89,7 @@ SoCIN_Spider::SoCIN_Spider(sc_module_name mn)
                 router_VC->i_VC_IN[0](i_VC_SELECTOR[routerId]);
                 router_VC->o_VC_OUT[0](o_VC_SELECTOR[routerId]);
             } else {
-                std::cout << "\n\t[SoCIN_Spider] -- ERROR: The router instantiated is not a VC router." << std::endl;
-                return;
+                throw std::runtime_error("[SoCIN_Spider] -- ERROR: The router instantiated is not a VC router.");
             }
         }
 
@@ -103,8 +107,7 @@ SoCIN_Spider::SoCIN_Spider(sc_module_name mn)
                 router_VC->i_VC_IN[rPortId](w_VC_SELECTOR_TO_RIGHT[wireId]);
                 router_VC->o_VC_OUT[rPortId](w_VC_SELECTOR_TO_LEFT[wireId]);
             } else {
-                std::cout << "\n\t[SoCIN_Spider] -- ERROR: The router instantiated is not a VC router." << std::endl;
-                return;
+                throw std::runtime_error("[SoCIN_Spider] -- ERROR: The router instantiated is not a VC router.");
             }
         }
 
@@ -122,8 +125,7 @@ SoCIN_Spider::SoCIN_Spider(sc_module_name mn)
                 router_VC->i_VC_IN[rPortId](w_VC_SELECTOR_TO_LEFT[wireId]);
                 router_VC->o_VC_OUT[rPortId](w_VC_SELECTOR_TO_RIGHT[wireId]);
             } else {
-                std::cout << "\n\t[SoCIN_Spider] -- ERROR: The router instantiated is not a VC router." << std::endl;
-                return;
+                throw std::runtime_error("[SoCIN_Spider] -- ERROR: The router instantiated is not a VC router.");
             }
         }
 
@@ -142,8 +144,7 @@ SoCIN_Spider::SoCIN_Spider(sc_module_name mn)
                 router_VC->i_VC_IN[rPortId](w_VC_SELECTOR_ACROSS[wIdFromAcross]);
                 router_VC->o_VC_OUT[rPortId](w_VC_SELECTOR_ACROSS[wIdToAcross]);
             } else {
-                std::cout << "\n\t[SoCIN_Spider] -- ERROR: The router instantiated is not a VC router." << std::endl;
-                return;
+                throw std::runtime_error("[SoCIN_Spider] -- ERROR: The router instantiated is not a VC router.");
             }
         }
 
@@ -281,7 +282,12 @@ extern "C" {
         // done before component instantiation.
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
-        return new SoCIN_Spider(moduleName);
+        try {
+            return new SoCIN_Spider(moduleName);
+        } catch(const std::runtime_error& error) {
+            std::cout << "Error to allocate the NoC: " << error.what() << std::endl;
+            return NULL;
+        }
     }
     SS_EXP void delete_NoC(INoC* noc) {
         delete noc;

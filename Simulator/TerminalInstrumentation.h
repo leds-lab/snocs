@@ -5,6 +5,7 @@
 #include "fg.h"
 
 #include "../SoCINDefines.h"
+#include "../NoC/NoC.h"
 #include "../FlowControl/FlowControl.h"
 #include "../PluginManager/PluginManager.h"
 #include "UnboundedFifo.h"
@@ -70,7 +71,7 @@ public:
     SC_HAS_PROCESS(TerminalInstrumentation);
     //////////////////////////////////////////////////////////////////////////////
     TerminalInstrumentation(sc_module_name nm,
-        unsigned short int TG_ID, bool packetFormat3D) :
+        unsigned short int TG_ID, INoC::TopologyType topologyType) :
         sc_module(nm),
         TG_ID(TG_ID)
     //////////////////////////////////////////////////////////////////////////////
@@ -123,7 +124,7 @@ public:
         u_IFC->i_DATA(rcv_data_wire);
 
         //////////////////////////////////
-        fg *fg0 = new fg("fg0",TG_ID,packetFormat3D,u_IFC->numberOfCyclesPerFlit());
+        fg *fg0 = new fg("fg0",TG_ID,topologyType,u_IFC->numberOfCyclesPerFlit());
         //////////////////////////////////
         fg0->clk(clk);
         fg0->rst(rst);
