@@ -27,12 +27,14 @@
 #define RELEASE 2
 #define GRANT   3
 
-//#define DEBUG
+//#define DEBUG_ADDRESSING
 
 UIntVar fg::getHeaderAddresses(unsigned short src,unsigned short dst) {
 
     UIntVar rib;
-
+#ifdef DEBUG_ADDRESSING
+    std::cout << "\nSrc: " << src << ", Dst: " << dst;
+#endif
     // Can be used absolute positions as 3D
     switch ( topologyType ) {
         case INoC::TT_Non_Orthogonal:
@@ -67,7 +69,9 @@ UIntVar fg::getHeaderAddresses(unsigned short src,unsigned short dst) {
             rib.range( 1, 0) = zDst;
             break;
     }
-
+#ifdef DEBUG_ADDRESSING
+    std::cout << " - RIB: " << rib.to_string(SC_HEX_US,false);
+#endif
     return rib;
 }
 
@@ -91,8 +95,6 @@ void fg::f_send_flit(Flit flit, unsigned int traffic_class)
     wait();
 
     while (snd_wok.read() == 0) {
-//        printf("\nFG: >>>> Waiting to print flit 0x%8X, but wok = %d", (unsigned int) flit, (unsigned int) snd_wok.read());
-//        printf("\n.");
         wait();
     }
 }
@@ -134,7 +136,6 @@ void fg::f_send_packet(unsigned short nodeId, unsigned long long cycle_to_send, 
     Flit headerFlit;
     headerFlit.data = flit;
     headerFlit.packet_ptr = packet;
-    std::cout << "\n[FG] Sending Header flit: " << headerFlit;
     f_send_flit(headerFlit, flow.traffic_class); // Send header
 
     /////////////////// Payload ///////////////////
@@ -148,8 +149,9 @@ void fg::f_send_packet(unsigned short nodeId, unsigned long long cycle_to_send, 
     /////////////////// Trailer ///////////////////
     // It sends the trailer flit: the lowest word with "Bye" string
     char msg[4] = "Bye"; // 4 bytes -> [0]: B , [1]: y, [2]: e, [3]: \0
-    //   =         Trailer       | ASCI:  B       |        y       |       e       |   \0
-    flit = ( (1 << (FLIT_WIDTH-1)) | (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
+    //   =   ASCI:  B       |        y       |       e       |   \0
+    flit = ( (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
+    flit[FLIT_WIDTH-1] = 1; // Trailer
 
     Flit trailer;
     trailer.data = flit;
