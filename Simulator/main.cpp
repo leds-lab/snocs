@@ -179,6 +179,8 @@ int sc_main(int argc, char* argv[]) {
 
     unsigned short numElements = u_NOC->getNumberOfInterfaces();
 
+    std::cout << " -- > Number of Elements: " << numElements << std::endl;
+
     // Wires to connect System Components to the network - Transmission interface
     sc_vector<sc_signal<Flit> > w_IN_DATA("w_IN_DATA",numElements);        // Network data input
     sc_vector<sc_signal<bool> > w_IN_VALID("w_IN_VALID",numElements);      // Network input flow control

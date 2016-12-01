@@ -27,13 +27,13 @@
 #define RELEASE 2
 #define GRANT   3
 
-//#define DEBUG_ADDRESSING
+//#define DEBUG_FG_ADDRESSING
 
 UIntVar fg::getHeaderAddresses(unsigned short src,unsigned short dst) {
 
     UIntVar rib;
-#ifdef DEBUG_ADDRESSING
-    std::cout << "\nSrc: " << src << ", Dst: " << dst;
+#ifdef DEBUG_FG_ADDRESSING
+    std::cout << "\n[FG] Addressing - Src: " << src << ", Dst: " << dst;
 #endif
     // Can be used absolute positions as 3D
     switch ( topologyType ) {
@@ -67,9 +67,13 @@ UIntVar fg::getHeaderAddresses(unsigned short src,unsigned short dst) {
             rib.range( 7, 5) = xDst;
             rib.range( 4, 2) = yDst;
             rib.range( 1, 0) = zDst;
+#ifdef DEBUG_FG_ADDRESSING
+            std::cout << "\n   Xsrc: " << xSrc << ", Ysrc: " << ySrc << ", Zsrc: " << zSrc
+                      << "\t-\t Xdst: " << xDst << ", Ydst: " << yDst << ", Zdst: " << zDst;
+#endif
             break;
     }
-#ifdef DEBUG_ADDRESSING
+#ifdef DEBUG_FG_ADDRESSING
     std::cout << " - RIB: " << rib.to_string(SC_HEX_US,false);
 #endif
     return rib;

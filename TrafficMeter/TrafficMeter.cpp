@@ -66,15 +66,13 @@ void TrafficMeter::initialize() {
     // It prints the header of the table
     fprintf(outFile,"FILE: %s",pathFilename);
     fprintf(outFile,"\n");
-    #if defined(__WIN32__) || defined(_WIN32)
-    //    fprintf(outFile,"\n    Packet\tXs\tYs\tXd\tYd\tThread\tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
-    //    fprintf(outFile,"\n        ID\t  \t  \t  \t  \t    ID\t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
-    fprintf(outFile,"\n    Packet\t src\tdest\tThread\tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
-    fprintf(outFile,"\n        ID\t    \t    \t    ID\t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
-    #else
-    fprintf(outFile,"\n    Packet\tXs\tYs\tXd\tYd\tThread\tTraffic\t    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
-    fprintf(outFile,"\n        ID\t  \t  \t  \t  \t    ID\t  Class\t            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
-    #endif
+#if defined(__WIN32__) || defined(_WIN32)
+    fprintf(outFile,"\n    Packet\t src\tdest\t Flow \tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
+    fprintf(outFile,"\n        ID\t    \t    \t   ID \t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
+#else
+    fprintf(outFile,"\n    Packet\t src\tdest\t Flow \tTraffic\t    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
+    fprintf(outFile,"\n        ID\t    \t    \t   ID \t  Class\t            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
+#endif
 
     fprintf(outFile,"\n#\n");
 }
