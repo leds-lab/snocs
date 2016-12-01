@@ -45,8 +45,8 @@ class PluginManager;
 #define ID_TO_COORDINATE_2D_X(id) (id % X_SIZE)
 #define ID_TO_COORDINATE_2D_Y(id) (id / X_SIZE)
 #define ID_TO_COORDINATE_3D_Z(id) (id / (X_SIZE * Y_SIZE))
-#define ID_TO_COORDINATE_3D_X(id) ( ID_TO_COORDINATE_2D_X(id - (X_SIZE*Y_SIZE*ID_TO_COORDINATE_3D_Z(id))) )
-#define ID_TO_COORDINATE_3D_Y(id) ( ID_TO_COORDINATE_2D_Y(id - (X_SIZE*Y_SIZE*ID_TO_COORDINATE_3D_Z(id))) )
+#define ID_TO_COORDINATE_3D_X(id) ( (ID_TO_COORDINATE_2D_X( (id - (X_SIZE*Y_SIZE*(ID_TO_COORDINATE_3D_Z(id)))) )) )
+#define ID_TO_COORDINATE_3D_Y(id) ( (ID_TO_COORDINATE_2D_Y( (id - (X_SIZE*Y_SIZE*(ID_TO_COORDINATE_3D_Z(id)))) )) )
 /*!
   TODO: IMPORTANT> Update
   Packet Format for the Mesh 2D SoCIN
