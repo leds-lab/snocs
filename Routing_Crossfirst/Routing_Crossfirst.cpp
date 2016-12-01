@@ -85,6 +85,10 @@ void Routing_Crossfirst::p_REQUEST() {
         } else { // Current == Destination
             v_REQUEST = REQ_LOCAL;
         }
+        if( f.packet_ptr != NULL ) {
+            f.packet_ptr->hops++;
+        }
+
 #ifdef DEBUG_ROUTING
         std::cout << "\n[Routing_Crossfirst]"
                   << " LOCAL: " << v_LOCAL << ", DEST: " << v_DEST

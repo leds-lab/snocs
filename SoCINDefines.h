@@ -265,6 +265,7 @@ struct Packet {
     float requiredBW;                      // Required bandwidth for the packet
     unsigned long int deadline;            // Defined deadline for the packet
     unsigned long int packetCreationCycle; // Packet cycle generation
+    unsigned short hops;                   // Number of hops of this packet in the network
 };
 /////////////////////////////////////////////////////////////////////////
 /// END of Packet structure

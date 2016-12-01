@@ -75,6 +75,10 @@ void Routing_DOR_Torus::p_REQUEST() {
         } else { // X == Y == 0
             v_REQUEST = REQ_L;
         }
+        if( f.packet_ptr != NULL ) {
+            f.packet_ptr->hops++;
+        }
+
 #ifdef DEBUG_ROUTING
         std::cout << "\n[DOR_TORUS] ROUTER_ID: " << ROUTER_ID
                   << ", xDest: " << v_XDEST << ", yDest: " << v_YDEST

@@ -34,6 +34,9 @@ void Routing_Crossbar::p_REQUEST() {
     if (v_HEADER_PRESENT) {
         unsigned portId = v_DEST.to_uint();
         v_REQUEST[portId] = 1;
+        if( f.packet_ptr != NULL ) {
+            f.packet_ptr->hops++;
+        }
     } else {
         v_REQUEST = 0;
     }

@@ -65,6 +65,10 @@ void Routing_Ring::p_REQUEST() {
         } else { // X == Y == 0
             v_REQUEST = REQ_LOCAL;
         }
+        if( f.packet_ptr != NULL ) {
+            f.packet_ptr->hops++;
+        }
+
 #ifdef DEBUG_ROUTING
         std::cout << "\n[Routing_Ring]"
                   << " LOCAL: " << v_LOCAL << ", DEST: " << v_DEST

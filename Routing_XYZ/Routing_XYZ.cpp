@@ -96,6 +96,9 @@ void Routing_XYZ::p_REQUEST() {
                 v_REQUEST = REQ_L;
             }
         }
+        if( f.packet_ptr != NULL ) {
+            f.packet_ptr->hops++;
+        }
     } else {
         v_REQUEST = REQ_NONE;
     }

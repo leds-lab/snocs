@@ -67,11 +67,11 @@ void TrafficMeter::initialize() {
     fprintf(outFile,"FILE: %s",pathFilename);
     fprintf(outFile,"\n");
 #if defined(__WIN32__) || defined(_WIN32)
-    fprintf(outFile,"\n    Packet\t src\tdest\t Flow \tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
+    fprintf(outFile,"\n    Packet\t SRC\tDEST\t Flow \tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
     fprintf(outFile,"\n        ID\t    \t    \t   ID \t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
 #else
-    fprintf(outFile,"\n    Packet\t src\tdest\t Flow \tTraffic\t    Deadline    Packet\t    Header\t   Trailer\t Packet\t    Req");
-    fprintf(outFile,"\n        ID\t    \t    \t   ID \t  Class\t              Creation\t  at cycle\t  at cycle\t Length\t     BW");
+    fprintf(outFile,"\n    Packet\t SRC\tDEST\tHops\t Flow \tTraffic\t    Deadline    Packet\t    Header\t   Trailer\t Packet\t    Req");
+    fprintf(outFile,"\n        ID\t    \t    \t    \t   ID \t  Class\t              Creation\t  at cycle\t  at cycle\t Length\t     BW");
 #endif
 
     fprintf(outFile,"\n#\n");
@@ -120,6 +120,7 @@ void TrafficMeter::writeInfo() {
             fprintf(outFile,"%10lu\t"  , pckId++);   // TEMP
             fprintf(outFile,"%4u\t"    , src);
             fprintf(outFile,"%4u\t"    , dest);
+            fprintf(outFile,"%4u\t"    , packet->hops);
             fprintf(outFile,"  %2u\t"  , flowId);
             fprintf(outFile,"  %2u\t"  , trafficClass);
             fprintf(outFile,"%10lu\t"  , packet->deadline);

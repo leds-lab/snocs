@@ -255,6 +255,9 @@ inline void InputControllerBus::p_OUTPUTS() {
             // If there is data on buffer to read and EOP and read command
             // then disable request
             if( (i_READ_OK.read() == 1) && (v_EOP == 1) && (i_READ.read() == 1) ) {
+                if( f.packet_ptr != NULL ) {
+                    f.packet_ptr->hops = 1;
+                }
                 o_REQUEST.write(0);
             }
         }

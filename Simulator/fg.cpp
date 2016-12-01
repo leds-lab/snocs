@@ -128,6 +128,7 @@ void fg::f_send_packet(unsigned short nodeId, unsigned long long cycle_to_send, 
     packet->packetCreationCycle = cycle_to_send + 1;
     packet->packetId = PARAMS->pckId++;
     packet->payloadLength = payload_length;
+    packet->hops = 0;
 
     /////////////////// Header ///////////////////
     flit = getHeaderAddresses(nodeId,flow.destination);    // Get Addressing according the topology type
