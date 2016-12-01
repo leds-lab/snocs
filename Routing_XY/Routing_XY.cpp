@@ -1,5 +1,7 @@
 #include "Routing_XY.h"
 
+//#define DEBUG_ROUTING
+
 /*!
  * \brief Routing_XY::Routing_XY XY routing for Mesh topology constructor
  * \param mn Module name
@@ -61,10 +63,28 @@ void Routing_XY::p_REQUEST() {
         } else { // X == Y == 0
             v_REQUEST = REQ_L;
         }
+
     } else {
         v_REQUEST = REQ_NONE;
     }
 
+#ifdef DEBUG_ROUTING
+        std::cout << "\n[Routing_XY]"
+                  << " Local(" << XID << "," << YID
+                  << ") - Dest(" << v_XDEST << "," << v_YDEST  << ") "
+                  << ", Req: ";
+        if(v_REQUEST == REQ_L) {
+            std::cout << "LOCAL";
+        } else if(v_REQUEST == REQ_N) {
+            std::cout << "NORTH";
+        } else if(v_REQUEST == REQ_E) {
+            std::cout << "EAST";
+        } else if(v_REQUEST == REQ_S) {
+            std::cout << "SOUTH";
+        } else if(v_REQUEST == REQ_W) {
+            std::cout << "WEST";
+        }
+#endif
     // Outputs
     for( unsigned short i = 0; i < numPorts; i++ ) {
         o_REQUEST[i].write( v_REQUEST[i] );
