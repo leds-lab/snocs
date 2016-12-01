@@ -15,12 +15,13 @@ SoCIN_Ring::SoCIN_Ring(sc_module_name mn)
     w_RETURN_TO_RIGHT("w_X_RETURN_TO_RIGHT"),
     w_VC_SELECTOR_TO_RIGHT("w_X_VC_SELECTOR_TO_RIGHT")
 {
-    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
-    if(tester != NULL) {
-        if( tester->supportedTopology() != this->topologyType() ) {
-            throw std::runtime_error("[SoCIN_Ring] Routing incompatible with the topology");
-        }
-    }
+//    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
+//    if(tester != NULL) {
+//        if( tester->supportedTopology() != this->topologyType() ) {
+//            throw std::runtime_error("[SoCIN_Ring] Routing incompatible with the topology");
+//        }
+//        PLUGIN_MANAGER->destroyRouting(tester);
+//    }
 
     unsigned short numberOfElements = numInterfaces;
 

@@ -46,13 +46,6 @@ SoCIN_3D::SoCIN_3D(sc_module_name mn)
         throw std::runtime_error("[SoCIN-3D]Number of interfaces is 0, verify Z size.");
     }
 
-    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
-    if(tester != NULL) {
-        if( tester->supportedTopology() != this->topologyType() ) {
-            throw std::runtime_error("[SoCINfp-3D] Routing incompatible with the topology");
-        }
-    }
-
     unsigned short i; // Loop iterator
 
     // Allocating the number of routers needed

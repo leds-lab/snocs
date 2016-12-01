@@ -23,12 +23,6 @@ SoCIN_Torus::SoCIN_Torus(sc_module_name mn)
       w_Y_RETURN_TO_NORTH("w_Y_RETURN_TO_NORTH"),
       w_Y_VC_SELECTOR_TO_NORTH("w_Y_VC_SELECTOR_TO_NORTH")
 {
-    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
-    if(tester != NULL) {
-        if( tester->supportedTopology() != this->topologyType() ) {
-            throw std::runtime_error("[SoCIN_Torus] Routing incompatible with the topology");
-        }
-    }
     // Allocating the number of routers needed
     u_ROUTER.resize(numInterfaces,NULL);
 

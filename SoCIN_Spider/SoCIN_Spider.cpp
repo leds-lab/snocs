@@ -19,12 +19,6 @@ SoCIN_Spider::SoCIN_Spider(sc_module_name mn)
       w_RETURN_ACROSS("w_X_RETURN_TO_ACROSS"),
       w_VC_SELECTOR_ACROSS("w_X_VC_SELECTOR_TO_ACROSS")
 {
-    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
-    if(tester != NULL) {
-        if( tester->supportedTopology() != this->topologyType() ) {
-            throw std::runtime_error("[SoCIN_Spider] Routing incompatible with the topology");
-        }
-    }
     unsigned short numberOfElements = numInterfaces;
 
     // Allocate the number of routers needed

@@ -5,12 +5,6 @@
 SoCIN_Unit::SoCIN_Unit(sc_module_name mn)
     : INoC_VC( mn, (X_SIZE*Y_SIZE) , NUM_VC)
 {
-    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
-    if(tester != NULL) {
-        if( tester->supportedTopology() != this->topologyType() ) {
-            throw std::runtime_error("[SoCIN_Unit] Routing incompatible with the topology");
-        }
-    }
     // Allocating the number of routers needed
     u_ROUTER.resize(1,NULL);
 

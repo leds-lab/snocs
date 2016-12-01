@@ -35,13 +35,6 @@ SoCINfp_VC::SoCINfp_VC(sc_module_name mn)
       w_Y_RETURN_TO_NORTH("w_Y_RETURN_TO_NORTH"),
       w_Y_VC_SELECTOR_TO_NORTH("w_Y_VC_SELECTOR_TO_NORTH")
 {
-    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
-    if(tester != NULL) {
-        if( tester->supportedTopology() != this->topologyType() ) {
-            throw std::runtime_error("[SoCINfp_VC] Routing incompatible with the topology");
-        }
-    }
-
     // Allocating the number of routers needed
     u_ROUTER.resize( (X_SIZE*Y_SIZE) , NULL);
     unsigned short numberOfXWires = (X_SIZE-1) * Y_SIZE;
@@ -386,12 +379,6 @@ SoCINfp::SoCINfp(sc_module_name mn)
       w_Y_VALID_TO_NORTH("w_Y_VALID_OUT"),
       w_Y_RETURN_TO_NORTH("w_Y_RETURN_OUT")
 {
-    IRouting* tester = PLUGIN_MANAGER->routingInstance("Tester",0,5);
-    if(tester != NULL) {
-        if( tester->supportedTopology() != this->topologyType() ) {
-            throw std::runtime_error("[SoCINfp] Routing incompatible with the topology");
-        }
-    }
     // Allocating the number of routers needed
     u_ROUTER.resize( (X_SIZE*Y_SIZE) , NULL);
 
