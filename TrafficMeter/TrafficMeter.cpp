@@ -70,8 +70,8 @@ void TrafficMeter::initialize() {
     fprintf(outFile,"\n    Packet\t src\tdest\t Flow \tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
     fprintf(outFile,"\n        ID\t    \t    \t   ID \t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
 #else
-    fprintf(outFile,"\n    Packet\t src\tdest\t Flow \tTraffic\t    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
-    fprintf(outFile,"\n        ID\t    \t    \t   ID \t  Class\t            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
+    fprintf(outFile,"\n    Packet\t src\tdest\t Flow \tTraffic\t    Deadline    Packet\t    Header\t   Trailer\t Packet\t    Req");
+    fprintf(outFile,"\n        ID\t    \t    \t   ID \t  Class\t              Creation\t  at cycle\t  at cycle\t Length\t     BW");
 #endif
 
     fprintf(outFile,"\n#\n");
