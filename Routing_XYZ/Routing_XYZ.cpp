@@ -1,6 +1,6 @@
 #include "Routing_XYZ.h"
 
-#define DEBUG_ROUTING
+//#define DEBUG_ROUTING
 
 Routing_XYZ::Routing_XYZ(sc_module_name mn,
                          unsigned short nPorts,
@@ -59,44 +59,48 @@ void Routing_XYZ::p_REQUEST() {
         v_Y_offset = (int) v_Y_DEST.to_int() - (int) YID;
         v_Z_offset = (int) v_Z_DEST.to_int() - (int) ZID;
 
-        if (v_X_TSV_offset != 0) { // First X tsv
-            if (v_X_TSV_offset > 0) {
-                v_REQUEST = REQ_E;
-            } else {
-                v_REQUEST = REQ_W;
+        if(v_Z_offset != 0) {
+            if (v_X_TSV_offset != 0) { // First X tsv
+                if (v_X_TSV_offset > 0) {
+                    v_REQUEST = REQ_E;
+                } else {
+                    v_REQUEST = REQ_W;
+                }
+            } else if (v_Y_TSV_offset != 0) { // Second Y tsv
+                if (v_Y_TSV_offset > 0) {
+                    v_REQUEST = REQ_N;
+                } else {
+                    v_REQUEST = REQ_S;
+                }
+            } else { // Third Z
+                if(v_Z_offset > 0) {
+                    v_REQUEST = REQ_U;
+                } else {
+                    v_REQUEST = REQ_D;
+                }
             }
-        } else if (v_Y_TSV_offset != 0) { // Second Y tsv
-            if (v_Y_TSV_offset > 0) {
-                v_REQUEST = REQ_N;
-            } else {
-                v_REQUEST = REQ_S;
+        } else {
+            if (v_X_offset != 0) { // Fourth X
+                if (v_X_offset > 0) {
+                    v_REQUEST = REQ_E;
+                } else {
+                    v_REQUEST = REQ_W;
+                }
+            } else if (v_Y_offset != 0) { // Fifth Y
+                if (v_Y_offset > 0) {
+                    v_REQUEST = REQ_N;
+                } else {
+                    v_REQUEST = REQ_S;
+                }
+            } else { // X == Y == Z == 0
+                v_REQUEST = REQ_L;
             }
-        } else if(v_Z_offset != 0) { // Third Z
-            if(v_Z_offset > 0) {
-                v_REQUEST = REQ_U;
-            } else {
-                v_REQUEST = REQ_D;
-            }
-        } else if (v_X_offset != 0) { // Fourth X
-            if (v_X_offset > 0) {
-                v_REQUEST = REQ_E;
-            } else {
-                v_REQUEST = REQ_W;
-            }
-        } else if (v_Y_offset != 0) { // Fifth Y
-            if (v_Y_offset > 0) {
-                v_REQUEST = REQ_N;
-            } else {
-                v_REQUEST = REQ_S;
-            }
-        } else { // X == Y == Z == 0
-            v_REQUEST = REQ_L;
         }
     } else {
         v_REQUEST = REQ_NONE;
     }
 #ifdef DEBUG_ROUTING
-        std::cout << "\n[Routing_XYZ]"
+        std::cout << "\n[Routing_XYZ] - RouterID: " << ROUTER_ID
                   << " Local(" << XID << "," << YID << "," << ZID
                   << ") -> DestTSV(" << v_X_TSV << "," << v_Y_TSV
                   << ") - Dest(" << v_X_DEST << "," << v_Y_DEST << "," << v_Z_DEST << ") "
