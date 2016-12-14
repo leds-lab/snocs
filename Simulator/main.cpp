@@ -538,7 +538,7 @@ unsigned int setupSimulator(int argc, char* argv[], InputParser &opt) {
     X_SIZE = getIntArg(opt,"-xsize",4,2,max2Daxis);
     Y_SIZE = getIntArg(opt,"-ysize",4,2,max2Daxis);
     NUM_ELEMENTS = getIntArg(opt,"-nelements",16,4,256);
-    FLIT_WIDTH = getIntArg(opt,"-datawidth",32,32,510) + 2; // Data Width + 2-bit framming (EOP & BOP)
+    FLIT_WIDTH = (getIntArg(opt,"-datawidth",32,32,510) + 2); // Data Width + 2-bit framming (EOP & BOP)
     NUM_VC = getIntArg(opt,"-vc",0,0,32);
     FIFO_IN_DEPTH = getIntArg(opt,"-fifoin",4,2,1024);
     FIFO_OUT_DEPTH = getIntArg(opt,"-fifoout",0,0,1024);

@@ -8,17 +8,20 @@ Parameters::Parameters() {
 
     pm = new PluginManager();
 // Default values
+    // System info
     clkPeriod = 1;
     traceSystem = false;
     workDir = const_cast<char*>("work");
     pluginsDir = const_cast<char*>("./plugins");
     confFile = const_cast<char*>("simconf.conf");
 
+    // Network info
     numElements = 16;
     xSize = 4;
     ySize = 4;
     zSize = 4;
 
+    // Packet Format
     wordWidth = 34;
     ribWidth = 8;
     trafficClassPosition = 30;
@@ -31,6 +34,8 @@ Parameters::Parameters() {
 }
 
 Parameters::Parameters(const Parameters &c) {
+    this->pckId = c.pckId;
+
     this->pm = c.pm;
 
     this->clkPeriod = c.clkPeriod;
@@ -43,14 +48,21 @@ Parameters::Parameters(const Parameters &c) {
     this->xSize = c.xSize;
     this->ySize = c.ySize;
     this->zSize = c.zSize;
+
     this->wordWidth = c.wordWidth;
     this->ribWidth = c.ribWidth;
+    this->trafficClassPosition = c.trafficClassPosition;
+    this->numberOfClasses = c.numberOfClasses;
+    this->commandPosition = c.commandPosition;
+
     this->numVirtualChannels = c.numVirtualChannels;
     this->fifoInDepth = c.fifoInDepth;
     this->fifoOutDepth = c.fifoOutDepth;
 }
 
 Parameters& Parameters::operator = (const Parameters& c) {
+    this->pckId = c.pckId;
+
     this->pm = c.pm;
 
     this->clkPeriod = c.clkPeriod;
@@ -63,8 +75,13 @@ Parameters& Parameters::operator = (const Parameters& c) {
     this->xSize = c.xSize;
     this->ySize = c.ySize;
     this->zSize = c.zSize;
+
     this->wordWidth = c.wordWidth;
     this->ribWidth = c.ribWidth;
+    this->trafficClassPosition = c.trafficClassPosition;
+    this->numberOfClasses = c.numberOfClasses;
+    this->commandPosition = c.commandPosition;
+
     this->numVirtualChannels = c.numVirtualChannels;
     this->fifoInDepth = c.fifoInDepth;
     this->fifoOutDepth = c.fifoOutDepth;

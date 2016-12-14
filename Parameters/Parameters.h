@@ -49,7 +49,7 @@ class PluginManager;
 #define ID_TO_COORDINATE_3D_X(id) ( (ID_TO_COORDINATE_2D_X( (id - (X_SIZE*Y_SIZE*(ID_TO_COORDINATE_3D_Z(id)))) )) )
 #define ID_TO_COORDINATE_3D_Y(id) ( (ID_TO_COORDINATE_2D_Y( (id - (X_SIZE*Y_SIZE*(ID_TO_COORDINATE_3D_Z(id)))) )) )
 /*!
-  TODO: IMPORTANT> Update
+  TODO: IMPORTANT> Update according the new packet format
   Packet Format for the Mesh 2D SoCIN
   e.g. 32-bit data width.
   The flit width (FLIT_WIDTH) is 34-bit because 2 bits are framing:
