@@ -5,7 +5,7 @@
 //#define WAVEFORM_SOCIN
 
 SoCIN_Spider::SoCIN_Spider(sc_module_name mn)
-    : INoC_VC(mn, (X_SIZE*Y_SIZE % 2 == 0? X_SIZE*Y_SIZE:X_SIZE*Y_SIZE+1),NUM_VC),
+    : INoC_VC(mn, (NUM_ELEMENTS%2 == 0? NUM_ELEMENTS:NUM_ELEMENTS+1),NUM_VC),
       w_DATA_TO_LEFT("w_X_DATA_TO_LEFT"),
       w_VALID_TO_LEFT("w_X_VALID_TO_LEFT"),
       w_RETURN_TO_LEFT("w_X_RETURN_TO_LEFT"),

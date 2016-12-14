@@ -14,6 +14,7 @@ Parameters::Parameters() {
     pluginsDir = const_cast<char*>("./plugins");
     confFile = const_cast<char*>("simconf.conf");
 
+    numElements = 16;
     xSize = 4;
     ySize = 4;
     zSize = 4;
@@ -38,6 +39,7 @@ Parameters::Parameters(const Parameters &c) {
     this->pluginsDir = c.pluginsDir;
     this->confFile = c.confFile;
 
+    this->numElements = c.numElements;
     this->xSize = c.xSize;
     this->ySize = c.ySize;
     this->zSize = c.zSize;
@@ -57,6 +59,7 @@ Parameters& Parameters::operator = (const Parameters& c) {
     this->pluginsDir = c.pluginsDir;
     this->confFile = c.confFile;
 
+    this->numElements = c.numElements;
     this->xSize = c.xSize;
     this->ySize = c.ySize;
     this->zSize = c.zSize;

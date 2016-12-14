@@ -5,7 +5,7 @@
 //#define WAVEFORM_SOCIN
 
 SoCIN_Ring::SoCIN_Ring(sc_module_name mn)
-    : INoC_VC(mn,(X_SIZE*Y_SIZE),NUM_VC),
+    : INoC_VC(mn,NUM_ELEMENTS,NUM_VC),
     w_DATA_TO_LEFT("w_X_DATA_TO_LEFT"),
     w_VALID_TO_LEFT("w_X_VALID_TO_LEFT"),
     w_RETURN_TO_LEFT("w_X_RETURN_TO_LEFT"),

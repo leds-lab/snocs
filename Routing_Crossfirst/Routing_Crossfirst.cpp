@@ -12,7 +12,7 @@ Routing_Crossfirst::Routing_Crossfirst(sc_module_name mn,
       REQ_ANTICLOCKWISE(4),
       REQ_ACROSS(8)
 {
-    sysSize = (X_SIZE*Y_SIZE % 2 == 0? X_SIZE*Y_SIZE:X_SIZE*Y_SIZE+1);
+    sysSize = (NUM_ELEMENTS%2 == 0? NUM_ELEMENTS:NUM_ELEMENTS+1);
     maxHops = ceil(sysSize/4);
 
     SC_METHOD(p_REQUEST);

@@ -41,7 +41,7 @@ void Routing_Ring::p_REQUEST() {
 
     // It runs the routing algorithm
     if (v_HEADER_PRESENT) {
-        unsigned short v_LAST_ID = X_SIZE * Y_SIZE - 1;
+        unsigned short v_LAST_ID = NUM_ELEMENTS - 1;
 
         v_LOCAL = ROUTER_ID;
         v_DEST = v_DATA.range(RIB_WIDTH-1, 0);

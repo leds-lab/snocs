@@ -35,6 +35,7 @@ class PluginManager;
 #define PLUGINS_DIR PARAMS->pluginsDir      // Plugins folder
 #define CONF_FILE PARAMS->confFile          // File with simulator definitions
 // Network info
+#define NUM_ELEMENTS PARAMS->numElements    // Number of elements in the network
 #define X_SIZE PARAMS->xSize                // Network X dimension
 #define Y_SIZE PARAMS->ySize                // Network Y dimension
 #define Z_SIZE PARAMS->zSize                // Network Z dimension (3D topologies)
@@ -130,6 +131,7 @@ public:
     char* pluginsDir;
     char* confFile;
     // Network info
+    unsigned short numElements;
     unsigned short xSize;
     unsigned short ySize;
     unsigned short zSize;

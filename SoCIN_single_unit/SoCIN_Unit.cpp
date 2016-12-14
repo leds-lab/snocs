@@ -3,7 +3,7 @@
 #include "../PluginManager/PluginManager.h"
 
 SoCIN_Unit::SoCIN_Unit(sc_module_name mn)
-    : INoC_VC( mn, (X_SIZE*Y_SIZE) , NUM_VC)
+    : INoC_VC( mn, NUM_ELEMENTS , NUM_VC)
 {
     // Allocating the number of routers needed
     u_ROUTER.resize(1,NULL);

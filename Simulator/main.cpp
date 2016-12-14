@@ -14,7 +14,7 @@
 // STL
 #include <ctime>
 
-#define SNOCS_MAJOR 1
+#define SNOCS_MAJOR 2
 #define SNOCS_MINOR 0
 #define SNOCS_PATCH 0
 
@@ -29,7 +29,7 @@ class InputParser;
 unsigned int setupSimulator(int argc, char* argv[],InputParser& opt);
 void generateListNodesGtkwave(unsigned short numElements);
 char *print_time(unsigned long long total_sec);
-void printConfiguration();
+void printConfiguration(InputParser& opt);
 
 // Messages to setup of the simulator
 const char* SETUP_MESSAGES[] =
@@ -73,7 +73,7 @@ void showHelp() {
 
     std::cout << " * TClk        : clock period in nanoseconds to system operation.\n"
                  " * WORK_DIR    : Directory to output simulation log files.\n"
-                 "                 Must be an existing directory.\n"
+                 "                 Must be an existent directory.\n"
                  " * PLUGINS_DIR : Directory with the plugins of the simulator.\n"
                  "                 Windows(.dll), Linux(.so) and OS X(.dylib)."
               << std::endl << std::endl;
@@ -81,27 +81,28 @@ void showHelp() {
     std::cout << "Options: " << std::endl
               << "   * To all options there are a default value                    *" << std::endl
               << "   * Not all options are used depending the system configuration *" << std::endl
-              << "   * There are limits values (i.e. min and max) to the options   *" << std::endl;
-    std::cout << "  -xsize value        Network X dimension. 2 =< Value =< (16 for 2D and 8 for 3D)" << std::endl
-              << "                      Default=4, Min: 2, Max: [16 (2D) | 8 (3D)]" << std::endl
+              << "   * There are limits values (i.e. min and max) to the options   *" << std::endl << std::endl;
+    std::cout << "  -nelements value    Number of elements in the network fot non-orthogonal topologies" << std::endl
+              << "                      Default=16, Min: 4, Max: 256" << std::endl << std::endl
+              << "  -xsize value        Network X dimension. 2 =< Value =< (16 for 2D and 8 for 3D)" << std::endl
+              << "                      Default=4, Min: 2, Max: [16 (2D) | 8 (3D)]" << std::endl << std::endl
               << "  -ysize value        Network Y dimension. 2 =< Value =< (16 for 2D and 8 for 3D)" << std::endl
-              << "                      Default=4, Min: 2, Max: [16 (2D) | 8 (3D)]" << std::endl
+              << "                      Default=4, Min: 2, Max: [16 (2D) | 8 (3D)]" << std::endl << std::endl
               << "  -zsize value        Network Z dimension. 1 < Value <= 4" << std::endl
-              << "                      Default=0 (no Z dimension), Min: 2, Max: 4" << std::endl
+              << "                      Default=0 (no Z dimension), Min: 2, Max: 4" << std::endl << std::endl
               << "  -datawidth value    Number of bits of the data channel. Value >= 32" << std::endl
-              << "                      Default=32, Min: 32, Max: 510" << std::endl
+              << "                      Default=32, Min: 32, Max: 510" << std::endl << std::endl
               << "  -fifoin value       Routers input buffers depth (flits). 1 < Value <= 1024." << std::endl
-              << "                      Default=4, Min: 2, Max: 1024" << std::endl
+              << "                      Default=4, Min: 2, Max: 1024" << std::endl << std::endl
               << "  -fifoout value      Routers output buffers depth (flits). 0 <= Value <= 1024." << std::endl
-              << "                      Default=0 (no output buffers), Min: 0, Max: 1024" << std::endl
+              << "                      Default=0 (no output buffers), Min: 0, Max: 1024" << std::endl << std::endl
               << "  -vc value           Number of virtual channels. 0 <= Value <= 32" << std::endl
-              << "                      Default=0 (no virtual channels), Min: 0, Max: 32" << std::endl
+              << "                      Default=0 (no virtual channels), Min: 0, Max: 32" << std::endl << std::endl
               << "  -trace              Generate waveforms." << std::endl
-              << "                      Default= Don't generate waveforms" << std::endl;
-    std::cout << "\nIMPORTANT: <xsize> and <ysize> options define the system size\n"
-                 "(i.e. number of elements). Not only for 2D orthogonal topologies,\n"
-                 "but also to some others, like ring (xsize * ysize = NumberOfElements).\n"
-                 "The option <zsize> must be used only for 3D topologies!" << std::endl;
+              << "                      Default= Don't generate waveforms" << std::endl << std::endl;
+    std::cout << "\nIMPORTANT: <xsize> and <ysize> options define the system size for 2D and 3D\n"
+                 "topologies (i.e. number of elements). In 2D the the limits for the <values> are\n"
+                 " different than 3D, because the network protocol used (Header Flit Format).\n";
 
 }
 
@@ -159,7 +160,7 @@ int sc_main(int argc, char* argv[]) {
         return -1;
     }
 
-    printConfiguration();
+    printConfiguration(optParser);
 
     /// [2] Network models building
     INoC* u_NOC = PLUGIN_MANAGER->nocInstance("NoC");
@@ -405,7 +406,7 @@ int sc_main(int argc, char* argv[]) {
     return 0;
 }
 
-void printConfiguration() {
+void printConfiguration(InputParser &opt) {
 
     std::cout << "  --- Configuration ---" << std::endl << std::endl;
 
@@ -415,11 +416,20 @@ void printConfiguration() {
               << prefix << "work_dir: " << WORK_DIR << "\n" \
               << prefix << "plugins_dir: " << PLUGINS_DIR << std::endl;
 
-    std::cout << prefix << "X Size: " << X_SIZE << std::endl
-              << prefix << "Y Size: " << Y_SIZE << std::endl;
-    if( Z_SIZE > 1 ) {
+    std::cout << prefix << prefix << "Arguments!" << std::endl;
+    if( opt.cmdOptionExists("-nelements") ) {
+        std::cout << prefix << "Number of elements: " << NUM_ELEMENTS << std::endl;
+    }
+    if( opt.cmdOptionExists("-xsize") ) {
+        std::cout << prefix << "X Size: " << X_SIZE << std::endl;
+    }
+    if( opt.cmdOptionExists("-ysize") ) {
+        std::cout << prefix << "Y Size: " << Y_SIZE << std::endl;
+    }
+    if( opt.cmdOptionExists("-zsize") ) {
         std::cout << prefix << "Z Size: " << Z_SIZE << std::endl;
     }
+
     std::cout << prefix << "Data Width: " << (FLIT_WIDTH-2) << std::endl;
     if( NUM_VC > 1 ) {
         std::cout << prefix << "Number of Virtual Channels: " << NUM_VC << std::endl;
@@ -527,6 +537,7 @@ unsigned int setupSimulator(int argc, char* argv[], InputParser &opt) {
     }
     X_SIZE = getIntArg(opt,"-xsize",4,2,max2Daxis);
     Y_SIZE = getIntArg(opt,"-ysize",4,2,max2Daxis);
+    NUM_ELEMENTS = getIntArg(opt,"-nelements",16,4,256);
     FLIT_WIDTH = getIntArg(opt,"-datawidth",32,32,510) + 2; // Data Width + 2-bit framming (EOP & BOP)
     NUM_VC = getIntArg(opt,"-vc",0,0,32);
     FIFO_IN_DEPTH = getIntArg(opt,"-fifoin",4,2,1024);

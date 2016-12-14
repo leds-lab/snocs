@@ -7,7 +7,6 @@ TrafficMeter::TrafficMeter(sc_module_name mn,
                            INoC::TopologyType topologyType,
                            bool isExternal)
     : SoCINModule(mn),
-      pckId(1),// TEMP
       workDir(workDir),outFileName(fileName), outFile(NULL),
       topologyType(topologyType),
       isExternal(isExternal),
@@ -116,8 +115,7 @@ void TrafficMeter::writeInfo() {
             unsigned short dest = this->getPacketDestination();
             unsigned short trafficClass = (unsigned short) packetHeader(CLS_POS,CLS_POS-2).to_uint();
             unsigned short flowId = (unsigned short) packetHeader(25,24).to_uint();
-//            fprintf(outFile,"%10lu\t"  , packet->packetId); // TEMP
-            fprintf(outFile,"%10lu\t"  , pckId++);   // TEMP
+            fprintf(outFile,"%10lu\t"  , packet->packetId); // TEMP
             fprintf(outFile,"%4u\t"    , src);
             fprintf(outFile,"%4u\t"    , dest);
             fprintf(outFile,"%4u\t"    , packet->hops);
