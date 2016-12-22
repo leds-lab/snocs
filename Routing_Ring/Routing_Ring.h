@@ -8,7 +8,7 @@ protected:
     unsigned char REQ_NONE;
     unsigned char REQ_LOCAL;
     unsigned char REQ_CLOCKWISE;     // left
-    unsigned char REQ_ANTICLOCKWISE; // right
+    unsigned char REQ_COUNTERCLOCKWISE; // right
 public:
 
     // Module's process

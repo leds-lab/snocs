@@ -9,7 +9,7 @@ Routing_Ring::Routing_Ring(sc_module_name mn,
       REQ_NONE(0),
       REQ_LOCAL(1),
       REQ_CLOCKWISE(2),
-      REQ_ANTICLOCKWISE(4)
+      REQ_COUNTERCLOCKWISE(4)
 {
     SC_METHOD(p_REQUEST);
     sensitive << i_READ_OK << i_DATA;
@@ -51,13 +51,13 @@ void Routing_Ring::p_REQUEST() {
         if (v_OFFSET != 0) {
             if (v_OFFSET > 0) {
                 if( v_OFFSET > v_LAST_ID/2 ) {
-                    v_REQUEST = REQ_ANTICLOCKWISE;
+                    v_REQUEST = REQ_COUNTERCLOCKWISE;
                 } else {
                     v_REQUEST = REQ_CLOCKWISE;
                 }
             } else {
                 if( (v_OFFSET*-1) <= v_LAST_ID/2 ) {
-                    v_REQUEST = REQ_ANTICLOCKWISE;
+                    v_REQUEST = REQ_COUNTERCLOCKWISE;
                 } else {
                     v_REQUEST = REQ_CLOCKWISE;
                 }
@@ -81,11 +81,13 @@ void Routing_Ring::p_REQUEST() {
                 std::cout << "CLOCKWISE";
                 break;
             case 4:
-                std::cout << "ANTICLOCKWISE";
+                std::cout << "COUNTERCLOCKWISE";
                 break;
             default:
                 std::cout << "NONE";
         }
+        UIntVar pckId = f.packet_ptr->packetId;
+        std::cout << " PckId: " << pckId.to_string(SC_HEX_US,false) << " @ " << sc_time_stamp();
 #endif
     } else {
         v_REQUEST = REQ_NONE;
