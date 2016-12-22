@@ -172,11 +172,14 @@ int sc_main(int argc, char* argv[]) {
 
     // ------------------- Establishing system -------------------
 
+    sc_set_time_resolution(1,SC_NS);
+
     /// [3] Signals instantation
     // System signals
     sc_clock                 w_CLK("CLK", CLK_PERIOD, SC_NS); // System clock | Tclk=1 ns
     sc_signal<bool>          w_RST;                           // Reset
     sc_signal<unsigned long> w_GLOBAL_CLOCK;                  // Number of cycles
+
 
     unsigned short numElements = u_NOC->getNumberOfInterfaces();
 
@@ -601,6 +604,7 @@ void generateListNodesGtkwave(unsigned short numElements) {
         // For virtual channel in selector
         if(NUM_VC > 1) {
             fprintf(out,"\n@c00028");
+            fprintf(out,"\n[color] 3");
             fprintf(out,"\n#{SystemC.L_VC_SEL_IN_%u([%u:0])}",elementId,vcWidth-1);
             for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
                 fprintf(out," SystemC.L_VC_SEL_IN_%u(%u)",elementId,vcBit);
@@ -614,14 +618,18 @@ void generateListNodesGtkwave(unsigned short numElements) {
         }
 
         fprintf(out,"\n@28");
+        fprintf(out,"\n[color] 3");
         fprintf(out,"\nSystemC.L_VAL_IN_%u",elementId);
+        fprintf(out,"\n[color] 3");
         fprintf(out,"\nSystemC.L_RET_IN_%u",elementId);
         fprintf(out,"\n@22");
+        fprintf(out,"\n[color] 3");
         fprintf(out,"\nSystemC.L_DATA_IN_%u[%u:0]",elementId,flit_width-1);
 
         // For virtual channel out selector
         if(NUM_VC > 1) {
             fprintf(out,"\n@c00028");
+            fprintf(out,"\n[color] 2");
             fprintf(out,"\n#{SystemC.L_VC_SEL_OUT_%u([%u:0])}",elementId,vcWidth-1);
             for(vcBit = vcWidth-1; vcBit < vcWidth; vcBit--) {
                 fprintf(out," SystemC.L_VC_SEL_OUT_%u(%u)",elementId,vcBit);
@@ -635,9 +643,12 @@ void generateListNodesGtkwave(unsigned short numElements) {
         }
 
         fprintf(out,"\n@28");
+        fprintf(out,"\n[color] 2");
         fprintf(out,"\nSystemC.L_VAL_OUT_%u",elementId);
+        fprintf(out,"\n[color] 2");
         fprintf(out,"\nSystemC.L_RET_OUT_%u",elementId);
         fprintf(out,"\n@22");
+        fprintf(out,"\n[color] 2");
         fprintf(out,"\nSystemC.L_DATA_OUT_%u[%u:0]",elementId,flit_width-1);
         fprintf(out,"\n@200");
     }
