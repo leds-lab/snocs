@@ -114,7 +114,7 @@ inline RequestRegister::RequestRegister(sc_module_name mn,
 {
     // Registering processes
     SC_METHOD(p_INTERNAL_SIGNALS);
-    sensitive << i_DATA << i_READ_OK << i_READ << r_CIRCUIT_SET << o_REQUESTING;
+    sensitive << i_DATA << i_READ_OK << i_READ << r_CIRCUIT_SET;// << o_REQUESTING;
 
     SC_METHOD(p_REQUESTS_REGISTERS);
     sensitive << i_CLK.pos() << i_RST;
@@ -251,7 +251,5 @@ inline void RequestRegister::p_OUTPUTS() {
     }
     o_REQUESTING.write(v_REQUESTING);
 }
-
-
 
 #endif // __REQUESTREGISTER_H__

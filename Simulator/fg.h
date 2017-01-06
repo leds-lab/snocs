@@ -49,8 +49,6 @@ SC_MODULE(fg)
     // Data structures with the basic fields of a flow
     struct FLOW_TYPE {
         unsigned int  type;                //  0: 0 = gtr determines the traffic model, 1 = tg determines the traffic model by using PARETO
-//        unsigned int  x_dest;              //  1: X address of the destination node
-//        unsigned int  y_dest;              //  2: Y address of the destination node
         unsigned short destination;
         unsigned int  flow_id;             //  3: Flow identifier
         unsigned int  traffic_class;       //  4: Class of traffic (RT0, RT1, nRT0, nRT1)
@@ -93,6 +91,7 @@ SC_MODULE(fg)
         nb_cycles_per_flit(nb_cycles_per_flit)
     //////////////////////////////////////////////////////////////////////////////
     {
+        std::cout << "\nInit FG: " << FG_ID;
         vcWidth = (unsigned short) ceil(log2(NUM_VC));
         if(vcWidth>0) {
             o_VC.init( vcWidth );

@@ -2,6 +2,7 @@
 #include "../PluginManager/PluginManager.h"
 
 //#define WAVEFORM_PARIS
+//#define DEBUG_PARIS
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -434,7 +435,7 @@ ParIS::~ParIS() {
 void ParIS::p_DEBUG() {
 
     std::string str = sc_time_stamp().to_string();
-
+/*
     for( unsigned short i = 0; i < numPorts; i++ ) {
         for( unsigned short x = 0; x < numPorts; x++ ) {
             bool req = w_REQUEST[i][x].read();
@@ -448,13 +449,11 @@ void ParIS::p_DEBUG() {
 
         }
     }
-
+*/
     for( unsigned short i = 0; i < numPorts; i++ ) {
-        if( ROUTER_ID == 0 ) {
-            Flit d = w_DATA[i].read();
-            printf("\n[ParIS] PORT[%u] IDLE: %d- RD: %d- ROK: %d- DATA: %s",
-                   i,w_IDLE[i].read(),w_READ[i].read(),w_READ_OK[i].read(),d.data.to_string(SC_HEX_US).c_str());
-        }
+        Flit d = w_DATA[i].read();
+        printf("\n[ParIS][%u] PORT[%u] IDLE: %d- RD: %d- ROK: %d- DATA: %s",ROUTER_ID,
+               i,w_IDLE[i].read(),w_READ[i].read(),w_READ_OK[i].read(),d.data.to_string(SC_HEX_US).c_str());
     }
 
 }

@@ -162,7 +162,7 @@ SoCIN_Ring::SoCIN_Ring(sc_module_name mn)
         }
     }
 
-    // X wires
+    // Internal wires
     for( i = 0; i < numberOfElements; i++) {
         char strI[5];
         sprintf(strI,"(%u)",i);

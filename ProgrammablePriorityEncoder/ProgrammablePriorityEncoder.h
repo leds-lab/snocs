@@ -323,17 +323,15 @@ inline void ProgrammablePriorityEncoder::p_IDLE()
     w_IDLE.write( not v_IDLE );
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////
 inline void ProgrammablePriorityEncoder::p_OUTPUTS()
 ////////////////////////////////////////////////////////////////////////////////
 // It updates the output
 {
-    o_IDLE.write(w_IDLE);
     for( unsigned short i = 0; i < nPorts; i++) {
         o_GRANT[i].write( r_GRANT[i].read() );
     }
-
+    o_IDLE.write(w_IDLE);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

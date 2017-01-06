@@ -1,5 +1,8 @@
 #include "Fifo.h"
 
+//#define DEBUG_FIFO_CONTROL
+//#define DEBUG_FIFO_DATAPATH
+
 ////////////////////////////////////////////////////////////////////////////////////////////
 /// \brief FIFO::FIFO Constructor of the memory that allocate the memory according size and
 /// register the processes of the FIFO
@@ -170,6 +173,7 @@ void FIFO::p_POINTERS_REGISTERS() {
  * \brief FIFO::p_WRITE_FIFO It implements the FIFO memory
  */
 void FIFO::p_WRITE_FIFO() {
+
     if( (i_WRITE.read()) && (r_CUR_STATE.read() != memSize) ) {
         for (unsigned short index = 0; index < memSize; index++) {
             if (index == r_WRITE_POINTER.read()) {
@@ -226,30 +230,27 @@ void FIFO::p_NULL() {
 ////////////////////////////////////////////////////////////////////////////////
 void FIFO::p_DEBUG_CONTROL() {
 
-    printf("\n[FIFO] - Router[%u]-Port[%u] @ %s",ROUTER_ID,PORT_ID,sc_time_stamp().to_string().c_str());
+    std::cout << "\n[FIFO] - Router[" << ROUTER_ID << "]-Port[" << PORT_ID << "] @ " << sc_time_stamp();
     std::cout << " NEXT_STATE= " << w_NEXT_STATE.read() \
               << " CURRENT_STATE= " << r_CUR_STATE.read();
 
 }
 
 void FIFO::p_DEBUG_DATAPATH() {
-    printf("\n[FIFO] - Router[%u]-Port[%u] @ %s",ROUTER_ID,PORT_ID,sc_time_stamp().to_string().c_str());
+    std::cout << std::endl << name() << " @ " << sc_time_stamp();
     std::cout << " CURRENT_STATE= "<< r_CUR_STATE.read();
 
     std::cout << " FIFO[" << (memSize-1) << "..0]=";
     Flit f;
     for( unsigned int i = 0; i < memSize; i++ ) {
         f = r_FIFO[i].read();
-        printf(" Data[%u]: %s",i,f.data.to_string(SC_HEX_US).c_str());
+        std::cout << " D[" << i << "]: " << f.data.to_string(SC_HEX_US,false);
     }
 
-    f = r_FIFO[r_READ_POINTER.read()].read();
-    printf("  OUTPUT: %s",f.data.to_string(SC_HEX_US).c_str());
-
-    std::cout << "  WRITE= " << i_WRITE.read();
-    std::cout << "  READ= " << i_READ.read();
-    std::cout << "  READ_POINTER= " << r_READ_POINTER.read();
-    std::cout << "  WRITE_POINTER= " << r_WRITE_POINTER.read();
+    std::cout << "  WR= " << i_WRITE.read();
+    std::cout << "  RD= " << i_READ.read();
+    std::cout << "  RD_PTR= " << r_READ_POINTER.read();
+    std::cout << "  WR_PTR= " << r_WRITE_POINTER.read();
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////

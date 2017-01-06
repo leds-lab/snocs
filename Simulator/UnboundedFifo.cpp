@@ -47,12 +47,11 @@ void UnboundedFifo::fifoProcess() {
             }
         }
 
-        if( i_WR.read() == 1 ) {    // It writes in fifo
+        if( i_WR.read() == 1 ) {              // It writes in fifo
             m_FIFO.push( i_DATA_IN.read() );  // Puts on the queue
             o_DATA_OUT.write(m_FIFO.front()); // Update the output data if necessary
             o_RD_OK.write(1);                 // Enable FIFO-!EMPTY because of the write
         }
-
     }
 }
 

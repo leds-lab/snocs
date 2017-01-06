@@ -153,16 +153,16 @@ void fg::f_send_packet(unsigned short nodeId, unsigned long long cycle_to_send, 
 
     /////////////////// Trailer ///////////////////
     // It sends the trailer flit: the lowest word with "Bye" string
-    char msg[4] = "Bye"; // 4 bytes -> [0]: B , [1]: y, [2]: e, [3]: \0
-    //   =   ASCI:  B       |        y       |       e       |   \0
-    flit = ( (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
+//    char msg[4] = "Bye"; // 4 bytes -> [0]: B , [1]: y, [2]: e, [3]: \0
+//    //   =   ASCI:  B       |        y       |       e       |   \0
+//    flit = ( (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
+    flit = packet->packetId; // Put the packet ID on the trailer payload
     flit[FLIT_WIDTH-1] = 1; // Trailer
 
     Flit trailer;
     trailer.data = flit;
     trailer.packet_ptr = packet;
     f_send_flit(trailer, flow.traffic_class); // Send trailer
-
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -296,10 +296,12 @@ void fg::p_send()
     number_of_packets_sent.write(0x0);
     wait();
 
+
     //////////////////
     // FLOW GENERATION
     //////////////////
     if (nb_of_flows) {
+        std::uniform_int_distribution<int> distribution(0,nb_of_flows-1);
         // It determines the router id (network address)
         id = FG_ID;
 
@@ -315,9 +317,8 @@ void fg::p_send()
         while (pck_counter < total_pck_2send) {
             // It randomly chooses one of the flows that still has some packet to send
             do {
-//                std::uniform_int_distribution<int> distribution(0,nb_of_flows);
-                flow_index = rand() % (nb_of_flows);
-//                flow_index = distribution(generator);
+                flow_index = distribution(generator);
+//                flow_index = rand() % (nb_of_flows);
             } while (flow[flow_index].pck_sent == flow[flow_index].pck_2send);
 //            printf("\nFluxo Selecionado: %u",flow_index);
 
@@ -409,8 +410,9 @@ void fg::p_send()
             // current flow to the value previously calculated value. Then, it inserts
             // wait cycles until cycle_to_send_next_pck is reached
             cycle_to_send_next_pck += flow[flow_index].idle;
-            while (clock_cycles.read() < cycle_to_send_next_pck)
+            while (clock_cycles.read() < cycle_to_send_next_pck) {
                 wait();
+            }
 
             /////////////////////
             // SENDING THE PACKET
@@ -492,8 +494,14 @@ void fg::p_send()
                 pck_counter += flow[flow_index].burst_size;
             else
                 pck_counter++;
+
+            if( FG_ID == 0 ) {
+                std::cout << "\nPckSent: " << pck_counter;
+            }
+
         }
     }
+
     eot.write(1);
     wait();
 
@@ -512,14 +520,36 @@ void fg::p_receive()
 
     UIntVar data;
     bool trailer;
+    bool header;
+    Flit f;
     while(1) {
-        const Flit f = rcv_data.read();
+        f = rcv_data.read();
         data = f.data;
         trailer = data[FLIT_WIDTH-1];
+        header = data[FLIT_WIDTH-2];
+
+//        if( rcv_rok ) {
+//            std::cout << "\nFG " << FG_ID
+//                      << " Packet: " << data.to_string(SC_HEX_US,false) << " - PckId: " << f.packet_ptr->packetId;
+//            if( header ) {
+//                std::cout << " Header @ ";
+//            } else {
+//                if( trailer ) {
+//                    std::cout << " Trailer @ ";
+//                } else {
+//                    std::cout << " Payload @ ";
+//                }
+//            }
+//            std::cout << sc_time_stamp();
+
+//            std::cout << std::endl;
+//        }
+
+
         if ((rcv_rok.read()==1) && trailer) {
             number_of_packets_received.write(number_of_packets_received.read() + 1);
+//            std::cout << "\nFG " << FG_ID << " - received: " << number_of_packets_received << " @ " << sc_time_stamp();
         }
-
         wait();
     }
 }

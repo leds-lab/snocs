@@ -170,6 +170,10 @@ int sc_main(int argc, char* argv[]) {
         return -1;
     }
 
+    unsigned short numElements = u_NOC->getNumberOfInterfaces();
+    std::cout << " -- > Number of Elements: " << numElements << std::endl;
+    NUM_ELEMENTS = numElements;
+
     // ------------------- Establishing system -------------------
 
     sc_set_time_resolution(1,SC_NS);
@@ -179,11 +183,6 @@ int sc_main(int argc, char* argv[]) {
     sc_clock                 w_CLK("CLK", CLK_PERIOD, SC_NS); // System clock | Tclk=1 ns
     sc_signal<bool>          w_RST;                           // Reset
     sc_signal<unsigned long> w_GLOBAL_CLOCK;                  // Number of cycles
-
-
-    unsigned short numElements = u_NOC->getNumberOfInterfaces();
-
-    std::cout << " -- > Number of Elements: " << numElements << std::endl;
 
     // Wires to connect System Components to the network - Transmission interface
     sc_vector<sc_signal<Flit> > w_IN_DATA("w_IN_DATA",numElements);        // Network data input
@@ -267,21 +266,21 @@ int sc_main(int argc, char* argv[]) {
 
         //------------- Binding TG -------------//
         // System signals
-        u_TG->clk(w_CLK);
-        u_TG->rst(w_RST);
-        u_TG->clock_cycles(w_GLOBAL_CLOCK);
+        u_TG->i_CLK(w_CLK);
+        u_TG->i_RST(w_RST);
+        u_TG->i_CLK_CYCLES(w_GLOBAL_CLOCK);
         // Connections with routers
         // The data that outgoing of the network, incoming in the traffic generator and vice-versa
-        u_TG->in_data(w_OUT_DATA[elementId]);
-        u_TG->in_val(w_OUT_VALID[elementId]);
-        u_TG->in_ret(w_OUT_RETURN[elementId]);
-        u_TG->out_data(w_IN_DATA[elementId]);
-        u_TG->out_val(w_IN_VALID[elementId]);
-        u_TG->out_ret(w_IN_RETURN[elementId]);
+        u_TG->i_DATA_IN(w_OUT_DATA[elementId]);
+        u_TG->i_VALID_IN(w_OUT_VALID[elementId]);
+        u_TG->o_RETURN_IN(w_OUT_RETURN[elementId]);
+        u_TG->o_DATA_OUT(w_IN_DATA[elementId]);
+        u_TG->o_VALID_OUT(w_IN_VALID[elementId]);
+        u_TG->i_RETURN_OUT(w_IN_RETURN[elementId]);
         // Status signals to simulation control
-        u_TG->eot(w_TG_EOT[elementId]);
-        u_TG->number_of_packets_sent(w_TG_NUM_PACKETS_SENT[elementId]);
-        u_TG->number_of_packets_received(w_TG_NUM_PACKETS_RECEIVED[elementId]);
+        u_TG->o_END_OF_TRANSMISSION(w_TG_EOT[elementId]);
+        u_TG->o_NUMBER_OF_PACKETS_SENT(w_TG_NUM_PACKETS_SENT[elementId]);
+        u_TG->o_NUMBER_OF_PACKETS_RECEIVED(w_TG_NUM_PACKETS_RECEIVED[elementId]);
         if(NUM_VC>1)
             u_TG->o_VC(w_IN_VC_SEL[elementId]);
 

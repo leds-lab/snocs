@@ -11,7 +11,17 @@ SOURCES += \
     ../StopSim/StopSim.cpp \
     ../TrafficMeter/TrafficMeter.cpp \
     fg.cpp \
-    UnboundedFifo.cpp
+    UnboundedFifo.cpp \
+    FlowGenerator.cpp \
+    DestinationGenerator.cpp \
+    UniformDistribution.cpp \
+    TypeInjection.cpp \
+    VarPacketSizeFixIdle.cpp \
+    VarIntervalFixPacketSize.cpp \
+    VarPacketSizeFixInterval.cpp \
+    VarIdleFixPacketSize.cpp \
+    VarBurstFixInterval.cpp \
+    ConstantInjection.cpp
 #    tm_single.cpp
 
 HEADERS += \
@@ -21,7 +31,17 @@ HEADERS += \
     ../TrafficMeter/TrafficMeter.h \
     fg.h \
     UnboundedFifo.h \
-    TerminalInstrumentation.h
+    TerminalInstrumentation.h \
+    FlowGenerator.h \
+    DestinationGenerator.h \
+    UniformDistribution.h \
+    TypeInjection.h \
+    VarPacketSizeFixIdle.h \
+    VarIntervalFixPacketSize.h \
+    VarPacketSizeFixInterval.h \
+    VarIdleFixPacketSize.h \
+    VarBurstFixInterval.h \
+    ConstantInjection.h
 #    tm_single.h
 
 OTHER_FILES += simconf.conf
