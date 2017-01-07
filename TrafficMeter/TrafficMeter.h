@@ -38,7 +38,7 @@ protected:
     unsigned short trafficClassWidth;    // Width of the field traffic class in the header flit
 
     UIntVar packetHeader;
-    unsigned long cycleOfArriving;
+    unsigned long long cycleOfArriving;
 
     INoC::TopologyType topologyType;
     bool isExternal;                    // Flag to indicates if the traffic meter is external of the network.
@@ -48,7 +48,7 @@ public:
     sc_in<bool>          i_CLK;        // Clock
     sc_in<bool>          i_RST;        // Reset
     sc_in<bool>          i_EOS;        // End-of-simulation - monitoring to close log files
-    sc_in<unsigned long> i_CLK_CYCLES; // Global clock counter
+    sc_in<unsigned long long> i_CLK_CYCLES; // Global clock counter
 
     // Link signals
     sc_vector<sc_in<bool> > i_VC_SEL; // Virtual channel selector if the link has virtual channel

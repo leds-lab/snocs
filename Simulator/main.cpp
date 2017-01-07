@@ -182,7 +182,7 @@ int sc_main(int argc, char* argv[]) {
     // System signals
     sc_clock                 w_CLK("CLK", CLK_PERIOD, SC_NS); // System clock | Tclk=1 ns
     sc_signal<bool>          w_RST;                           // Reset
-    sc_signal<unsigned long> w_GLOBAL_CLOCK;                  // Number of cycles
+    sc_signal<unsigned long long> w_GLOBAL_CLOCK;                  // Number of cycles
 
     // Wires to connect System Components to the network - Transmission interface
     sc_vector<sc_signal<Flit> > w_IN_DATA("w_IN_DATA",numElements);        // Network data input
@@ -591,7 +591,7 @@ void generateListNodesGtkwave(unsigned short numElements) {
     fprintf(out,"\n@200");
     fprintf(out,"\n-System-Signals");
     fprintf(out,"\n@22");
-    fprintf(out,"\nSystemC.GLOBAL_CLK[31:0]");
+    fprintf(out,"\nSystemC.GLOBAL_CLK[63:0]");
     fprintf(out,"\n@28");
     fprintf(out,"\nSystemC.CLK");
     fprintf(out,"\nSystemC.RST");

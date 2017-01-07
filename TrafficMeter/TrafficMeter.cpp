@@ -84,7 +84,7 @@ void TrafficMeter::p_PROBE() {
 void TrafficMeter::p_FINISH() {
 
     if( i_EOS.read() == 1 ) {
-        fprintf(this->outFile,"\n# %lu", i_CLK_CYCLES.read());
+        fprintf(this->outFile,"\n# %llu", i_CLK_CYCLES.read());
         fclose(outFile);
     }
 }
@@ -123,8 +123,8 @@ void TrafficMeter::writeInfo() {
             fprintf(outFile,"  %2u\t"  , trafficClass);
             fprintf(outFile,"%10lu\t"  , packet->deadline);
             fprintf(outFile,"%10lu\t"  , packet->packetCreationCycle);
-            fprintf(outFile,"%10lu\t"  , this->cycleOfArriving);
-            fprintf(outFile,"%10lu\t"  , i_CLK_CYCLES.read());
+            fprintf(outFile,"%10llu\t"  , this->cycleOfArriving);
+            fprintf(outFile,"%10llu\t"  , i_CLK_CYCLES.read());
             fprintf(outFile,"%5u\t"    , packet->payloadLength);
             fprintf(outFile,"  %.2f\t" , round(packet->requiredBW) );
             fprintf(outFile,"\n");

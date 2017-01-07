@@ -101,7 +101,7 @@ void StopSim::p_STOP() {
         if (stopTime_cycles == 0) {
             if (w_EOT.read() == 1) {
                 if (r_TOTAL_PACKETS_SENT.read() == r_TOTAL_PACKETS_RECEIVED.read()) {
-                    fprintf(fp_out,"%lu", i_CLK_CYCLES.read());
+                    fprintf(fp_out,"%llu", i_CLK_CYCLES.read());
                     fclose(fp_out);
                     o_EOS.write(1);
                     wait();
@@ -110,7 +110,7 @@ void StopSim::p_STOP() {
             }
         } else {
             if (i_CLK_CYCLES.read() >= stopTime_cycles) {
-                fprintf(fp_out,"%lu", i_CLK_CYCLES.read());
+                fprintf(fp_out,"%llu", i_CLK_CYCLES.read());
                 fclose(fp_out);
                 o_EOS.write(1);
                 wait();
