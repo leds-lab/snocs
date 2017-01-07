@@ -84,7 +84,6 @@ public:
         }
 
         u_FIFO_OUT = new UnboundedFifo("FifoOutTG"); // Unbounded Fifo Packet Source
-        u_FIFO_OUT->id = TG_ID;
         u_FIFO_OUT->i_CLK(i_CLK);
         u_FIFO_OUT->i_RST(i_RST);
         u_FIFO_OUT->i_DATA_IN(w_DATA_SEND);

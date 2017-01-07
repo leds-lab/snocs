@@ -361,6 +361,9 @@ void FlowGenerator::p_SEND() {
             // current flow to the value previously calculated value. Then, it inserts
             // wait cycles until cycle_to_send_next_pck is reached
             cycleToSendNextPacket += flow.idle;
+            if( cycleToSendNextPacket < i_CLK_CYCLES.read() ) {
+                std::cout << std::endl << "FG " << FG_ID << " under congestion to send packets.";
+            }
 // ZEFERINO
             while ( i_CLK_CYCLES.read() < cycleToSendNextPacket) wait(); // Wait until the cycle to send the packet
 
