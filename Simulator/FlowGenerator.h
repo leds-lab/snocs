@@ -46,7 +46,7 @@ public:
     // System signals
     sc_in<bool>          i_CLK;
     sc_in<bool>          i_RST;
-    sc_in<unsigned long> i_CLK_CYCLES;
+    sc_in<unsigned long long> i_CLK_CYCLES;
 
     // Interface to the VCs of the communication port (its is done by means of FIFOs)
     sc_out<Flit>  o_DATA_SEND;          // I/F with the output FIFO
