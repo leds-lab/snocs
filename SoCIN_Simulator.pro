@@ -52,7 +52,8 @@ SUBDIRS += \
     Routing_Crossfirst \
     SoCIN_3D \
     Routing_XYZ \
-    Routing_Ring_zero
+    Routing_Ring_zero \
+    Routing_NF
 
 OTHER_FILES += \
     app.pri \

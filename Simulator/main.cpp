@@ -176,7 +176,7 @@ int sc_main(int argc, char* argv[]) {
 
     // ------------------- Establishing system -------------------
 
-    sc_set_time_resolution(1,SC_NS);
+//    sc_set_time_resolution(1,SC_NS);
 
     /// [3] Signals instantation
     // System signals
