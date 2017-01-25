@@ -19,7 +19,7 @@ void Routing_RingZero::p_REQUEST() {
     bool      v_BOP;                // packet framing bit: begin of packet
     bool      v_HEADER_PRESENT;     // A header is in the FIFO's output
     UIntVar   v_REQUEST(0,numPorts);// Encoded request
-    int v_LOCAL, v_OFFSET;    // Aux. variables used for routing
+    int v_LOCAL;                    // Aux. variables used for routing
 
     Flit f = i_DATA.read();
     v_DATA = f.data;

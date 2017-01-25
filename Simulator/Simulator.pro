@@ -10,7 +10,6 @@ SOURCES += \
     ../SystemSignals/SystemSignals.cpp \
     ../StopSim/StopSim.cpp \
     ../TrafficMeter/TrafficMeter.cpp \
-    fg.cpp \
     UnboundedFifo.cpp \
     FlowGenerator.cpp \
     DestinationGenerator.cpp \
@@ -29,7 +28,6 @@ HEADERS += \
     ../SystemSignals/SystemSignals.h \
     ../StopSim/StopSim.h \
     ../TrafficMeter/TrafficMeter.h \
-    fg.h \
     UnboundedFifo.h \
     TerminalInstrumentation.h \
     FlowGenerator.h \

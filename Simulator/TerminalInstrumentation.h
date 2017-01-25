@@ -2,7 +2,6 @@
 #define __TERMINAL_INSTRUMENTATION_H__
 
 #include <systemc.h>
-#include "fg.h"
 
 #include "../SoCINDefines.h"
 #include "../NoC/NoC.h"
