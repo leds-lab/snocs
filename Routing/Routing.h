@@ -88,6 +88,10 @@ protected:
     unsigned char REQ_S;
     unsigned char REQ_W;
     unsigned char REQ_NONE;
+    unsigned char INDEX_N;
+    unsigned char INDEX_E;
+    unsigned char INDEX_S;
+    unsigned char INDEX_W;
 
     unsigned short XID,YID;
 public:
@@ -138,6 +142,10 @@ public:
                 REQ_W = (unsigned char) pow(2,(useNorth+useEast+useSouth+useWest));
             }
         }
+        INDEX_N = log2(REQ_N);
+        INDEX_E = log2(REQ_E);
+        INDEX_S = log2(REQ_S);
+        INDEX_W = log2(REQ_W);
     }
 
     INoC::TopologyType supportedTopology() const { return INoC::TT_Orthogonal2D; }

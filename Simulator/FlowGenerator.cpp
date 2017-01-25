@@ -174,9 +174,6 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
     trailer.data = flit;
     trailer.packet_ptr = packet;
     this->sendFlit(trailer, virtualChannel); // Send trailer
-
-    o_NUMBER_OF_PACKETS_SENT.write( o_NUMBER_OF_PACKETS_SENT.read() + 1 );
-
 }
 
 void FlowGenerator::sendBurst(FlowParameters flowParam, unsigned long long cycleToSend) {
