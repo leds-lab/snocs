@@ -6,49 +6,49 @@ PG_Rotative::PG_Rotative(sc_module_name mn,
                      unsigned short int ROUTER_ID,
                      unsigned short int PORT_ID)
         : IPriorityGenerator(mn,numReqs_Grants,ROUTER_ID,PORT_ID),
-          update_register("PGRot_update_register"), Gdelayed("PGRot_Gdelayed",numReqs_Grants),
-          nextP("PGRot_nextP",numReqs_Grants), Preg("PGRot_Preg",numReqs_Grants)
+          r_UPDATE("PGRot_update_register"), r_GDELAYED("PGRot_Gdelayed",numReqs_Grants),
+          r_NEXT_PRIORITIES("PGRot_nextP",numReqs_Grants), r_PRIORITIES("PGRot_Preg",numReqs_Grants)
 {
 
     unsigned short int i;
-    SC_METHOD(p_gdelayed);
+    SC_METHOD(p_GDELAYED);
     sensitive << i_CLK.pos() << i_RST;
 
-    SC_METHOD(p_update_register);
+    SC_METHOD(p_UPDATE);
     for( i = 0; i < numReqs_Grants; i++) {
-        sensitive << i_GRANTS[i] << Gdelayed[i];
+        sensitive << i_GRANTS[i] << r_GDELAYED[i];
     }
 
-    SC_METHOD(p_nextp);
+    SC_METHOD(p_NEXT_PRIORITIES);
     for( i = 0; i < numReqs_Grants; i++) {
         sensitive << i_GRANTS[i];
     }
 
-    SC_METHOD(p_preg);
+    SC_METHOD(p_PRIORITIES);
     sensitive << i_CLK.pos() << i_RST;
 
-    SC_METHOD(p_outputs);
+    SC_METHOD(p_OUTPUTS);
     for( i = 0; i < numReqs_Grants; i++) {
-        sensitive << Preg[i];
+        sensitive << r_PRIORITIES[i];
     }
 
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PG_Rotative::p_gdelayed()
+void PG_Rotative::p_GDELAYED()
 ////////////////////////////////////////////////////////////////////////////////
 // It's just a d-type register that holds the state of G for one clock cycle
 {
     if (i_RST.read())
         for(unsigned short int i = 0; i < numPorts; i++)
-            Gdelayed[i].write(0);
+            r_GDELAYED[i].write(0);
     else
         for(unsigned short int i = 0; i < numPorts; i++)
-            Gdelayed[i].write(i_GRANTS[i].read());
+            r_GDELAYED[i].write(i_GRANTS[i].read());
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PG_Rotative::p_update_register()
+void PG_Rotative::p_UPDATE()
 ////////////////////////////////////////////////////////////////////////////////
 // It just implements a parameterizable OR which detect if any request was
 // granted in the last cycle. In this case, it enables the priority register
@@ -62,7 +62,7 @@ void PG_Rotative::p_update_register()
 
     for(i = 0; i < numPorts; i++) {
         v_G[i] = i_GRANTS[i].read();
-        v_Gdelayed[i] = Gdelayed[i].read();
+        v_Gdelayed[i] = r_GDELAYED[i].read();
     }
 
     // It first determines if there exists any request that was granted in the
@@ -77,12 +77,12 @@ void PG_Rotative::p_update_register()
         update_register_tmp = update_register_tmp | v_GRANTING[i];
     }
 
-    update_register.write(update_register_tmp);
+    r_UPDATE.write(update_register_tmp);
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void PG_Rotative::p_nextp()
+void PG_Rotative::p_NEXT_PRIORITIES()
 ////////////////////////////////////////////////////////////////////////////////
 // It determines the next priority order by rotating 1x left the current
 // priority status. Ex. If Preg="0001", then, nextP="0010". Such rotation will
@@ -94,7 +94,7 @@ void PG_Rotative::p_nextp()
     unsigned short int i;
 
     for( i = 0; i < numPorts; i++) {
-        v_Preg[i] = Preg[i].read();
+        v_Preg[i] = r_PRIORITIES[i].read();
     }
 
     v_NEXT_P[0] = v_Preg[numPorts-1];
@@ -104,13 +104,13 @@ void PG_Rotative::p_nextp()
     }
 
     for( i = 0; i < numPorts; i++) {
-        nextP[i].write(v_NEXT_P[i]);
+        r_NEXT_PRIORITIES[i].write(v_NEXT_P[i]);
     }
 }
 
 
 ////////////////////////////////////////////////////////////////////////////////
-void PG_Rotative::p_preg()
+void PG_Rotative::p_PRIORITIES()
 ////////////////////////////////////////////////////////////////////////////////
 // It is reset with bit 0 in 1 and the others in 0, and is updated at each
 // arbitration cycle (after a request is grant) with the value determined
@@ -122,14 +122,14 @@ void PG_Rotative::p_preg()
     unsigned short int i;
 
     for( i = 0; i < numPorts; i++) {
-        v_Preg[i] = Preg[i].read();
-        v_NEXT_P[i] = nextP[i].read();
+        v_Preg[i] = r_PRIORITIES[i].read();
+        v_NEXT_P[i] = r_NEXT_PRIORITIES[i].read();
     }
 
     if (i_RST.read()) {
         v_Preg[0] = 1;
     } else {
-        if (update_register.read()) {
+        if (r_UPDATE.read()) {
             v_Preg[0] = v_NEXT_P[0];
         }
     }
@@ -138,24 +138,24 @@ void PG_Rotative::p_preg()
         if (i_RST.read()) {
             v_Preg[i] = 0;
         } else {
-            if (update_register.read()) {
+            if (r_UPDATE.read()) {
                 v_Preg[i] = v_NEXT_P[i];
             }
         }
     }
 
     for( i = 0; i < numPorts; i++) {
-        Preg[i].write(v_Preg[i]);
+        r_PRIORITIES[i].write(v_Preg[i]);
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-void PG_Rotative::p_outputs()
+void PG_Rotative::p_OUTPUTS()
 ////////////////////////////////////////////////////////////////////////////////
 // It updates the output
 {
     for(unsigned short int i = 0; i < numPorts; i++) {
-        o_PRIORITIES[i].write( Preg[i].read() );
+        o_PRIORITIES[i].write( r_PRIORITIES[i].read() );
     }
 }
 

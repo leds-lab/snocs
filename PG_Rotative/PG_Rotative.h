@@ -31,35 +31,26 @@ class PG_Rotative : public IPriorityGenerator {
 public:
 
     // Internal signals
-    sc_signal<bool>             update_register; //! Command to up to date Preg
-    sc_vector<sc_signal<bool> > Gdelayed;        //! G delayed in 1 cycle
-    sc_vector<sc_signal<bool> > nextP;           //! Next priorities values
-    sc_vector<sc_signal<bool> > Preg;            //! Priorities register
+    sc_signal<bool>             r_UPDATE;           //! Command to up to date Preg
+    sc_vector<sc_signal<bool> > r_GDELAYED;         //! G delayed in 1 cycle
+    sc_vector<sc_signal<bool> > r_NEXT_PRIORITIES;  //! Next priorities values
+    sc_vector<sc_signal<bool> > r_PRIORITIES;       //! Priorities register
 
     // Module's processes
-    void p_gdelayed();
-    void p_update_register();
-    void p_nextp();
-    void p_preg();
-    void p_outputs();
-    void p_debug();
-
-    ModuleType moduleType() const { return  SoCINModule::TPriorityGenerator; }
-    const char* moduleName() const { return "PG_Rotative"; }
+    void p_GDELAYED();
+    void p_UPDATE();
+    void p_NEXT_PRIORITIES();
+    void p_PRIORITIES();
+    void p_OUTPUTS();
 
     SC_HAS_PROCESS(PG_Rotative);
-    /*!
-     * \brief PG_Rotative
-     * \param mn
-     * \param numReqs_Grants
-     * \param ROUTER_ID
-     * \param PORT_ID
-     */
     PG_Rotative(sc_module_name mn,
               unsigned short int numReqs_Grants,
               unsigned short int ROUTER_ID,
               unsigned short int PORT_ID);
 
+    ModuleType moduleType() const { return  SoCINModule::TPriorityGenerator; }
+    const char* moduleName() const { return "PG_Rotative"; }
 };
 
 
