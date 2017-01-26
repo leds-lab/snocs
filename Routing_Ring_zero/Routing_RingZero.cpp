@@ -1,5 +1,7 @@
 #include "Routing_RingZero.h"
 
+#define ROUTER_SELECTED 0
+
 Routing_RingZero::Routing_RingZero(sc_module_name mn,
                                    unsigned short nPorts,
                                    unsigned short ROUTER_ID)
@@ -19,7 +21,7 @@ void Routing_RingZero::p_REQUEST() {
     bool      v_BOP;                // packet framing bit: begin of packet
     bool      v_HEADER_PRESENT;     // A header is in the FIFO's output
     UIntVar   v_REQUEST(0,numPorts);// Encoded request
-    int v_LOCAL;                    // Aux. variables used for routing
+    int v_LOCAL, v_OFFSET;          // Aux. variables used for routing
 
     Flit f = i_DATA.read();
     v_DATA = f.data;
@@ -37,16 +39,41 @@ void Routing_RingZero::p_REQUEST() {
     // It runs the routing algorithm
     if (v_HEADER_PRESENT) {
 
+        unsigned short v_LAST_ID = NUM_ELEMENTS - 1;
+
         v_LOCAL = ROUTER_ID;
         v_DEST = v_DATA.range(RIB_WIDTH-1, 0);
 
-        if( v_DEST > v_LOCAL ) {
-            v_REQUEST = REQ_CLOCKWISE;
-        } else if( v_DEST < v_LOCAL ) {
-            v_REQUEST = REQ_COUNTERCLOCKWISE;
-        } else { // X == Y == 0
-            v_REQUEST = REQ_LOCAL;
+        v_OFFSET = v_DEST.to_int() - v_LOCAL;
+
+        if(ROUTER_ID == ROUTER_SELECTED || v_DEST == ROUTER_SELECTED) {
+            if (v_OFFSET != 0) {
+                if (v_OFFSET > 0) {
+                    if( v_OFFSET > v_LAST_ID/2 ) {
+                        v_REQUEST = REQ_COUNTERCLOCKWISE;
+                    } else {
+                        v_REQUEST = REQ_CLOCKWISE;
+                    }
+                } else {
+                    if( (v_OFFSET*-1) <= v_LAST_ID/2 ) {
+                        v_REQUEST = REQ_COUNTERCLOCKWISE;
+                    } else {
+                        v_REQUEST = REQ_CLOCKWISE;
+                    }
+                }
+            } else { // X == Y == 0
+                v_REQUEST = REQ_LOCAL;
+            }
+        } else {
+            if( v_DEST > v_LOCAL ) {
+                v_REQUEST = REQ_CLOCKWISE;
+            } else if( v_DEST < v_LOCAL ) {
+                v_REQUEST = REQ_COUNTERCLOCKWISE;
+            } else { // X == Y == 0
+                v_REQUEST = REQ_LOCAL;
+            }
         }
+
         if( f.packet_ptr != NULL ) {
             f.packet_ptr->hops++;
         }
