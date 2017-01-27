@@ -244,6 +244,8 @@ int sc_main(int argc, char* argv[]) {
     u_NOC->i_CLK(w_CLK);
     u_NOC->i_RST(w_RST);
 
+    unsigned long long totalPacketsToSend = 0;
+
     // Instantiating System Components (TGs, TMs) & binding dynamic ports
     for( unsigned short elementId = 0; elementId < numElements; elementId++ ) {
         // Assembling TG name
@@ -251,6 +253,8 @@ int sc_main(int argc, char* argv[]) {
         sprintf(strTgName,"TG_%u",elementId);
         // Instantiate TG
         TerminalInstrumentation* u_TG = new TerminalInstrumentation(strTgName,elementId,u_NOC->topologyType());
+        totalPacketsToSend += u_TG->u_FG->getTotalPacketsToSend();
+        u_TG->u_FG->stopMethod = u_STOP->stopMethod;
 
         // Assembling TM name
         char strTmName[10];
@@ -316,7 +320,9 @@ int sc_main(int argc, char* argv[]) {
         u_STOP->i_TG_NUM_PACKETS_SENT[elementId](w_TG_NUM_PACKETS_SENT[elementId]);
         u_STOP->i_TG_NUM_PACKETS_RECEIVED[elementId](w_TG_NUM_PACKETS_RECEIVED[elementId]);
         u_STOP->i_TG_EOT[elementId](w_TG_EOT[elementId]);
-
+    }
+    if( u_STOP->stopMethod == StopSim::AllPacketsDelivered ) {
+        u_STOP->setTotalPacketsToSend(totalPacketsToSend);
     }
 
     /// [5] Trace generation

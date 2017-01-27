@@ -55,6 +55,7 @@ public:
     IInputFlowControl*  u_IFC;
     IOutputFlowControl* u_OFC;
     UnboundedFifo* u_FIFO_OUT;
+    FlowGenerator* u_FG;
 
     void p_debug(void) {
         if ((TG_ID)==0) {
@@ -143,21 +144,21 @@ public:
         if(NUM_VC>1)
             fg0->o_VC(o_VC);
 #else
-        FlowGenerator* fg0 = new FlowGenerator("FlowGenerator",TG_ID,topologyType,u_IFC->numberOfCyclesPerFlit());
-        fg0->i_CLK(i_CLK);
-        fg0->i_RST(i_RST);
-        fg0->i_CLK_CYCLES(i_CLK_CYCLES);
-        fg0->o_DATA_SEND(w_DATA_SEND);
-        fg0->o_WRITE_SEND(w_WRITE_SEND);
-        fg0->i_WRITE_OK_SEND(w_WRITE_OK_SEND);
-        fg0->i_DATA_RECEIVE(w_DATA_RECEIVE);
-        fg0->i_READ_OK_RECEIVE(w_READ_OK_RECEIVE);
-        fg0->o_READ_RECEIVE(w_READ_RECEIVE);
-        fg0->o_END_OF_TRANSMISSION(o_END_OF_TRANSMISSION);
-        fg0->o_NUMBER_OF_PACKETS_SENT(o_NUMBER_OF_PACKETS_SENT);
-        fg0->o_NUMBER_OF_PACKETS_RECEIVED(o_NUMBER_OF_PACKETS_RECEIVED);
+        u_FG = new FlowGenerator("FlowGenerator",TG_ID,topologyType,u_IFC->numberOfCyclesPerFlit());
+        u_FG->i_CLK(i_CLK);
+        u_FG->i_RST(i_RST);
+        u_FG->i_CLK_CYCLES(i_CLK_CYCLES);
+        u_FG->o_DATA_SEND(w_DATA_SEND);
+        u_FG->o_WRITE_SEND(w_WRITE_SEND);
+        u_FG->i_WRITE_OK_SEND(w_WRITE_OK_SEND);
+        u_FG->i_DATA_RECEIVE(w_DATA_RECEIVE);
+        u_FG->i_READ_OK_RECEIVE(w_READ_OK_RECEIVE);
+        u_FG->o_READ_RECEIVE(w_READ_RECEIVE);
+        u_FG->o_END_OF_TRANSMISSION(o_END_OF_TRANSMISSION);
+        u_FG->o_NUMBER_OF_PACKETS_SENT(o_NUMBER_OF_PACKETS_SENT);
+        u_FG->o_NUMBER_OF_PACKETS_RECEIVED(o_NUMBER_OF_PACKETS_RECEIVED);
         if( NUM_VC > 1 ) {
-            fg0->o_VC_SEND(o_VC);
+            u_FG->o_VC_SEND(o_VC);
         }
 #endif
     }
