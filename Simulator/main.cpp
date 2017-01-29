@@ -71,7 +71,7 @@ void showHelp() {
     std::cout << " >>> Usage: SNoCS TClk WORK_DIR PLUGINS_DIR [options]"
               << std::endl << std::endl;
 
-    std::cout << " * TClk        : clock period in nanoseconds to system operation.\n"
+    std::cout << " * TClk        : clock period in nanoseconds for the system operation.\n"
                  " * WORK_DIR    : Directory to output simulation log files.\n"
                  "                 Must be an existent directory.\n"
                  " * PLUGINS_DIR : Directory with the plugins of the simulator.\n"
@@ -82,7 +82,7 @@ void showHelp() {
               << "   * To all options there are a default value                    *" << std::endl
               << "   * Not all options are used depending the system configuration *" << std::endl
               << "   * There are limits values (i.e. min and max) to the options   *" << std::endl << std::endl;
-    std::cout << "  -nelements value    Number of elements in the network fot non-orthogonal topologies" << std::endl
+    std::cout << "  -nelements value    Number of elements in the network for non-orthogonal topologies" << std::endl
               << "                      Default=16, Min: 4, Max: 256" << std::endl << std::endl
               << "  -xsize value        Network X dimension. 2 =< Value =< (16 for 2D and 8 for 3D)" << std::endl
               << "                      Default=4, Min: 2, Max: [16 (2D) | 8 (3D)]" << std::endl << std::endl
@@ -409,7 +409,7 @@ int sc_main(int argc, char* argv[]) {
         delete u_TMs[i];
     }
     delete[] formattedTime;
-    delete PLUGIN_MANAGER;
+//    delete PLUGIN_MANAGER;
 
     return 0;
 }
