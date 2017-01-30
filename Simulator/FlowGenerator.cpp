@@ -442,7 +442,7 @@ void FlowGenerator::p_SEND() {
                 packetsSent++;
 
 // EDUARDO - Sending packets forever
-            if( packetsSent % totalPacketsToSend == 0 ) { // Old stop condition - remove to back the old model
+            if( packetsSent % totalPacketsToSend == 0 ) { // Old stop condition while(packetsSent < totalPacketsToSend)
                 if( stopMethod != StopSim::AllPacketsDelivered ) {
                     this->reloadFlows();
                 } else {

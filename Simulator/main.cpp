@@ -239,6 +239,8 @@ int sc_main(int argc, char* argv[]) {
     //////////////////////////////////////////////////////////////////////////////
     std::vector<TrafficMeter *> u_TMs(numElements,NULL);
     //////////////////////////////////////////////////////////////////////////////
+    std::vector<TerminalInstrumentation *> u_TIs(numElements,NULL);
+    //////////////////////////////////////////////////////////////////////////////
 
     // System signals
     u_NOC->i_CLK(w_CLK);
@@ -255,6 +257,7 @@ int sc_main(int argc, char* argv[]) {
         TerminalInstrumentation* u_TG = new TerminalInstrumentation(strTgName,elementId,u_NOC->topologyType());
         totalPacketsToSend += u_TG->u_FG->getTotalPacketsToSend();
         u_TG->u_FG->stopMethod = u_STOP->stopMethod;
+        u_TIs[elementId] = u_TG;
 
         // Assembling TM name
         char strTmName[10];
@@ -388,6 +391,7 @@ int sc_main(int argc, char* argv[]) {
     // Start the simulation (the StopSim will stop it with sc_stop())
     time_t start;
     time_t finish;
+    sc_set_stop_mode(SC_STOP_IMMEDIATE);
     time(&start);
     sc_start();
     time(&finish);
@@ -403,13 +407,13 @@ int sc_main(int argc, char* argv[]) {
         generateListNodesGtkwave(numElements);
     }
 
-
     // Deallocating simulator units and auxiliar data
     for( unsigned short i = 0; i < numElements; i++ ) {
         delete u_TMs[i];
+        delete u_TIs[i];
     }
     delete[] formattedTime;
-//    delete PLUGIN_MANAGER;
+    delete PLUGIN_MANAGER;
 
     return 0;
 }
