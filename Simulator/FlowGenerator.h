@@ -5,6 +5,7 @@
 #include "../NoC/NoC.h"
 
 #include "DestinationGenerator.h"
+#include "../StopSim/StopSim.h"
 
 // Switching types
 #define WH 0
@@ -22,6 +23,7 @@
 
 class FlowGenerator : public SoCINModule  {
 public:
+    StopSim::StopMethod stopMethod;
 
     struct FlowParameters {             // Manage the traffic parameters
         unsigned int  type;                 //  0: 0 = gtr determines the traffic model, 1 = tg determines the traffic model by using PARETO
@@ -74,6 +76,7 @@ public:
     void sendBurst(FlowParameters flowParam, unsigned long long cycleToSend);
 
     bool readTrafficFile();
+    void reloadFlows();
 
     SC_HAS_PROCESS(FlowGenerator);
     FlowGenerator(sc_module_name mn,
@@ -85,6 +88,8 @@ public:
     const char* moduleName() const { return "FlowGenerator"; }
 
     ~FlowGenerator() {}
+
+    inline unsigned long getTotalPacketsToSend() const { return this->totalPacketsToSend; }
 
 protected:
     virtual FlowParameters &getFlow();
@@ -98,6 +103,8 @@ private:
 
     std::default_random_engine randomGenerator;
     std::uniform_int_distribution<int> uniformRandom;
+
+    unsigned long totalPacketsToSend;
 
     DestinationGenerator* destGen;
 };

@@ -25,7 +25,16 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 class StopSim : public SoCINModule {
 protected:
     unsigned short numInterfaces;
+    unsigned long long totalPacketsToReceive;
+    unsigned long long stopCycle;
+    FILE* fp_out;
+
+    void configureStopOptions();
 public:
+    enum StopMethod { AllPacketsDelivered  = 0,
+                      ByTime,
+                      ByCycles,
+                      ByPacketsDelivered };
     // Interface
     // System signals
     sc_in<bool>          i_CLK;         // Clock
@@ -45,9 +54,12 @@ public:
 
     // Internal data structures
     char* confFileName;
+    void endSimulation(FILE *fp_out);
 
     // Module's process
     void p_STOP();
+
+    inline void setTotalPacketsToSend(unsigned long long total) { this->totalPacketsToReceive = total; }
 
     SC_HAS_PROCESS(StopSim);
     StopSim(sc_module_name mn,
@@ -58,6 +70,8 @@ public:
     const char* moduleName() const { return "StopSim"; }
 
     ~StopSim(){}
+
+    StopMethod stopMethod;
 };
 
 #endif // __STOPSIM_H__

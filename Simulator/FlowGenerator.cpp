@@ -24,7 +24,8 @@ FlowGenerator::FlowGenerator(sc_module_name mn,
       topologyType(topologyType),
       FG_ID(FG_ID),
       numberCyclesPerFlit(numberOfCyclesPerFlit),
-      randomGenerator(std::chrono::system_clock::now().time_since_epoch().count())
+      randomGenerator(std::chrono::system_clock::now().time_since_epoch().count()),
+      totalPacketsToSend(0)
 {
 
     // Initialize the default random engine with time seed
@@ -228,6 +229,7 @@ bool FlowGenerator::readTrafficFile() {
     flows.resize(numberOfFlows);
     uniformRandom = std::uniform_int_distribution<int>(0, (int) numberOfFlows -1);
 
+    totalPacketsToSend = 0;
     for(unsigned int flow_index = 0; flow_index < numberOfFlows; flow_index++){
         FlowParameters flow;
         fscanf(trafficFile,"%u" , &(flow.type));
@@ -245,6 +247,8 @@ bool FlowGenerator::readTrafficFile() {
         fscanf(trafficFile,"%u" , &(flow.last_payload_length));
         fscanf(trafficFile,"%f" , &(flow.parameter1));
         fscanf(trafficFile,"%f" , &(flow.parameter2));
+        // It determines the total number of packets to be sent by all the flows
+        totalPacketsToSend += flow.pck_2send;
         flow.pck_sent = 0;
         flows[flow_index] = flow;
     }
@@ -284,6 +288,13 @@ FlowGenerator::FlowParameters& FlowGenerator::getFlow() {
     return *flowSelected;
 }
 
+void FlowGenerator::reloadFlows() {
+    for(unsigned int i = 0; i < flows.size(); i++) {
+        FlowParameters* flow = &flows[i];
+        flow->pck_sent = 0;
+    }
+}
+
 void FlowGenerator::p_SEND() {
 
     // Reseting
@@ -293,27 +304,19 @@ void FlowGenerator::p_SEND() {
     o_END_OF_TRANSMISSION.write(0);
     o_NUMBER_OF_PACKETS_SENT.write(0);
     wait();
+//        // TEMP
+//        destGen = new UniformDistribution;
 
     unsigned int numFlows = this->flows.size();
     if(numFlows > 0) {
-        // TEMP
-        destGen = new UniformDistribution;
-
-        unsigned long long totalPacketsToSend = 0;
-        // It determines the total number of packets to be sent by all the flows
-        for( unsigned int i = 0; i < numFlows; i++ ) {
-            totalPacketsToSend += flows[i].pck_2send;
-        }
-
         unsigned long long cycleToSendNextPacket;
         // It determines the cycle to send the first packet
         cycleToSendNextPacket = i_CLK_CYCLES.read();
 
         unsigned long long packetsSent = 0;
 
-
         ///// Sending the packets /////
-        while( packetsSent < totalPacketsToSend ) { // Send all packets
+        while( true ) { // Send packets
             FlowParameters& flow = this->getFlow(); // Get a flow randomly
 
             TypeInjection* tpInjection = NULL;
@@ -437,6 +440,17 @@ void FlowGenerator::p_SEND() {
                 packetsSent += flow.burst_size;
             else
                 packetsSent++;
+
+// EDUARDO - Sending packets forever
+            if( packetsSent % totalPacketsToSend == 0 ) { // Old stop condition while(packetsSent < totalPacketsToSend)
+                if( stopMethod != StopSim::AllPacketsDelivered ) {
+                    this->reloadFlows();
+                } else {
+                    break;
+                }
+            }
+// EDUARDO - Sendind packets forever
+
 
 // ZEFERINO
 //            // It inserts wait states until cycle_to_inject is reached

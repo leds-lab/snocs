@@ -71,7 +71,7 @@ void showHelp() {
     std::cout << " >>> Usage: SNoCS TClk WORK_DIR PLUGINS_DIR [options]"
               << std::endl << std::endl;
 
-    std::cout << " * TClk        : clock period in nanoseconds to system operation.\n"
+    std::cout << " * TClk        : clock period in nanoseconds for the system operation.\n"
                  " * WORK_DIR    : Directory to output simulation log files.\n"
                  "                 Must be an existent directory.\n"
                  " * PLUGINS_DIR : Directory with the plugins of the simulator.\n"
@@ -82,7 +82,7 @@ void showHelp() {
               << "   * To all options there are a default value                    *" << std::endl
               << "   * Not all options are used depending the system configuration *" << std::endl
               << "   * There are limits values (i.e. min and max) to the options   *" << std::endl << std::endl;
-    std::cout << "  -nelements value    Number of elements in the network fot non-orthogonal topologies" << std::endl
+    std::cout << "  -nelements value    Number of elements in the network for non-orthogonal topologies" << std::endl
               << "                      Default=16, Min: 4, Max: 256" << std::endl << std::endl
               << "  -xsize value        Network X dimension. 2 =< Value =< (16 for 2D and 8 for 3D)" << std::endl
               << "                      Default=4, Min: 2, Max: [16 (2D) | 8 (3D)]" << std::endl << std::endl
@@ -239,10 +239,14 @@ int sc_main(int argc, char* argv[]) {
     //////////////////////////////////////////////////////////////////////////////
     std::vector<TrafficMeter *> u_TMs(numElements,NULL);
     //////////////////////////////////////////////////////////////////////////////
+    std::vector<TerminalInstrumentation *> u_TIs(numElements,NULL);
+    //////////////////////////////////////////////////////////////////////////////
 
     // System signals
     u_NOC->i_CLK(w_CLK);
     u_NOC->i_RST(w_RST);
+
+    unsigned long long totalPacketsToSend = 0;
 
     // Instantiating System Components (TGs, TMs) & binding dynamic ports
     for( unsigned short elementId = 0; elementId < numElements; elementId++ ) {
@@ -251,6 +255,9 @@ int sc_main(int argc, char* argv[]) {
         sprintf(strTgName,"TG_%u",elementId);
         // Instantiate TG
         TerminalInstrumentation* u_TG = new TerminalInstrumentation(strTgName,elementId,u_NOC->topologyType());
+        totalPacketsToSend += u_TG->u_FG->getTotalPacketsToSend();
+        u_TG->u_FG->stopMethod = u_STOP->stopMethod;
+        u_TIs[elementId] = u_TG;
 
         // Assembling TM name
         char strTmName[10];
@@ -316,7 +323,9 @@ int sc_main(int argc, char* argv[]) {
         u_STOP->i_TG_NUM_PACKETS_SENT[elementId](w_TG_NUM_PACKETS_SENT[elementId]);
         u_STOP->i_TG_NUM_PACKETS_RECEIVED[elementId](w_TG_NUM_PACKETS_RECEIVED[elementId]);
         u_STOP->i_TG_EOT[elementId](w_TG_EOT[elementId]);
-
+    }
+    if( u_STOP->stopMethod == StopSim::AllPacketsDelivered ) {
+        u_STOP->setTotalPacketsToSend(totalPacketsToSend);
     }
 
     /// [5] Trace generation
@@ -382,6 +391,7 @@ int sc_main(int argc, char* argv[]) {
     // Start the simulation (the StopSim will stop it with sc_stop())
     time_t start;
     time_t finish;
+    sc_set_stop_mode(SC_STOP_IMMEDIATE);
     time(&start);
     sc_start();
     time(&finish);
@@ -397,10 +407,10 @@ int sc_main(int argc, char* argv[]) {
         generateListNodesGtkwave(numElements);
     }
 
-
     // Deallocating simulator units and auxiliar data
     for( unsigned short i = 0; i < numElements; i++ ) {
         delete u_TMs[i];
+        delete u_TIs[i];
     }
     delete[] formattedTime;
     delete PLUGIN_MANAGER;

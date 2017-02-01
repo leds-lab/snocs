@@ -19,32 +19,46 @@ StopSim::StopSim(sc_module_name mn,
       w_EOT("StopSim_wEOT"),
       confFileName(filename)
 {
+
+    this->configureStopOptions();
     SC_CTHREAD(p_STOP,i_CLK.pos());
     sensitive << i_CLK.pos() << i_RST;
 }
 
-void StopSim::p_STOP() {
-
-    unsigned long int stopTime_ns;
-    unsigned long int stopTime_cycles;
+void StopSim::configureStopOptions() {
     char str[512];
     FILE *fp_in;
-    FILE *fp_out;
 
-    // It opens the input file and reads the stop time
+    // It opens the input file and reads the stop options
     sprintf(str,"%s/%s.par",WORK_DIR,confFileName);
     if ((fp_in=fopen(str,"r")) == NULL) {
         printf("\n [StopSim] ERROR: Impossible to open file \"%s\".\nExiting...", str);
         exit(1);
     }
+
+    unsigned long int stopTime_ns;
+    unsigned long int stopNumPackets;
+
     fscanf(fp_in,"%s",str);
-    stopTime_cycles = atol(str);
+    stopCycle = atol(str);
     fscanf(fp_in,"%s",str);
     stopTime_ns = atol(str);
+    fscanf(fp_in,"%s",str);
+    stopNumPackets = atol(str);
     fclose(fp_in);
 
-    if(stopTime_cycles == 0 && stopTime_ns != 0) {
-        stopTime_cycles = stopTime_ns / CLK_PERIOD;
+    if(stopCycle == 0) {
+        if( stopTime_ns != 0) {
+            stopMethod = ByTime;
+            stopCycle = stopTime_ns / CLK_PERIOD;
+        } else if(stopNumPackets > 0) {
+            totalPacketsToReceive = stopNumPackets;
+            stopMethod = ByPacketsDelivered;
+        } else {
+            stopMethod = AllPacketsDelivered;
+        }
+    } else {
+        stopMethod = ByCycles;
     }
 
     // It opens the output file
@@ -53,6 +67,9 @@ void StopSim::p_STOP() {
         printf("\n	[StopSim] ERROR: Impossible to open file \"%s\". Exiting...", str);
         exit(1);
     }
+}
+
+void StopSim::p_STOP() {
 
     // It resets the counters
     r_TOTAL_PACKETS_SENT.write(0);
@@ -98,25 +115,29 @@ void StopSim::p_STOP() {
                   << std::endl;
 #endif // DEBUG_STOPSIM
 
-        if (stopTime_cycles == 0) {
-            if (w_EOT.read() == 1) {
-                if (r_TOTAL_PACKETS_SENT.read() == r_TOTAL_PACKETS_RECEIVED.read()) {
-                    fprintf(fp_out,"%llu", i_CLK_CYCLES.read());
-                    fclose(fp_out);
-                    o_EOS.write(1);
-                    wait();
-                    sc_stop();
+        switch( stopMethod ) {
+            case AllPacketsDelivered:
+            case ByPacketsDelivered:
+                if( v_NUM_PACKET_RECEIVED >= totalPacketsToReceive ) { // Stop by the number of packets delivered
+                    this->endSimulation(fp_out);
                 }
-            }
-        } else {
-            if (i_CLK_CYCLES.read() >= stopTime_cycles) {
-                fprintf(fp_out,"%llu", i_CLK_CYCLES.read());
-                fclose(fp_out);
-                o_EOS.write(1);
-                wait();
-                sc_stop();
-            }
+                break;
+            case ByCycles:
+            case ByTime:
+                if (i_CLK_CYCLES.read() >= stopCycle) {
+                    this->endSimulation(fp_out);
+                }
+                break;
         }
+
         wait();
     }
+}
+
+void StopSim::endSimulation(FILE* fp_out) {
+    fprintf(fp_out,"%llu", i_CLK_CYCLES.read());
+    fclose(fp_out);
+    o_EOS.write(1);
+    wait();
+    sc_stop();
 }
