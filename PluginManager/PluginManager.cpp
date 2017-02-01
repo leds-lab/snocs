@@ -316,6 +316,7 @@ IRouter* PluginManager::routerInstance(sc_module_name name,
 
 IRouting* PluginManager::routingInstance(sc_core::sc_module_name name,
                                          unsigned short ROUTER_ID,
+                                         unsigned short PORT_ID,
                                          unsigned short nPorts)
 {
     if( !pluginsLoaded ) {
@@ -328,7 +329,7 @@ IRouting* PluginManager::routingInstance(sc_core::sc_module_name name,
        std::cerr << "Error on load symbol of factory creator function - Routing: " << dlsym_error << std::endl;
        return NULL;
     }
-    IRouting* r = new_Routing(sc_get_curr_simcontext(),name,nPorts,ROUTER_ID);
+    IRouting* r = new_Routing(sc_get_curr_simcontext(),name,nPorts,ROUTER_ID,PORT_ID);
     if(r) {
         this->allocatedUnits.push_back(r);
     }

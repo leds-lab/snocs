@@ -82,7 +82,7 @@ public:
                             unsigned short nPorts,
                             unsigned short nVirtualChannels);
     IRouting* routingInstance(sc_core::sc_module_name name,
-                              unsigned short ROUTER_ID,
+                              unsigned short ROUTER_ID, unsigned short PORT_ID,
                               unsigned short nPorts);
     IInputFlowControl* inputFlowControlInstance(sc_core::sc_module_name name,
                                                 unsigned short ROUTER_ID,

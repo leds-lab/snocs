@@ -48,17 +48,18 @@ public:
     // Requests
     sc_vector<sc_out<bool> > o_REQUEST;    // Requests from the input ports
 
-    unsigned short ROUTER_ID;
+    unsigned short ROUTER_ID, PORT_ID;
 
     IRouting(sc_module_name mn,
              unsigned short nPorts,
-             unsigned short ROUTER_ID)
+             unsigned short ROUTER_ID,
+             unsigned short PORT_ID)
         : SoCINModule(mn) , numPorts(nPorts),
           i_READ_OK("IRouting_iREAD_OK"),
           i_DATA("IRouting_iDATA"),
           i_IDLE("IRouting_iIDLE",nPorts),
           o_REQUEST("IRouting_oREQUEST",nPorts),
-          ROUTER_ID(ROUTER_ID) {}
+          ROUTER_ID(ROUTER_ID), PORT_ID(PORT_ID) {}
 
     ModuleType moduleType() const { return SoCINModule::TRouting; }
     virtual INoC::TopologyType supportedTopology() const = 0;
@@ -98,8 +99,9 @@ public:
 
     IOrthogonal2DRouting(sc_module_name mn,
              unsigned short nPorts,
-             unsigned short ROUTER_ID)
-        : IRouting(mn,nPorts,ROUTER_ID),
+             unsigned short ROUTER_ID,
+             unsigned short PORT_ID)
+        : IRouting(mn,nPorts,ROUTER_ID,PORT_ID),
           REQ_L(1),     // Local port is always the first requisition - 0b00001
           REQ_N(0),     // Initialize ALL communication requests on 0
           REQ_E(0),     // Initialize ALL communication requests on 0
@@ -183,8 +185,9 @@ public:
 
     IOrthogonal3DRouting(sc_module_name mn,
              unsigned short nPorts,
-             unsigned short ROUTER_ID)
-        : IRouting(mn,nPorts,ROUTER_ID),
+             unsigned short ROUTER_ID,
+             unsigned short PORT_ID)
+        : IRouting(mn,nPorts,ROUTER_ID,PORT_ID),
           REQ_L(1),     // Local port is always the first requisition - 0b00001
           REQ_N(0),     // Initialize ALL communication requests on 0
           REQ_E(0),     // Initialize ALL communication requests on 0
@@ -269,7 +272,8 @@ inline IOrthogonal3DRouting::~IOrthogonal3DRouting() {}
 typedef IRouting* create_Routing(sc_simcontext*,
                                  sc_module_name,
                                  unsigned short nPorts,
-                                 unsigned short int ROUTER_ID);
+                                 unsigned short int ROUTER_ID,
+                                 unsigned short PORT_ID);
 
 /*!
  * \brief destroy_Routing Typedef for deallocating a

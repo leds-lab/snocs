@@ -60,7 +60,7 @@ int sc_main(int argc, char *argv[]) {
 
     ////////////// Instantiate system components //////////////
     // Routing
-    IRouting* routing = new_Routing_t(sc_get_curr_simcontext(),"Routing",nPorts,ROUTER_ID);
+    IRouting* routing = new_Routing_t(sc_get_curr_simcontext(),"Routing",nPorts,ROUTER_ID,0);
     // Tester (Driver) - testbench
     tst_InputController* ic = new tst_InputController("Testbench",routing,nPorts,ROUTER_ID,PORT_ID);
     ic->i_CLK(w_CLK);

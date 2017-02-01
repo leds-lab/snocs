@@ -275,7 +275,7 @@ ParIS::ParIS(sc_module_name mn,
         IMemory*  u_i_MEM = PLUGIN_MANAGER->memoryInstance(strMemIn,ROUTER_ID,i,FIFO_IN_DEPTH);
         char strRouting[30];
         sprintf(strRouting,"%s_ROUTING",strXIN);
-        IRouting* u_ROUTING = PLUGIN_MANAGER->routingInstance(strRouting,ROUTER_ID,nPorts);
+        IRouting* u_ROUTING = PLUGIN_MANAGER->routingInstance(strRouting,ROUTER_ID,i,nPorts);
         char strIFC[20];
         sprintf(strIFC,"%s_IFC",strXIN);
         IInputFlowControl* u_IFC = PLUGIN_MANAGER->inputFlowControlInstance(strIFC,ROUTER_ID,i);

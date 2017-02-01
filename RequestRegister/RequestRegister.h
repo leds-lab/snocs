@@ -198,9 +198,11 @@ inline void RequestRegister::p_REQUESTS_REGISTERS() {
                                   << ROUTER_ID << "] - PORT: "<<PORT_ID
                                    <<"\nSimulation aborted!" << std::endl;
                         sc_stop();
+                        exit(-1);
                     }
                     r_REQUEST[i].write(0);
                 } else {
+
                     r_REQUEST[i].write( i_REQUEST[i].read() );
                 }
             }

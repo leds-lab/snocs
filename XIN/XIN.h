@@ -120,7 +120,7 @@ inline XIN_Virtual::XIN_Virtual(sc_module_name mn,
 {
     // Instantiating sub-modules
     // Assumption: None NULL module is generated here
-    IRouting* routing = PLUGIN_MANAGER->routingInstance("Routing",ROUTER_ID,nPorts);
+    IRouting* routing = PLUGIN_MANAGER->routingInstance("Routing",ROUTER_ID,PORT_ID,nPorts);
     u_MEMORY      = PLUGIN_MANAGER->memoryInstance("XIN_Virtual_Memory",ROUTER_ID,PORT_ID,FIFO_IN_DEPTH);
     u_IC          = new InputController("XIN_Virtual_IC",nPorts,routing,ROUTER_ID,PORT_ID);
     u_AND_READ    = new And("XIN_Virtual_AND_READ",2);

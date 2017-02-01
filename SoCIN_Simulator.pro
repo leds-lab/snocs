@@ -55,7 +55,8 @@ SUBDIRS += \
     Routing_Ring_zero \
     Routing_NF \
     Routing_WF \
-    Routing_NL
+    Routing_NL \
+    Routing_OE
 
 OTHER_FILES += \
     app.pri \

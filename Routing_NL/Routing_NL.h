@@ -37,7 +37,8 @@ public:
     SC_HAS_PROCESS(Routing_NL);
     Routing_NL(sc_module_name mn,
                unsigned short nPorts,
-               unsigned short ROUTER_ID);
+               unsigned short ROUTER_ID,
+               unsigned short PORT_ID);
 
     const char* moduleName() const { return "Routing_NL"; }
 };
