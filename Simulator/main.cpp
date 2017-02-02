@@ -99,7 +99,9 @@ void showHelp() {
               << "  -vc value           Number of virtual channels. 0 <= Value <= 32" << std::endl
               << "                      Default=0 (no virtual channels), Min: 0, Max: 32" << std::endl << std::endl
               << "  -trace              Generate waveforms." << std::endl
-              << "                      Default= Don't generate waveforms" << std::endl << std::endl;
+              << "                      Default= Don't generate waveforms" << std::endl << std::endl
+              << "  -seed               Simulation seed for the pseudo-random number generators." << std::endl
+              << "                      Default=0" << std::endl << std::endl;
     std::cout << "\nIMPORTANT: <xsize> and <ysize> options define the system size for 2D and 3D\n"
                  "topologies (i.e. number of elements). In 2D the the limits for the <values> are\n"
                  " different than 3D, because the network protocol used (Header Flit Format).\n";
@@ -175,8 +177,6 @@ int sc_main(int argc, char* argv[]) {
     NUM_ELEMENTS = numElements;
 
     // ------------------- Establishing system -------------------
-
-//    sc_set_time_resolution(1,SC_NS);
 
     /// [3] Signals instantation
     // System signals
@@ -462,6 +462,10 @@ void printConfiguration(InputParser &opt) {
         std::cout << prefix << "Don't generate Waveforms (.vcd)!" << std::endl;
     }
 
+    if( opt.cmdOptionExists("-seed") ) {
+        std::cout << prefix << "Simulation seed: " << SEED << std::endl;
+    }
+
 }
 
 int getIntArg(InputParser& opt,std::string arg, int defaultValue, int min, int max = 0) {
@@ -554,6 +558,7 @@ unsigned int setupSimulator(int argc, char* argv[], InputParser &opt) {
     NUM_VC = getIntArg(opt,"-vc",0,0,32);
     FIFO_IN_DEPTH = getIntArg(opt,"-fifoin",4,2,1024);
     FIFO_OUT_DEPTH = getIntArg(opt,"-fifoout",0,0,1024);
+    SEED = getIntArg(opt,"-seed",0,0);
 
     if( opt.cmdOptionExists("-trace") ) {
         TRACE = true;

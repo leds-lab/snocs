@@ -1,5 +1,4 @@
 #include "FlowGenerator.h"
-#include <chrono>
 #include <ctime>
 #include "../Parameters/Parameters.h"
 
@@ -24,12 +23,12 @@ FlowGenerator::FlowGenerator(sc_module_name mn,
       topologyType(topologyType),
       FG_ID(FG_ID),
       numberCyclesPerFlit(numberOfCyclesPerFlit),
-      randomGenerator(std::chrono::system_clock::now().time_since_epoch().count()),
+      randomGenerator(SEED),
       totalPacketsToSend(0)
 {
 
     // Initialize the default random engine with time seed
-    srand(std::time(NULL));
+    srand(SEED);
 
     if(!this->readTrafficFile()) {
         exit(-1);

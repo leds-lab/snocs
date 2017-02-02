@@ -14,6 +14,7 @@ Parameters::Parameters() {
     workDir = const_cast<char*>("work");
     pluginsDir = const_cast<char*>("./plugins");
     confFile = const_cast<char*>("simconf.conf");
+    seed = 0;
 
     // Network info
     numElements = 16;
@@ -43,6 +44,7 @@ Parameters::Parameters(const Parameters &c) {
     this->workDir = c.workDir;
     this->pluginsDir = c.pluginsDir;
     this->confFile = c.confFile;
+    this->seed = c.seed;
 
     this->numElements = c.numElements;
     this->xSize = c.xSize;
@@ -70,6 +72,7 @@ Parameters& Parameters::operator = (const Parameters& c) {
     this->workDir = c.workDir;
     this->pluginsDir = c.pluginsDir;
     this->confFile = c.confFile;
+    this->seed = c.seed;
 
     this->numElements = c.numElements;
     this->xSize = c.xSize;

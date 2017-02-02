@@ -34,6 +34,7 @@ class PluginManager;
 #define WORK_DIR PARAMS->workDir            // Work folder
 #define PLUGINS_DIR PARAMS->pluginsDir      // Plugins folder
 #define CONF_FILE PARAMS->confFile          // File with simulator definitions
+#define SEED PARAMS->seed                   // Seed for the pseudo-random number generator on the Flow Generator
 // Network info
 #define NUM_ELEMENTS PARAMS->numElements    // Number of elements in the network
 #define X_SIZE PARAMS->xSize                // Network X dimension
@@ -130,6 +131,7 @@ public:
     char* workDir;
     char* pluginsDir;
     char* confFile;
+    unsigned int seed; // For the PRNG on Flow Generator
     // Network info
     unsigned short numElements;
     unsigned short xSize;
