@@ -99,19 +99,19 @@ void StopSim::p_STOP() {
         std::cout << "[StopSim] cycle = " << i_CLK_CYCLES.read();
 
         std::cout << "\n Packets Sent = " << r_TOTAL_PACKETS_SENT.read()
-//                  << " (";
-//        for( i = 0; i < numInterfaces; i++ ) {
-//            std::cout << i_TG_NUM_PACKETS_SENT[i].read() << " + ";
-//        }
-//        std::cout << ")"
+                  << " (";
+        for( i = 0; i < numInterfaces; i++ ) {
+            std::cout << i_TG_NUM_PACKETS_SENT[i].read() << " + ";
+        }
+        std::cout << ")"
                   << std::endl;
 
         std::cout << " Packets Received = " << r_TOTAL_PACKETS_RECEIVED.read()
-//                  << " (";
-//        for( i = 0; i < numInterfaces; i++ ) {
-//            std::cout << i_TG_NUM_PACKETS_RECEIVED[i].read() << " + ";
-//        }
-//        std::cout << ")"
+                  << " (";
+        for( i = 0; i < numInterfaces; i++ ) {
+            std::cout << i_TG_NUM_PACKETS_RECEIVED[i].read() << " + ";
+        }
+        std::cout << ")"
                   << std::endl;
 #endif // DEBUG_STOPSIM
 

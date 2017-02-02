@@ -66,8 +66,8 @@ void TrafficMeter::initialize() {
     fprintf(outFile,"FILE: %s",pathFilename);
     fprintf(outFile,"\n");
 #if defined(__WIN32__) || defined(_WIN32)
-    fprintf(outFile,"\n    Packet\t SRC\tDEST\t Flow \tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
-    fprintf(outFile,"\n        ID\t    \t    \t   ID \t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
+    fprintf(outFile,"\n    Packet\t SRC\tDEST\tHops\t Flow \tTraffic    Deadline\t    Packet\t    Header\t   Trailer\t Packet\t    Req");
+    fprintf(outFile,"\n        ID\t    \t    \t    \t   ID \t  Class            \t  Creation\t  at cycle\t  at cycle\t Length\t     BW");
 #else
     fprintf(outFile,"\n    Packet\t SRC\tDEST\tHops\t Flow \tTraffic\t    Deadline    Packet\t    Header\t   Trailer\t Packet\t    Req");
     fprintf(outFile,"\n        ID\t    \t    \t    \t   ID \t  Class\t              Creation\t  at cycle\t  at cycle\t Length\t     BW");

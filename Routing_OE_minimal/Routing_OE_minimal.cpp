@@ -1,15 +1,15 @@
-#include "Routing_OE.h"
+#include "Routing_OE_minimal.h"
 #include <ctime>
 
 //#define DEBUG_ROUTING
 
 /*!
- * \brief Routing_OE::Routing_OE Odd-Even routing for Mesh topology constructor
+ * \brief Routing_OE_minimal::Routing_OE_minimal Odd-Even routing for Mesh topology constructor
  * \param mn Module name
  * \param nPorts Number of ports to route - number of requests to generate
  * \param ROUTER_ID Router identifier in the network
  */
-Routing_OE::Routing_OE(sc_module_name mn,
+Routing_OE_minimal::Routing_OE_minimal(sc_module_name mn,
                        unsigned short nPorts,
                        unsigned short ROUTER_ID,
                        unsigned short PORT_ID)
@@ -20,9 +20,9 @@ Routing_OE::Routing_OE(sc_module_name mn,
 }
 
 /*!
- * \brief Routing_OE::p_REQUEST Process that generate the requests
+ * \brief Routing_OE_minimal::p_REQUEST Process that generate the requests
  */
-void Routing_OE::p_REQUEST() {
+void Routing_OE_minimal::p_REQUEST() {
     UIntVar   v_DATA;                   // Used to extract fields from data
     UIntVar   v_XSOURCE(0,RIB_WIDTH/2);   // x-coordinate
     UIntVar   v_YSOURCE(0,RIB_WIDTH/2);   // y-coordinate
@@ -55,7 +55,6 @@ void Routing_OE::p_REQUEST() {
         v_X_offset = (int) v_XDEST.to_int() - (int) XID;
         v_Y_offset = (int) v_YDEST.to_int() - (int) YID;
         if(v_X_offset == 0 && v_Y_offset == 0) {
-            // Destination Node
             v_REQUEST = REQ_L;
         } else {
             bool N_Avail = false;
@@ -63,22 +62,20 @@ void Routing_OE::p_REQUEST() {
             bool S_Avail = false;
             bool W_Avail = false;
             if(v_X_offset == 0){
-                // Destination column
                 if(v_Y_offset > 0){
                     N_Avail = true;
-                }else{
+                }else if(v_Y_offset < 0){
                     S_Avail = true;
                 }
             }else{
                 if(v_X_offset > 0){
-                    // EAST
                     if(v_Y_offset == 0){
                         E_Avail = true;
                     }else{
                         if(XID % 2 == 1 || XID == v_XSOURCE){
                             if(v_Y_offset > 0){
                                 N_Avail = true;
-                            }else{
+                            }else if(v_Y_offset < 0){
                                 S_Avail = true;
                             }
                         }
@@ -87,12 +84,11 @@ void Routing_OE::p_REQUEST() {
                         }
                     }
                 }else{
-                    // WEST
                     W_Avail = true;
                     if(XID % 2 == 0){
                         if(v_Y_offset > 0){
                             N_Avail = true;
-                        }else{
+                        }else if(v_Y_offset < 0){
                             S_Avail = true;
                         }
                     }
@@ -124,7 +120,7 @@ void Routing_OE::p_REQUEST() {
             else if(W_Avail)
                 v_REQUEST = REQ_W;
             else {
-                std::cout << "\n [ERROR] Routing OE - without request. Aborting...";
+                std::cout << "\n [ERROR] Routing OE_Minimal - without request. Aborting...";
                 sc_stop();
                 exit(-1);
             }
@@ -134,7 +130,7 @@ void Routing_OE::p_REQUEST() {
             f.packet_ptr->hops++;
         }
 #ifdef DEBUG_ROUTING
-        std::cout << "\n[Routing_OE]"
+        std::cout << "\n[Routing_OE_minimal]"
                   << " Local(" << XID << "," << YID
                   << ") - Fonte(" << v_XSOURCE << "," << v_YSOURCE
                   << ") - Dest(" << v_XDEST << "," << v_YDEST  << ") "
@@ -182,7 +178,7 @@ extern "C" {
         sc_curr_simcontext = simcontext;
         sc_default_global_context = simcontext;
 
-        return new Routing_OE(moduleName,nPorts,ROUTER_ID,PORT_ID);
+        return new Routing_OE_minimal(moduleName,nPorts,ROUTER_ID,PORT_ID);
     }
     SS_EXP void delete_Routing(IRouting* routing) {
         delete routing;
