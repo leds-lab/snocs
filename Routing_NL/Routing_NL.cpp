@@ -99,6 +99,10 @@ void Routing_NL::p_REQUEST() {
                 }
             }
         }
+
+        if( f.packet_ptr != NULL ) {
+            f.packet_ptr->hops++;
+        }
 #ifdef DEBUG_ROUTING
         std::cout << "\n[Routing_NL]"
                   << " Local(" << XID << "," << YID

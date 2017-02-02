@@ -108,6 +108,9 @@ void Routing_OE::p_REQUEST() {
             v_REQUEST = v_REQ_SORTED;
         }
 
+        if( f.packet_ptr != NULL ) {
+            f.packet_ptr->hops++;
+        }
 #ifdef DEBUG_ROUTING
         std::cout << "\n[Routing_OE]"
                   << " Local(" << XID << "," << YID

@@ -140,6 +140,9 @@ void Routing_WF::p_REQUEST() {
                 }
             }
         }
+        if( f.packet_ptr != NULL ) {
+            f.packet_ptr->hops++;
+        }
 #ifdef DEBUG_ROUTING
         std::cout << "\n[Routing_WF]"
                   << " Local(" << XID << "," << YID
