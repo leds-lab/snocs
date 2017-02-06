@@ -98,6 +98,7 @@ void Routing_OE::p_REQUEST() {
                     }
                 }
             }
+            // Don't request same port
             if(PORT_ID == INDEX_N)
                 N_Avail = false;
             else if(PORT_ID == INDEX_E)
@@ -106,6 +107,24 @@ void Routing_OE::p_REQUEST() {
                 S_Avail = false;
             else if(PORT_ID == INDEX_W)
                 W_Avail = false;
+//        std::cout << "N:" << N_Avail
+//                  << "\nE:" << E_Avail
+//                  << "\nS:" << S_Avail
+//                  << "\nW:" << W_Avail << std::endl;
+            // On borders, non request to out of the network
+            if( XID == 0 ) { // First column
+                W_Avail = false;
+            }
+            if( XID == X_SIZE-1 ) {
+                E_Avail = false;
+            }
+            if(YID == 0) {
+                S_Avail = false;
+            }
+            if(YID == Y_SIZE-1) {
+                N_Avail = false;
+            }
+
 
             if(N_Avail && i_IDLE[INDEX_N])
                 v_REQUEST = REQ_N;
@@ -129,11 +148,12 @@ void Routing_OE::p_REQUEST() {
                 exit(-1);
             }
         }
-
+//        std::cout << f.packet_ptr->packetId;
         if( f.packet_ptr != NULL ) {
             f.packet_ptr->hops++;
         }
 #ifdef DEBUG_ROUTING
+        std::cout << "\n Router: " << ROUTER_ID << " - Reqs Code: N " << (int)REQ_N << " E " << (int)REQ_E << " S " << (int)REQ_S << " W " << (int)REQ_W;
         std::cout << "\n[Routing_OE]"
                   << " Local(" << XID << "," << YID
                   << ") - Fonte(" << v_XSOURCE << "," << v_YSOURCE
