@@ -57,7 +57,8 @@ SUBDIRS += \
     Routing_WF \
     Routing_NL \
     Routing_OE \
-    Routing_OE_minimal
+    Routing_OE_minimal \
+    PG_Random
 
 OTHER_FILES += \
     app.pri \
