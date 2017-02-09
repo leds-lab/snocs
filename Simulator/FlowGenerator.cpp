@@ -302,9 +302,8 @@ void FlowGenerator::p_SEND() {
     o_WRITE_SEND.write(0);
     o_END_OF_TRANSMISSION.write(0);
     o_NUMBER_OF_PACKETS_SENT.write(0);
+
     wait();
-    //        // TEMP
-    //        destGen = new UniformDistribution;
 
     unsigned int numFlows = this->flows.size();
     if(numFlows > 0) {
@@ -317,12 +316,9 @@ void FlowGenerator::p_SEND() {
         ///// Sending the packets /////
         while( true ) { // Send packets
 
-            wait();
-
-//            if(i_UNBOUNDEDFIFO_NOTEMPTY.read() == 0) {
-            if( u_FIFO->m_FIFO.size() < 2 ) {
-
-
+// EDUARDO - only store one packet on the source queue
+            if( u_FIFO->m_FIFO.size() < 2 ) { // Dally approach, only put packet on the source queue when there is one or none packet
+// EDUARDO - only store one packet on the source queue
                 FlowParameters& flow = this->getFlow(); // Get a flow randomly
 
                 TypeInjection* tpInjection = NULL;
@@ -392,7 +388,7 @@ void FlowGenerator::p_SEND() {
                         // It calculates when the first packet of the next burst of packets have to be injected
                         cycleToSendNextPacket += ((flow.payload_length+HEADER_LENGTH) * numberCyclesPerFlit * (flow.burst_size - 1))
                                 + ((flow.last_payload_length+HEADER_LENGTH) * numberCyclesPerFlit);
-                        //ZEFERINO                            + flow[flow_index].idle;
+//ZEFERINO                            + flow[flow_index].idle;
                     } else {
                         // It increments the packet counters
                         o_NUMBER_OF_PACKETS_SENT.write( o_NUMBER_OF_PACKETS_SENT.read() + flow.burst_size - 1);
@@ -400,7 +396,7 @@ void FlowGenerator::p_SEND() {
 
                         // It calculates when the first packet of the next burst of packets have to be injected
                         cycleToSendNextPacket += ((flow.payload_length+HEADER_LENGTH) * numberCyclesPerFlit * (flow.burst_size - 1));
-                        //ZEFERINO                            + flow[flow_index].idle;
+//ZEFERINO                            + flow[flow_index].idle;
                     }
 
                     // SENDING PACKETS ONE BY ONE (NOT IN A BURST)
@@ -433,7 +429,7 @@ void FlowGenerator::p_SEND() {
 
                     // It calculates when the next packet have to be injected
                     cycleToSendNextPacket += ((flow.payload_length+HEADER_LENGTH) * numberCyclesPerFlit);
-                    //ZEFERINO                        + flow[flow_index].idle;
+//ZEFERINO                        + flow[flow_index].idle;
                 }
                 // Deallocates the channel after send a packet or a burst
                 o_WRITE_SEND.write(0);
@@ -445,7 +441,11 @@ void FlowGenerator::p_SEND() {
                 else
                     packetsSent++;
 
-                // EDUARDO - Sending packets forever
+// ZEFERINO
+//            // It inserts wait states until cycle_to_inject is reached
+//            while(clock_cycles.read() < cycle_to_send_next_pck) wait();
+
+// EDUARDO - Sending packets forever
                 if( packetsSent % totalPacketsToSend == 0 ) { // Old stop condition while(packetsSent < totalPacketsToSend)
                     if( stopMethod != StopSim::AllPacketsDelivered ) {
                         this->reloadFlows();
@@ -453,46 +453,15 @@ void FlowGenerator::p_SEND() {
                         break;
                     }
                 }
-                // EDUARDO - Sendind packets forever
+// EDUARDO - Sendind packets forever
+// EDUARDO - only store one packet on the source queue
+            } else {
+                wait();
             }
+// EDUARDO - only store one packet on the source queue
 
-
-            // ZEFERINO
-            //            // It inserts wait states until cycle_to_inject is reached
-            //            while(clock_cycles.read() < cycle_to_send_next_pck) wait();
         }
     }
-
-    //    if( FG_ID == 0 ) {
-    //        FlowParameters flow;
-    //        flow.type = 0;
-    //        flow.burst_size = 0;
-    //        flow.deadline = 0;
-    //        flow.destination = 0; // Invalid for FG 0
-    //        flow.flow_id = 0;
-    //        flow.iat = 0;
-    //        flow.idle = 0;
-    //        flow.last_payload_length = 0;
-    //        flow.parameter1 = 0;
-    //        flow.parameter2 = 0;
-    //        flow.payload_length = 1;
-    //        flow.pck_2send = 10;
-    //        flow.pck_sent = 0;
-    //        flow.required_bw = 320;
-    //        flow.switching_type = 0;
-    //        flow.traffic_class = 0;
-
-    //        for( unsigned int i = 0; i < flow.pck_2send; i++) {
-    //            flow.destination = destGen->getDestination(FG_ID);
-    //            this->sendPacket(flow,0,flow.payload_length,NORMAL);
-    //            o_WRITE_SEND.write(0);
-    //            o_DATA_SEND.write(fNull);
-
-    //            for( int x = 0; x < 10; x++) {
-    //                wait();
-    //            }
-    //        }
-    //    }
 
     o_END_OF_TRANSMISSION.write(1);
     wait();
