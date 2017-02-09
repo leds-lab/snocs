@@ -6,6 +6,7 @@
 
 #include "DestinationGenerator.h"
 #include "../StopSim/StopSim.h"
+#include "UnboundedFifo.h"
 
 // Switching types
 #define WH 0
@@ -24,6 +25,8 @@
 class FlowGenerator : public SoCINModule  {
 public:
     StopSim::StopMethod stopMethod;
+
+    UnboundedFifo* u_FIFO;
 
     struct FlowParameters {             // Manage the traffic parameters
         unsigned int  type;                 //  0: 0 = gtr determines the traffic model, 1 = tg determines the traffic model by using PARETO
@@ -63,6 +66,10 @@ public:
     sc_out<bool>         o_END_OF_TRANSMISSION;
     sc_out<unsigned int> o_NUMBER_OF_PACKETS_SENT;
     sc_out<unsigned int> o_NUMBER_OF_PACKETS_RECEIVED;
+
+
+    // TEST
+    sc_in<bool> i_UNBOUNDEDFIFO_NOTEMPTY;
 
     // Module's processes
     void p_SEND();

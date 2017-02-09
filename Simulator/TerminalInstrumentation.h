@@ -145,6 +145,8 @@ public:
             fg0->o_VC(o_VC);
 #else
         u_FG = new FlowGenerator("FlowGenerator",TG_ID,topologyType,u_IFC->numberOfCyclesPerFlit());
+        u_FG->u_FIFO = u_FIFO_OUT;
+        u_FG->i_UNBOUNDEDFIFO_NOTEMPTY(w_READ_OK_SEND);
         u_FG->i_CLK(i_CLK);
         u_FG->i_RST(i_RST);
         u_FG->i_CLK_CYCLES(i_CLK_CYCLES);

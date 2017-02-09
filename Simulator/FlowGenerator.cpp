@@ -53,41 +53,41 @@ UIntVar FlowGenerator::getHeaderAddresses(unsigned short src,unsigned short dst)
     UIntVar rib;
     // For Non-Orthogonal and 2D-Orthogonal can be used absolute positions as used in 3D-Orthogonal
     switch ( topologyType ) {
-        case INoC::TT_Non_Orthogonal:
-            rib.range(RIB_WIDTH*2-1,RIB_WIDTH) = src;
-            rib.range(RIB_WIDTH-1,0) = dst;
-            break;
-        case INoC::TT_Orthogonal2D: {
-            unsigned xSrc = ID_TO_COORDINATE_2D_X(src);
-            unsigned ySrc = ID_TO_COORDINATE_2D_Y(src);
-            unsigned xDst = ID_TO_COORDINATE_2D_X(dst);
-            unsigned yDst = ID_TO_COORDINATE_2D_Y(dst);
-            rib.range(RIB_WIDTH*2-1,RIB_WIDTH*2-RIB_WIDTH/2) = xSrc;
-            rib.range(RIB_WIDTH*2-RIB_WIDTH/2-1,RIB_WIDTH) = ySrc;
-            rib.range(RIB_WIDTH-1,RIB_WIDTH/2) = xDst;
-            rib.range(RIB_WIDTH/2-1,0) = yDst;
-            break;
-        }
-        case INoC::TT_Orthogonal3D:
-            unsigned xSrc = ID_TO_COORDINATE_3D_X(src);
-            unsigned ySrc = ID_TO_COORDINATE_3D_Y(src);
-            unsigned zSrc = ID_TO_COORDINATE_3D_Z(src);
-            unsigned xDst = ID_TO_COORDINATE_3D_X(dst);
-            unsigned yDst = ID_TO_COORDINATE_3D_Y(dst);
-            unsigned zDst = ID_TO_COORDINATE_3D_Z(dst);
-            rib.range(21,19) = xDst;    // TSV - The same X dst because consider that all routers have TSV
-            rib.range(18,16) = yDst;    // TSV - The same Y dst ...
-            rib.range(15,13) = xSrc;
-            rib.range(12,10) = ySrc;
-            rib.range( 9, 8) = zSrc;
-            rib.range( 7, 5) = xDst;
-            rib.range( 4, 2) = yDst;
-            rib.range( 1, 0) = zDst;
+    case INoC::TT_Non_Orthogonal:
+        rib.range(RIB_WIDTH*2-1,RIB_WIDTH) = src;
+        rib.range(RIB_WIDTH-1,0) = dst;
+        break;
+    case INoC::TT_Orthogonal2D: {
+        unsigned xSrc = ID_TO_COORDINATE_2D_X(src);
+        unsigned ySrc = ID_TO_COORDINATE_2D_Y(src);
+        unsigned xDst = ID_TO_COORDINATE_2D_X(dst);
+        unsigned yDst = ID_TO_COORDINATE_2D_Y(dst);
+        rib.range(RIB_WIDTH*2-1,RIB_WIDTH*2-RIB_WIDTH/2) = xSrc;
+        rib.range(RIB_WIDTH*2-RIB_WIDTH/2-1,RIB_WIDTH) = ySrc;
+        rib.range(RIB_WIDTH-1,RIB_WIDTH/2) = xDst;
+        rib.range(RIB_WIDTH/2-1,0) = yDst;
+        break;
+    }
+    case INoC::TT_Orthogonal3D:
+        unsigned xSrc = ID_TO_COORDINATE_3D_X(src);
+        unsigned ySrc = ID_TO_COORDINATE_3D_Y(src);
+        unsigned zSrc = ID_TO_COORDINATE_3D_Z(src);
+        unsigned xDst = ID_TO_COORDINATE_3D_X(dst);
+        unsigned yDst = ID_TO_COORDINATE_3D_Y(dst);
+        unsigned zDst = ID_TO_COORDINATE_3D_Z(dst);
+        rib.range(21,19) = xDst;    // TSV - The same X dst because consider that all routers have TSV
+        rib.range(18,16) = yDst;    // TSV - The same Y dst ...
+        rib.range(15,13) = xSrc;
+        rib.range(12,10) = ySrc;
+        rib.range( 9, 8) = zSrc;
+        rib.range( 7, 5) = xDst;
+        rib.range( 4, 2) = yDst;
+        rib.range( 1, 0) = zDst;
 #ifdef DEBUG_FG_ADDRESSING
-            std::cout << "\n   Xsrc: " << xSrc << ", Ysrc: " << ySrc << ", Zsrc: " << zSrc
-                      << "\t-\t Xdst: " << xDst << ", Ydst: " << yDst << ", Zdst: " << zDst;
+        std::cout << "\n   Xsrc: " << xSrc << ", Ysrc: " << ySrc << ", Zsrc: " << zSrc
+                  << "\t-\t Xdst: " << xDst << ", Ydst: " << yDst << ", Zdst: " << zDst;
 #endif
-            break;
+        break;
     }
 #ifdef DEBUG_FG_ADDRESSING
     std::cout << " - RIB: " << rib.to_string(SC_HEX_US,false);
@@ -163,9 +163,9 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
 
     /////////////////// Trailer ///////////////////
     // It sends the trailer flit: the lowest word with "Bye" string
-//    char msg[4] = "Bye"; // 4 bytes -> [0]: B , [1]: y, [2]: e, [3]: \0
-//    //   =   ASCI:  B       |        y       |       e       |   \0
-//    flit = ( (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
+    //    char msg[4] = "Bye"; // 4 bytes -> [0]: B , [1]: y, [2]: e, [3]: \0
+    //    //   =   ASCI:  B       |        y       |       e       |   \0
+    //    flit = ( (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
     // Send trailer with the packet id
     flit = packet->packetId; // Put the packet ID on the trailer payload
     flit[FLIT_WIDTH-1] = 1; // Trailer
@@ -303,8 +303,8 @@ void FlowGenerator::p_SEND() {
     o_END_OF_TRANSMISSION.write(0);
     o_NUMBER_OF_PACKETS_SENT.write(0);
     wait();
-//        // TEMP
-//        destGen = new UniformDistribution;
+    //        // TEMP
+    //        destGen = new UniformDistribution;
 
     unsigned int numFlows = this->flows.size();
     if(numFlows > 0) {
@@ -316,10 +316,17 @@ void FlowGenerator::p_SEND() {
 
         ///// Sending the packets /////
         while( true ) { // Send packets
-            FlowParameters& flow = this->getFlow(); // Get a flow randomly
 
-            TypeInjection* tpInjection = NULL;
-            switch (flow.type) {
+            wait();
+
+//            if(i_UNBOUNDEDFIFO_NOTEMPTY.read() == 0) {
+            if( u_FIFO->m_FIFO.size() < 2 ) {
+
+
+                FlowParameters& flow = this->getFlow(); // Get a flow randomly
+
+                TypeInjection* tpInjection = NULL;
+                switch (flow.type) {
                 case 0: // Constant
                     tpInjection = new ConstantInjection(numberCyclesPerFlit);
                     break;
@@ -339,70 +346,68 @@ void FlowGenerator::p_SEND() {
                     tpInjection = new VarBurstFixInterval(numberCyclesPerFlit);
                     break;
                 default: break;
-            }
-
-            // PARETO-based generation
-            if(flow.type > 0 && flow.type <= 5) {
-                do {
-                    float r    = ((float) (rand()%10000)) / (10000.0);
-                    float ton  = pow( (float)(1-r),(-1.0/flow.parameter1) );
-                    float toff = pow( (float)(1-r),(-1.0/flow.parameter2) );
-            // If function of probability is Pareto, it determines the required bw
-                    flow.required_bw = ton/(ton+toff);
-                    tpInjection->adjustFlow(flow);
-                } while (flow.payload_length == 0);
-            }
-
-            /////////////////////////////////////////////////////////////////
-            // EMULATING PROCESSING (IDLE INTERVAL BEFORE INJECTING A PACKET)
-            /////////////////////////////////////////////////////////////////
-            // It updates the cycle to send the next packet adding the idle cycles of the
-            // current flow to the value previously calculated value. Then, it inserts
-            // wait cycles until cycle_to_send_next_pck is reached
-            cycleToSendNextPacket += flow.idle;
-            if( cycleToSendNextPacket < i_CLK_CYCLES.read() ) {
-                std::cout << std::endl << "FG " << FG_ID << " under congestion to send packets.";
-            }
-// ZEFERINO
-            while ( i_CLK_CYCLES.read() < cycleToSendNextPacket) wait(); // Wait until the cycle to send the packet
-
-
-            /////////////////////
-            // SENDING THE PACKET
-            /////////////////////
-            // SENDING PACKETS IN A BURST
-            if (flow.burst_size != 0) {
-                // It sends a burst of packets
-                this->sendBurst(flow,cycleToSendNextPacket);
-
-                // It increments the packet counters and calculates when the first packet
-                // of the next burst of packets have to be injected. But, if last_payload_length
-                // equals 0, the last packet is not taken into account because it was not
-                // actually sent
-                if (flow.last_payload_length != 0) {
-                    // It increments the packet counters
-                    o_NUMBER_OF_PACKETS_SENT.write( o_NUMBER_OF_PACKETS_SENT.read() + flow.burst_size );
-                    flow.pck_sent += flow.burst_size;
-
-                    // It calculates when the first packet of the next burst of packets have to be injected
-                    cycleToSendNextPacket += ((flow.payload_length+HEADER_LENGTH) * numberCyclesPerFlit * (flow.burst_size - 1))
-                            + ((flow.last_payload_length+HEADER_LENGTH) * numberCyclesPerFlit);
-//ZEFERINO                            + flow[flow_index].idle;
-                } else {
-                    // It increments the packet counters
-                    o_NUMBER_OF_PACKETS_SENT.write( o_NUMBER_OF_PACKETS_SENT.read() + flow.burst_size - 1);
-                    flow.pck_sent += flow.burst_size - 1;
-
-                    // It calculates when the first packet of the next burst of packets have to be injected
-                    cycleToSendNextPacket += ((flow.payload_length+HEADER_LENGTH) * numberCyclesPerFlit * (flow.burst_size - 1));
-//ZEFERINO                            + flow[flow_index].idle;
                 }
 
-            // SENDING PACKETS ONE BY ONE (NOT IN A BURST)
-            } else {
-                unsigned short pckType = NORMAL; // By default - NORMAL packet - WORMHOLE uses normal
-                // It sends the packet
-                switch (flow.switching_type) {
+                // PARETO-based generation
+                if(flow.type > 0 && flow.type <= 5) {
+                    do {
+                        float r    = ((float) (rand()%10000)) / (10000.0);
+                        float ton  = pow( (float)(1-r),(-1.0/flow.parameter1) );
+                        float toff = pow( (float)(1-r),(-1.0/flow.parameter2) );
+                        // If function of probability is Pareto, it determines the required bw
+                        flow.required_bw = ton/(ton+toff);
+                        tpInjection->adjustFlow(flow);
+                    } while (flow.payload_length == 0);
+                }
+
+                /////////////////////////////////////////////////////////////////
+                // EMULATING PROCESSING (IDLE INTERVAL BEFORE INJECTING A PACKET)
+                /////////////////////////////////////////////////////////////////
+                // It updates the cycle to send the next packet adding the idle cycles of the
+                // current flow to the value previously calculated value. Then, it inserts
+                // wait cycles until cycle_to_send_next_pck is reached
+                cycleToSendNextPacket += flow.idle;
+                if( cycleToSendNextPacket < i_CLK_CYCLES.read() ) {
+                   // std::cout << std::endl << "FG " << FG_ID << " under congestion to send packets.";
+                }
+                // ZEFERINO
+                while ( i_CLK_CYCLES.read() < cycleToSendNextPacket) wait(); // Wait until the cycle to send the packet
+                /////////////////////
+                // SENDING THE PACKET
+                /////////////////////
+                // SENDING PACKETS IN A BURST
+                if (flow.burst_size != 0) {
+                    // It sends a burst of packets
+                    this->sendBurst(flow,cycleToSendNextPacket);
+
+                    // It increments the packet counters and calculates when the first packet
+                    // of the next burst of packets have to be injected. But, if last_payload_length
+                    // equals 0, the last packet is not taken into account because it was not
+                    // actually sent
+                    if (flow.last_payload_length != 0) {
+                        // It increments the packet counters
+                        o_NUMBER_OF_PACKETS_SENT.write( o_NUMBER_OF_PACKETS_SENT.read() + flow.burst_size );
+                        flow.pck_sent += flow.burst_size;
+
+                        // It calculates when the first packet of the next burst of packets have to be injected
+                        cycleToSendNextPacket += ((flow.payload_length+HEADER_LENGTH) * numberCyclesPerFlit * (flow.burst_size - 1))
+                                + ((flow.last_payload_length+HEADER_LENGTH) * numberCyclesPerFlit);
+                        //ZEFERINO                            + flow[flow_index].idle;
+                    } else {
+                        // It increments the packet counters
+                        o_NUMBER_OF_PACKETS_SENT.write( o_NUMBER_OF_PACKETS_SENT.read() + flow.burst_size - 1);
+                        flow.pck_sent += flow.burst_size - 1;
+
+                        // It calculates when the first packet of the next burst of packets have to be injected
+                        cycleToSendNextPacket += ((flow.payload_length+HEADER_LENGTH) * numberCyclesPerFlit * (flow.burst_size - 1));
+                        //ZEFERINO                            + flow[flow_index].idle;
+                    }
+
+                    // SENDING PACKETS ONE BY ONE (NOT IN A BURST)
+                } else {
+                    unsigned short pckType = NORMAL; // By default - NORMAL packet - WORMHOLE uses normal
+                    // It sends the packet
+                    switch (flow.switching_type) {
                     case CS :
                         if (flow.pck_sent == 0) {
                             // If it is first packet, it alocates the circuit
@@ -416,77 +421,78 @@ void FlowGenerator::p_SEND() {
                                 pckType = NORMAL;
                             }
                         }
-                    break;
+                        break;
 
-                default : break;
+                    default : break;
+                    }
+                    this->sendPacket(flow,cycleToSendNextPacket,flow.payload_length,pckType);
+
+                    // It increments the packet counters
+                    o_NUMBER_OF_PACKETS_SENT.write( o_NUMBER_OF_PACKETS_SENT.read() + 1);
+                    flow.pck_sent++;
+
+                    // It calculates when the next packet have to be injected
+                    cycleToSendNextPacket += ((flow.payload_length+HEADER_LENGTH) * numberCyclesPerFlit);
+                    //ZEFERINO                        + flow[flow_index].idle;
                 }
-                this->sendPacket(flow,cycleToSendNextPacket,flow.payload_length,pckType);
+                // Deallocates the channel after send a packet or a burst
+                o_WRITE_SEND.write(0);
+                o_DATA_SEND.write(fNull);
 
-                // It increments the packet counters
-                o_NUMBER_OF_PACKETS_SENT.write( o_NUMBER_OF_PACKETS_SENT.read() + 1);
-                flow.pck_sent++;
+                // It increments the number of total packets sent
+                if (flow.burst_size != 0)
+                    packetsSent += flow.burst_size;
+                else
+                    packetsSent++;
 
-                // It calculates when the next packet have to be injected
-                cycleToSendNextPacket += ((flow.payload_length+HEADER_LENGTH) * numberCyclesPerFlit);
-//ZEFERINO                        + flow[flow_index].idle;
-            }
-            // Deallocates the channel after send a packet or a burst
-            o_WRITE_SEND.write(0);
-            o_DATA_SEND.write(fNull);
-
-            // It increments the number of total packets sent
-            if (flow.burst_size != 0)
-                packetsSent += flow.burst_size;
-            else
-                packetsSent++;
-
-// EDUARDO - Sending packets forever
-            if( packetsSent % totalPacketsToSend == 0 ) { // Old stop condition while(packetsSent < totalPacketsToSend)
-                if( stopMethod != StopSim::AllPacketsDelivered ) {
-                    this->reloadFlows();
-                } else {
-                    break;
+                // EDUARDO - Sending packets forever
+                if( packetsSent % totalPacketsToSend == 0 ) { // Old stop condition while(packetsSent < totalPacketsToSend)
+                    if( stopMethod != StopSim::AllPacketsDelivered ) {
+                        this->reloadFlows();
+                    } else {
+                        break;
+                    }
                 }
+                // EDUARDO - Sendind packets forever
             }
-// EDUARDO - Sendind packets forever
 
 
-// ZEFERINO
-//            // It inserts wait states until cycle_to_inject is reached
-//            while(clock_cycles.read() < cycle_to_send_next_pck) wait();
+            // ZEFERINO
+            //            // It inserts wait states until cycle_to_inject is reached
+            //            while(clock_cycles.read() < cycle_to_send_next_pck) wait();
         }
     }
 
-//    if( FG_ID == 0 ) {
-//        FlowParameters flow;
-//        flow.type = 0;
-//        flow.burst_size = 0;
-//        flow.deadline = 0;
-//        flow.destination = 0; // Invalid for FG 0
-//        flow.flow_id = 0;
-//        flow.iat = 0;
-//        flow.idle = 0;
-//        flow.last_payload_length = 0;
-//        flow.parameter1 = 0;
-//        flow.parameter2 = 0;
-//        flow.payload_length = 1;
-//        flow.pck_2send = 10;
-//        flow.pck_sent = 0;
-//        flow.required_bw = 320;
-//        flow.switching_type = 0;
-//        flow.traffic_class = 0;
+    //    if( FG_ID == 0 ) {
+    //        FlowParameters flow;
+    //        flow.type = 0;
+    //        flow.burst_size = 0;
+    //        flow.deadline = 0;
+    //        flow.destination = 0; // Invalid for FG 0
+    //        flow.flow_id = 0;
+    //        flow.iat = 0;
+    //        flow.idle = 0;
+    //        flow.last_payload_length = 0;
+    //        flow.parameter1 = 0;
+    //        flow.parameter2 = 0;
+    //        flow.payload_length = 1;
+    //        flow.pck_2send = 10;
+    //        flow.pck_sent = 0;
+    //        flow.required_bw = 320;
+    //        flow.switching_type = 0;
+    //        flow.traffic_class = 0;
 
-//        for( unsigned int i = 0; i < flow.pck_2send; i++) {
-//            flow.destination = destGen->getDestination(FG_ID);
-//            this->sendPacket(flow,0,flow.payload_length,NORMAL);
-//            o_WRITE_SEND.write(0);
-//            o_DATA_SEND.write(fNull);
+    //        for( unsigned int i = 0; i < flow.pck_2send; i++) {
+    //            flow.destination = destGen->getDestination(FG_ID);
+    //            this->sendPacket(flow,0,flow.payload_length,NORMAL);
+    //            o_WRITE_SEND.write(0);
+    //            o_DATA_SEND.write(fNull);
 
-//            for( int x = 0; x < 10; x++) {
-//                wait();
-//            }
-//        }
-//    }
+    //            for( int x = 0; x < 10; x++) {
+    //                wait();
+    //            }
+    //        }
+    //    }
 
     o_END_OF_TRANSMISSION.write(1);
     wait();
@@ -500,17 +506,17 @@ void FlowGenerator::p_RECEIVE() {
 
     UIntVar data;
     bool trailer;
-//    bool header;
+    //    bool header;
     Flit f;
     while(1) {
         f = i_DATA_RECEIVE.read();
         data = f.data;
         trailer = data[FLIT_WIDTH-1];
-//        header = data[FLIT_WIDTH-2];
+        //        header = data[FLIT_WIDTH-2];
 
         if ((i_READ_OK_RECEIVE.read()==1) && trailer) {
             o_NUMBER_OF_PACKETS_RECEIVED.write(o_NUMBER_OF_PACKETS_RECEIVED.read() + 1);
-//            std::cout << "\nFG " << FG_ID << " - received: " << number_of_packets_received << " @ " << sc_time_stamp();
+            //            std::cout << "\nFG " << FG_ID << " - received: " << number_of_packets_received << " @ " << sc_time_stamp();
         }
         wait();
     }
