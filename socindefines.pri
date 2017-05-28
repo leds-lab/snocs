@@ -3,9 +3,14 @@ LIBS += -L$$PWD/plugins/ -lparameters
 INCLUDEPATH += $$PWD/Parameters
 DEPENDPATH += $$PWD/Parameters
 
-# qmake version 5.7.0
-#QMAKE_RPATHDIR += $ORIGIN
-# Previous qmake version compatibily
-unix {
-    QMAKE_LFLAGS += -Wl,-rpath=\$$ORIGIN
+greaterThan(QT_VERSION, 5.7) {
+    unix {
+        message("Using RPATH")
+        QMAKE_RPATHDIR += $ORIGIN
+    }
+} else {
+    unix:!mac {
+        message("Using LFLAGS")
+        QMAKE_LFLAGS += -Wl,-rpath=\$$ORIGIN
+    }
 }
