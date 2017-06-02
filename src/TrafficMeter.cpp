@@ -1,5 +1,5 @@
 #include "TrafficMeter.h"
-#include "../PluginManager/PluginManager.h"
+#include "../src/PluginManager.h"
 
 TrafficMeter::TrafficMeter(sc_module_name mn,
                            char *workDir,

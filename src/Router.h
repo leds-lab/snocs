@@ -18,8 +18,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __ROUTER_H__
 #define __ROUTER_H__
 
-#include "../XIN/XIN.h"
-#include "../XOUT/XOUT.h"
+#include "../src/XIN.h"
+#include "../src/XOUT.h"
 
 /////////////////////////////////////////////////////////////////////////////////
 /// Simple Router interface

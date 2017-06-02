@@ -1,6 +1,6 @@
 #include "SoCIN_Unit.h"
-#include "../Router/Router.h"
-#include "../PluginManager/PluginManager.h"
+#include "../src/Router.h"
+#include "../src/PluginManager.h"
 
 SoCIN_Unit::SoCIN_Unit(sc_module_name mn)
     : INoC_VC( mn, NUM_ELEMENTS , NUM_VC)

@@ -20,7 +20,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __FIFO_H__
 #define __FIFO_H__
 
-#include "../Memory/Memory.h"
+#include "../src/Memory.h"
 
 /////////////////////////////////////////////////////////////
 /// Concrete implementation of FIFO Memory

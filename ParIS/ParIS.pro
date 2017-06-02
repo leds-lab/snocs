@@ -4,15 +4,15 @@
 #
 #-------------------------------------------------
 
-include(../Router/Router.pro)
+include(../common.pri)
 include(../plugin.pri)
 include(../socindefines.pri)
 
 TARGET = router_ParIS
 
 SOURCES += ParIS.cpp \
-    ../PluginManager/PluginManager.cpp
+    ../src/PluginManager.cpp
 
 HEADERS += ParIS.h \
-    ../PluginManager/PluginManager.h
+    ../src/PluginManager.h
 

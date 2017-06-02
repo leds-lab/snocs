@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-include(../PriorityGenerator/PriorityGenerator.pro)
+include(../common.pri)
 include(../plugin.pri)
 
 TARGET = pg_roundrobin

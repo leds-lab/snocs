@@ -19,7 +19,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __ROUTING_NL_H__
 #define __ROUTING_NL_H__
 
-#include "../Routing/Routing.h"
+#include "../src/Routing.h"
 
 /*!
  * \brief The Routing_NL class implements the North-Last routing algorithm

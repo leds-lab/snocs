@@ -1,7 +1,7 @@
 #ifndef __PG_RANDOM_H__
 #define __PG_RANDOM_H__
 
-#include "../PriorityGenerator/PriorityGenerator.h"
+#include "../src/PriorityGenerator.h"
 #include <random>
 /*!
  * \brief The PG_Random class implements a random

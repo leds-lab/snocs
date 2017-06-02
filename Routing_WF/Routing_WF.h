@@ -19,7 +19,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __ROUTING_WF_H__
 #define __ROUTING_WF_H__
 
-#include "../Routing/Routing.h"
+#include "../src/Routing.h"
 
 /*!
  * \brief The Routing_WF class implements the West-First routing algorithm

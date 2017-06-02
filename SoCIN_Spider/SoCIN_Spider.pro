@@ -4,15 +4,15 @@
 #
 #-------------------------------------------------
 
-include(../NoC/NoC.pro)
+include(../common.pri)
 include(../plugin.pri)
 include(../socindefines.pri)
 
 TARGET = noc_SoCIN_Spider
 
 SOURCES += SoCIN_Spider.cpp \
-    ../PluginManager/PluginManager.cpp
+    ../src/PluginManager.cpp
 
 HEADERS += SoCIN_Spider.h \
-    ../PluginManager/PluginManager.h
+    ../src/PluginManager.h
 

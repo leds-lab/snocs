@@ -19,8 +19,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 
 #include "../SoCINModule.h"
 #include "../SoCINDefines.h"
-#include "../FlowControl/FlowControl.h"
-#include "../NoC/NoC.h"
+#include "../src/FlowControl.h"
+#include "../src/NoC.h"
 
 /*!
  * \brief The TrafficMeter class implements a link traffic meter

@@ -1,7 +1,7 @@
 #ifndef __SOCIN_3D_H__
 #define __SOCIN_3D_H__
 
-#include "../NoC/NoC.h"
+#include "../src/NoC.h"
 
 class SoCIN_3D : public INoC_VC {
 public:

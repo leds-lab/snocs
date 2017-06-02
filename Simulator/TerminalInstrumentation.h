@@ -4,10 +4,10 @@
 #include <systemc.h>
 
 #include "../SoCINDefines.h"
-#include "../NoC/NoC.h"
-#include "../FlowControl/FlowControl.h"
-#include "../PluginManager/PluginManager.h"
-#include "../Memory/Memory.h"
+#include "../src/NoC.h"
+#include "../src/FlowControl.h"
+#include "../src/PluginManager.h"
+#include "../src/Memory.h"
 #include "UnboundedFifo.h"
 #include "FlowGenerator.h"
 

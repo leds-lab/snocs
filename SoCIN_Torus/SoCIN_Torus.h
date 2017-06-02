@@ -1,7 +1,7 @@
 #ifndef __SOCIN_TORUS_H__
 #define __SOCIN_TORUS_H__
 
-#include "../NoC/NoC.h"
+#include "../src/NoC.h"
 
 class SoCIN_Torus : public INoC_VC {
 public:

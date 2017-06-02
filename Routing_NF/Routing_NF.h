@@ -19,7 +19,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __ROUTING_NF_H__
 #define __ROUTING_NF_H__
 
-#include "../Routing/Routing.h"
+#include "../src/Routing.h"
 
 /*!
  * \brief The Routing_NF class implements the Negative-First routing algorithm

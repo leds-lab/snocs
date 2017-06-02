@@ -20,7 +20,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __OUTPUTCONTROLLER_H__
 #define __OUTPUTCONTROLLER_H__
 
-#include "../Arbiter/Arbiter.h"
+#include "../src/Arbiter.h"
 
 /////////////////////////////////////////////////////////////
 /// Output Controller

@@ -1,4 +1,4 @@
-#include "../PriorityGenerator/PriorityGenerator.h"
+#include "../src/PriorityGenerator.h"
 
 #include <dlfcn.h>
 #include <ctime>

@@ -1,4 +1,4 @@
-#include "../AndParam/And.h"
+#include "../src/And.h"
 
 using namespace sc_core;
 using namespace sc_dt;

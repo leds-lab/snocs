@@ -4,14 +4,14 @@
 #
 #-------------------------------------------------
 
-include(../NoC/NoC.pro)
+include(../common.pri)
 include(../plugin.pri)
 include(../socindefines.pri)
 
 TARGET = noc_SoCIN_Ring
 
 SOURCES += SoCIN_Ring.cpp \
-    ../PluginManager/PluginManager.cpp
+    ../src/PluginManager.cpp
 
 HEADERS += SoCIN_Ring.h \
-    ../PluginManager/PluginManager.h
+    ../src/PluginManager.h

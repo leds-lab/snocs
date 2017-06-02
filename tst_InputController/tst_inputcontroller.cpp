@@ -1,5 +1,5 @@
-#include "../InputController/InputController.h"
-#include "../Routing/Routing.h"
+#include "../src/InputController.h"
+#include "../src/Routing.h"
 
 #include <dlfcn.h>
 #include <ctime>

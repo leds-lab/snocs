@@ -1,4 +1,4 @@
-#include "../Demultiplexers/Demultiplexers.h"
+#include "../src/Demultiplexers.h"
 
 using namespace std;
 using namespace sc_dt;

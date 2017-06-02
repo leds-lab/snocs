@@ -1,7 +1,7 @@
 #ifndef __ROUTING_CROSSFIRST_H__
 #define __ROUTING_CROSSFIRST_H__
 
-#include "../Routing/Routing.h"
+#include "../src/Routing.h"
 
 class Routing_Crossfirst : public IRouting {
 protected:

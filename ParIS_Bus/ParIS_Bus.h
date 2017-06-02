@@ -1,7 +1,7 @@
 #ifndef __PARIS_BUS_H__
 #define __PARIS_BUS_H__
 
-#include "../Router/Router.h"
+#include "../src/Router.h"
 
 class ParIS_none_VC_Bus : public IRouter {
 public:

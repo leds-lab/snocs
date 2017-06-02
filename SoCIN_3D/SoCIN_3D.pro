@@ -4,15 +4,15 @@
 #
 #-------------------------------------------------
 
-include(../NoC/NoC.pro)
+include(../common.pri)
 include(../plugin.pri)
 include(../socindefines.pri)
 
 TARGET = noc_SoCIN_3D
 
 SOURCES += SoCIN_3D.cpp \
-    ../PluginManager/PluginManager.cpp
+    ../src/PluginManager.cpp
 
 
 HEADERS += SoCIN_3D.h \
-    ../PluginManager/PluginManager.h
+    ../src/PluginManager.h

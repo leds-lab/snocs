@@ -19,7 +19,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __ROUTING_XYZ_H__
 #define __ROUTING_XYZ_H__
 
-#include "../Routing/Routing.h"
+#include "../src/Routing.h"
 
 /*!
  * \brief The Routing_XYZ class implements the XYZ routing algorithm

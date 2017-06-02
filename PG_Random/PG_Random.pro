@@ -1,4 +1,4 @@
-include(../PriorityGenerator/PriorityGenerator.pro)
+include(../common.pri)
 include(../plugin.pri)
 include(../socindefines.pri)
 

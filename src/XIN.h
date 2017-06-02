@@ -23,14 +23,14 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __XIN_H__
 #define __XIN_H__
 
-#include "../Memory/Memory.h"
-#include "../InputController/InputController.h"
-#include "../AndParam/And.h"
-#include "../FlowControl/FlowControl.h"
-#include "../Multiplexers/Multiplexers.h"
-#include "../Demultiplexers/Demultiplexers.h"
-#include "../AndParam/And.h"
-#include "../PluginManager/PluginManager.h"
+#include "../src/Memory.h"
+#include "../src/InputController.h"
+#include "../src/And.h"
+#include "../src/FlowControl.h"
+#include "../src/Multiplexers.h"
+#include "../src/Demultiplexers.h"
+#include "../src/And.h"
+#include "../src/PluginManager.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////

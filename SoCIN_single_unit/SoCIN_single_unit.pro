@@ -5,16 +5,16 @@
 #-------------------------------------------------
 
 
-include(../NoC/NoC.pro)
+include(../common.pri)
 include(../plugin.pri)
 include(../socindefines.pri)
 
 TARGET = noc_unit
 
 SOURCES += \
-    ../PluginManager/PluginManager.cpp \
+    ../src/PluginManager.cpp \
     SoCIN_Unit.cpp
 
 HEADERS += \
-    ../PluginManager/PluginManager.h \
+    ../src/PluginManager.h \
     SoCIN_Unit.h

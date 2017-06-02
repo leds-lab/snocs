@@ -19,8 +19,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __INPUTCONTROLLER_H__
 #define __INPUTCONTROLLER_H__
 
-#include "../Routing/Routing.h"
-#include "../RequestRegister/RequestRegister.h"
+#include "../src/Routing.h"
+#include "../src/RequestRegister.h"
 
 /////////////////////////////////////////////////////////////
 /// Input Controller

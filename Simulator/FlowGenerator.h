@@ -2,10 +2,10 @@
 #define __FLOWGENERATOR_H__
 
 #include "../SoCINDefines.h"
-#include "../NoC/NoC.h"
+#include "../src/NoC.h"
 
 #include "DestinationGenerator.h"
-#include "../StopSim/StopSim.h"
+#include "../src/StopSim.h"
 #include "UnboundedFifo.h"
 
 // Switching types

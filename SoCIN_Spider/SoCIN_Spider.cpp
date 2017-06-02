@@ -1,6 +1,6 @@
 #include "SoCIN_Spider.h"
-#include "../Router/Router.h"
-#include "../PluginManager/PluginManager.h"
+#include "../src/Router.h"
+#include "../src/PluginManager.h"
 
 //#define WAVEFORM_SOCIN
 

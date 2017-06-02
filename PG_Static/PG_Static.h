@@ -18,7 +18,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __PG_STATIC_H__
 #define __PG_STATIC_H__
 
-#include "../PriorityGenerator/PriorityGenerator.h"
+#include "../src/PriorityGenerator.h"
 
 class PG_Static : public IPriorityGenerator {
 public:

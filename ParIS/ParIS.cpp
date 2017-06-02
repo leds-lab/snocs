@@ -1,5 +1,5 @@
 #include "ParIS.h"
-#include "../PluginManager/PluginManager.h"
+#include "../src/PluginManager.h"
 
 //#define WAVEFORM_PARIS
 //#define DEBUG_PARIS

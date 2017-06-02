@@ -1,6 +1,6 @@
 #include "SoCIN_3D.h"
-#include "../Router/Router.h"
-#include "../PluginManager/PluginManager.h"
+#include "../src/Router.h"
+#include "../src/PluginManager.h"
 
 #include <stdexcept>
 

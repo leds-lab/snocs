@@ -21,7 +21,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __PG_ROTATIVE_H__
 #define __PG_ROTATIVE_H__
 
-#include "../PriorityGenerator/PriorityGenerator.h"
+#include "../src/PriorityGenerator.h"
 /*!
  * \brief The PG_Rotative class implements a rotative
  * priority generator that rotates the priorities in

@@ -1,7 +1,8 @@
 include(../app.pri)
 include(../socindefines.pri)
 
-OBJECTS += ../objs/PluginManager.o
-
 SOURCES += \
-    tst_pluginmanager.cpp
+    tst_pluginmanager.cpp \
+    ../src/PluginManager.cpp
+
+HEADERS += ../src/PluginManager.h

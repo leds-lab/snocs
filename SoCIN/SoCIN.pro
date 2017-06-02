@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-include(../NoC/NoC.pro)
+include(../common.pri)
 include(../plugin.pri)
 include(../socindefines.pri)
 
@@ -12,8 +12,8 @@ TARGET = noc_SoCIN
 
 HEADERS += \
     SoCIN.h \
-    ../PluginManager/PluginManager.h
+    ../src/PluginManager.h
 
 SOURCES += \
     SoCIN.cpp \
-    ../PluginManager/PluginManager.cpp
+    ../src/PluginManager.cpp

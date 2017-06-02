@@ -1,5 +1,5 @@
-
-include(../Routing/Routing.pro)
+include(../common.pri)
+include(../socindefines.pri)
 include(../plugin.pri)
 
 TARGET = routing_ring_zero

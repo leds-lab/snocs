@@ -19,7 +19,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __ROUTING_XY_H__
 #define __ROUTING_XY_H__
 
-#include "../Routing/Routing.h"
+#include "../src/Routing.h"
 
 /*!
  * \brief The Routing_XY class implements the XY routing algorithm

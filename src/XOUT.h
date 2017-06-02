@@ -23,14 +23,14 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __XOUT_H__
 #define __XOUT_H__
 
-#include "../Memory/Memory.h"
-#include "../OutputController/OutputController.h"
-#include "../FlowControl/FlowControl.h"
-#include "../Multiplexers/Multiplexers.h"
-#include "../Demultiplexers/Demultiplexers.h"
-#include "../VcPriorityEncoder/VcPriorityEncoder.h"
+#include "../src/Memory.h"
+#include "../src/OutputController.h"
+#include "../src/FlowControl.h"
+#include "../src/Multiplexers.h"
+#include "../src/Demultiplexers.h"
+#include "../src/VcPriorityEncoder.h"
 
-#include "../PluginManager/PluginManager.h"
+#include "../src/PluginManager.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////

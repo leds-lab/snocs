@@ -4,14 +4,14 @@
 #
 #-------------------------------------------------
 
-include(../NoC/NoC.pro)
+include(../common.pri)
 include(../plugin.pri)
 include(../socindefines.pri)
 
 TARGET = noc_SoCIN_Torus
 
 SOURCES += SoCIN_Torus.cpp \
-    ../PluginManager/PluginManager.cpp
+    ../src/PluginManager.cpp
 
 HEADERS += SoCIN_Torus.h \
-    ../PluginManager/PluginManager.h
+    ../src/PluginManager.h

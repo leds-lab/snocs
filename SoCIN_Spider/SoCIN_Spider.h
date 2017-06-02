@@ -1,7 +1,7 @@
 #ifndef __SOCIN_SPIDER_H__
 #define __SOCIN_SPIDER_H__
 
-#include "../NoC/NoC.h"
+#include "../src/NoC.h"
 
 class SoCIN_Spider : public INoC_VC {
 public:

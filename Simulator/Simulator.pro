@@ -6,10 +6,10 @@ include(../socindefines.pri)
 
 SOURCES += \
     main.cpp \
-    ../PluginManager/PluginManager.cpp \
-    ../SystemSignals/SystemSignals.cpp \
-    ../StopSim/StopSim.cpp \
-    ../TrafficMeter/TrafficMeter.cpp \
+    ../src/PluginManager.cpp \
+    ../src/SystemSignals.cpp \
+    ../src/StopSim.cpp \
+    ../src/TrafficMeter.cpp \
     UnboundedFifo.cpp \
     FlowGenerator.cpp \
     DestinationGenerator.cpp \
@@ -21,13 +21,12 @@ SOURCES += \
     VarIdleFixPacketSize.cpp \
     VarBurstFixInterval.cpp \
     ConstantInjection.cpp
-#    tm_single.cpp
 
 HEADERS += \
-    ../PluginManager/PluginManager.h \
-    ../SystemSignals/SystemSignals.h \
-    ../StopSim/StopSim.h \
-    ../TrafficMeter/TrafficMeter.h \
+    ../src/PluginManager.h \
+    ../src/SystemSignals.h \
+    ../src/StopSim.h \
+    ../src/TrafficMeter.h \
     UnboundedFifo.h \
     TerminalInstrumentation.h \
     FlowGenerator.h \
@@ -40,6 +39,5 @@ HEADERS += \
     VarIdleFixPacketSize.h \
     VarBurstFixInterval.h \
     ConstantInjection.h
-#    tm_single.h
 
 OTHER_FILES += simconf.conf

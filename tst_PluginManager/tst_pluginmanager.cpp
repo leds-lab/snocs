@@ -1,6 +1,6 @@
-#include "../PluginManager/PluginManager.h"
+#include "../src/PluginManager.h"
 
-#include "../Memory/Memory.h"
+#include "../src/Memory.h"
 
 #include <iostream>
 

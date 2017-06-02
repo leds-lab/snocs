@@ -1,4 +1,4 @@
-#include "../ProgrammablePriorityEncoder/ProgrammablePriorityEncoder.h"
+#include "../src/ProgrammablePriorityEncoder.h"
 
 int sc_main(int , char **) {
 

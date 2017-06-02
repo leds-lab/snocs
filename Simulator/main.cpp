@@ -1,9 +1,9 @@
-#include "../NoC/NoC.h"
-#include "../StopSim/StopSim.h"
-#include "../SystemSignals/SystemSignals.h"
-#include "../TrafficMeter/TrafficMeter.h"
+#include "../src/NoC.h"
+#include "../src/StopSim.h"
+#include "../src/SystemSignals.h"
+#include "../src/TrafficMeter.h"
 
-#include "../PluginManager/PluginManager.h"
+#include "../src/PluginManager.h"
 
 // TEMP
 #include "TerminalInstrumentation.h"

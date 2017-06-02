@@ -1,7 +1,7 @@
 #ifndef __ROUTING_DOR_TORUS_H__
 #define __ROUTING_DOR_TORUS_H__
 
-#include "../Routing/Routing.h"
+#include "../src/Routing.h"
 
 /*!
  * \brief The Routing_DOR_Torus class implements the dimension-order

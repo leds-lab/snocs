@@ -1,6 +1,6 @@
 #include "SoCIN.h"
-#include "../Router/Router.h"
-#include "../PluginManager/PluginManager.h"
+#include "../src/Router.h"
+#include "../src/PluginManager.h"
 
 //#define DEBUG_SOCIN
 //#define WAVEFORM_SOCIN

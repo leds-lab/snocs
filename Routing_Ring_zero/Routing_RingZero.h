@@ -1,7 +1,7 @@
 #ifndef ROUTING_RINGZERO_H
 #define ROUTING_RINGZERO_H
 
-#include "../Routing/Routing.h"
+#include "../src/Routing.h"
 
 class Routing_RingZero : public IRouting {
 protected:

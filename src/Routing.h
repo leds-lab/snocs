@@ -22,7 +22,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #include "../SoCINModule.h"
 #include "../SoCINDefines.h"
 
-#include "../NoC/NoC.h"
+#include "../src/NoC.h"
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 

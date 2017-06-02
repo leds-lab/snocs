@@ -21,7 +21,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __PG_ROUNDROBIN_H__
 #define __PG_ROUNDROBIN_H__
 
-#include "../PriorityGenerator/PriorityGenerator.h"
+#include "../src/PriorityGenerator.h"
 
 /////////////////////////////////////////
 class PG_RoundRobin : public IPriorityGenerator {

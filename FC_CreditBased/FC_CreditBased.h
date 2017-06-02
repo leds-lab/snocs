@@ -18,7 +18,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __FC_CREDITBASED_H__
 #define __FC_CREDITBASED_H__
 
-#include "../FlowControl/FlowControl.h"
+#include "../src/FlowControl.h"
 
 /////////////////////////////////////////////////////////////
 /// Concrete implementation of Input Flow Controller

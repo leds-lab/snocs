@@ -1,7 +1,7 @@
 #ifndef __SOCIN_UNIT_H__
 #define __SOCIN_UNIT_H__
 
-#include "../NoC/NoC.h"
+#include "../src/NoC.h"
 
 class SoCIN_Unit : public INoC_VC {
 

@@ -18,7 +18,7 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __FC_HANDSHAKE_H__
 #define __FC_HANDSHAKE_H__
 
-#include "../FlowControl/FlowControl.h"
+#include "../src/FlowControl.h"
 
 enum handshake_states {s_S0, s_S1, s_S2}; // States of the FSMs of handshake-type ifc and ofc
 

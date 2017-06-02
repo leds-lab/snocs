@@ -17,8 +17,8 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #ifndef __ARBITER_H__
 #define __ARBITER_H__
 
-#include "../PriorityGenerator/PriorityGenerator.h"
-#include "../ProgrammablePriorityEncoder/ProgrammablePriorityEncoder.h"
+#include "../src/PriorityGenerator.h"
+#include "../src/ProgrammablePriorityEncoder.h"
 
 /////////////////////////////////////////////////////////////
 /// Interface for Arbiters

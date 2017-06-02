@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-include(../Memory/Memory.pro)
+include(../common.pri)
+include(../socindefines.pri)
 include(../plugin.pri)
 
 TARGET = mem_fifo

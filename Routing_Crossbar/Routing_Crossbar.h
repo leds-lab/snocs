@@ -1,7 +1,7 @@
 #ifndef __ROUTING_CROSSBAR_H__
 #define __ROUTING_CROSSBAR_H__
 
-#include "../Routing/Routing.h"
+#include "../src/Routing.h"
 
 class Routing_Crossbar : public IRouting {
 public:

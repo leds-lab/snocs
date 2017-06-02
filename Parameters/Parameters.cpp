@@ -1,5 +1,5 @@
 #include "Parameters.h"
-#include "../PluginManager/PluginManager.h"
+#include "../src/PluginManager.h"
 
 Parameters* Parameters::params = 0; // Defining and initializing
 

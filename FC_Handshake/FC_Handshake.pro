@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-include(../FlowControl/FlowControl.pro)
+include(../common.pri)
 include(../plugin.pri)
 
 TARGET = fc_handshake

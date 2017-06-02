@@ -2,55 +2,18 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
     Parameters \
-    PriorityGenerator \
+    FC_Handshake \
+    FC_CreditBased \
     PG_Static \
     PG_Rotative \
     PG_RoundRobin \
-    tst_PG \
-    ProgrammablePriorityEncoder \
-    Arbiter \
-    tst_Arbiter \
-    tst_ProgrammablePriorityEncoder \
-    FlowControl \
-    FC_Handshake \
-    FC_CreditBased \
-    Memory \
+    PG_Random \
     FIFO \
-    Multiplexers \
-    tst_Multiplexrers \
-    Demultiplexers \
-    tst_Demultiplexers \
-    Routing \
-    Simulator \
     Routing_XY \
-    RequestRegister \
-    InputController \
-    tst_InputController \
-    OutputController \
-    XIN \
-    AndParam \
-    tst_AndParam \
-    XOUT \
-    Router \
-    ParIS \
-    PluginManager \
-    tst_PluginManager \
-    NoC \
-    SoCIN \
-    StopSim \
-    SystemSignals \
-    VcPriorityEncoder \
-    TrafficMeter \
-    SoCIN_single_unit \
     Routing_Crossbar \
-    ParIS_Bus \
-    SoCIN_Torus \
     Routing_DOR_Torus \
-    SoCIN_Ring \
     Routing_Ring \
-    SoCIN_Spider \
     Routing_Crossfirst \
-    SoCIN_3D \
     Routing_XYZ \
     Routing_Ring_zero \
     Routing_NF \
@@ -58,7 +21,23 @@ SUBDIRS += \
     Routing_NL \
     Routing_OE \
     Routing_OE_minimal \
-    PG_Random
+    ParIS \
+    ParIS_Bus \
+    SoCIN \
+    SoCIN_single_unit \
+    SoCIN_Torus \
+    SoCIN_Ring \
+    SoCIN_Spider \
+    SoCIN_3D \
+    Simulator \
+    tst_PG \
+    tst_Arbiter \
+    tst_ProgrammablePriorityEncoder \
+    tst_Multiplexrers \
+    tst_Demultiplexers \
+    tst_InputController \
+    tst_AndParam \
+    tst_PluginManager
 
 OTHER_FILES += \
     app.pri \

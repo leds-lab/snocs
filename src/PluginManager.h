@@ -61,7 +61,7 @@ private:
     PluginLoader* memory;
     PluginLoader* priorityGenerator;
 
-    std::vector<SoCINModule*> allocatedUnits;
+    std::vector<SoCINModule *> allocatedUnits;
 
     std::map<std::string, std::string> properties;
     bool pluginsLoaded;
@@ -113,7 +113,5 @@ public:
     void output_properties();
 
 };
-
-
 
 #endif // __PLUGINMANAGER_H__
