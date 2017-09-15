@@ -44,6 +44,20 @@ FlowGenerator::FlowGenerator(sc_module_name mn,
 
     SC_CTHREAD(p_RECEIVE, i_CLK.pos());
     sensitive << i_CLK.pos() << i_RST.pos();
+
+    SC_METHOD(p_SEND_CYPHER);
+    sensitive << w_SIMON_SEND;
+
+    // SIMON
+    w_SIMON_KEY.init(8);
+    // Simon bind
+    u_SIMON =  new SIMON("Simon" + FG_ID);
+    u_SIMON->i_DATA(w_FLIT_SEND);
+    u_SIMON->i_KEY(w_SIMON_KEY);
+    u_SIMON->i_TYPE(w_SIMON_TYPE);
+
+    u_SIMON->o_DATA(w_SIMON_SEND);
+
 }
 
 UIntVar FlowGenerator::getHeaderAddresses(unsigned short src,unsigned short dst) {
@@ -116,6 +130,13 @@ void FlowGenerator::sendFlit(Flit flit, unsigned short virtualChannel) {
     }
 }
 
+void FlowGenerator::p_SEND_CYPHER() {
+
+    Flit f = w_SIMON_SEND.read();
+    sendFlit( f, 0 );
+
+}
+
 void FlowGenerator::sendPacket(FlowParameters flowParam,
                                unsigned long long cycleToSend,
                                unsigned long payloadLength,
@@ -143,6 +164,7 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
     flit.range(CMD_POSITION,CMD_POSITION-1) = packetType;   // Switching (NORMAL, ALLOC, RELEASE, GRANT)
     flit.range(CLS_POS,CLS_POS-2) = flowParam.traffic_class;// Traffic Class
     flit.range(FID_POS,FID_POS-1) = flowParam.flow_id;      // Flow id
+    flit[23] = true || false; // Tipo para o SIMON
 
     // TODO Verify what virtual channel must be used according the traffic class
     unsigned short virtualChannel = flowParam.traffic_class;
@@ -151,14 +173,26 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
     Flit headerFlit;
     headerFlit.data = flit;
     headerFlit.packet_ptr = packet;
-    this->sendFlit(headerFlit,virtualChannel); // Send header
+
+    // SIMON (remover chave fixa)
+    uint8_t simon64_32_key[] = {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19};
+    for(unsigned short i = 0; i < w_SIMON_KEY.size(); i++) {
+        w_SIMON_KEY[i].write(simon64_32_key[i]);
+    }
+    w_SIMON_TYPE.write(true); //Passar Tipo
+    w_FLIT_SEND.write(headerFlit); // Passa texto claro "Flit"
+
+    //Flit cifrado = w_SIMON_SEND.read();
+    //this->sendFlit(cifrado,virtualChannel); // Send header
 
     /////////////////// Payload ///////////////////
     for(unsigned short i = 0; i < payloadLength - 1; i++) {
         Flit payload;
         payload.data = i; // The content of the flit is only the number of flit in the packet
         payload.packet_ptr = packet;
-        this->sendFlit(payload,virtualChannel); // Sending payload
+        //SIMON
+        w_FLIT_SEND.write(payload);
+       // this->sendFlit(payload,virtualChannel); // Sending payload
     }
 
     /////////////////// Trailer ///////////////////
@@ -472,21 +506,49 @@ void FlowGenerator::p_RECEIVE() {
     o_READ_RECEIVE.write(1);
     o_NUMBER_OF_PACKETS_RECEIVED.write(0);
     wait();
-
     UIntVar data;
     bool trailer;
     //    bool header;
     Flit f;
-    while(1) {
-        f = i_DATA_RECEIVE.read();
-        data = f.data;
-        trailer = data[FLIT_WIDTH-1];
-        //        header = data[FLIT_WIDTH-2];
 
-        if ((i_READ_OK_RECEIVE.read()==1) && trailer) {
-            o_NUMBER_OF_PACKETS_RECEIVED.write(o_NUMBER_OF_PACKETS_RECEIVED.read() + 1);
-            //            std::cout << "\nFG " << FG_ID << " - received: " << number_of_packets_received << " @ " << sc_time_stamp();
+    if(FG_ID == 4) {
+        // Key Gen
+        while(1) {
+            f = i_DATA_RECEIVE.read();
+            data = f.data;
+            trailer = data[FLIT_WIDTH-1];
+            //        header = data[FLIT_WIDTH-2];
+
+            if ((i_READ_OK_RECEIVE.read()==1) && trailer) {
+                o_NUMBER_OF_PACKETS_RECEIVED.write(o_NUMBER_OF_PACKETS_RECEIVED.read() + 1);
+                FlowParameters fp;
+                //preencher FP
+                //                fp.
+                this->sendPacket(fp,i_CLK_CYCLES.read(),2,NORMAL);
+                this->sendPacket();
+                //            std::cout << "\nFG " << FG_ID << " - received: " << number_of_packets_received << " @ " << sc_time_stamp();
+            }
+            wait();
         }
-        wait();
+
+    } else {
+        while(1) {
+            f = i_DATA_RECEIVE.read();
+            data = f.data;
+            trailer = data[FLIT_WIDTH-1];
+            //        header = data[FLIT_WIDTH-2];
+
+            if ((i_READ_OK_RECEIVE.read()==1) && trailer) {
+                o_NUMBER_OF_PACKETS_RECEIVED.write(o_NUMBER_OF_PACKETS_RECEIVED.read() + 1);
+                //            std::cout << "\nFG " << FG_ID << " - received: " << number_of_packets_received << " @ " << sc_time_stamp();
+            }
+            wait();
+        }
     }
+
+}
+
+void FlowGenerator::generateKey(uint8_t *key){
+
+    uint8_t a = std::hex(std::uniform_int_distribution<uint8_t>(0,255));
 }

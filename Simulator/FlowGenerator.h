@@ -8,6 +8,10 @@
 #include "../src/StopSim.h"
 #include "UnboundedFifo.h"
 
+
+// SIMON
+#include "simon.h"
+
 // Switching types
 #define WH 0
 #define CS 1
@@ -67,6 +71,20 @@ public:
     sc_out<unsigned int> o_NUMBER_OF_PACKETS_SENT;
     sc_out<unsigned int> o_NUMBER_OF_PACKETS_RECEIVED;
 
+    // SIMON
+    sc_vector<sc_signal<sc_uint<16>>> w_SIMON_LOCAL_KEYS; //Chaves
+
+    sc_signal<bool> w_SIMON_TYPE;
+    sc_vector<sc_signal<uint8_t>> w_SIMON_KEY;
+    sc_signal<Flit> w_FLIT_SEND;
+    sc_signal<Flit> w_SIMON_SEND;
+
+    //    sc_signal<bool> w_WRITE_SEND;
+    //    sc_signal<bool> w_WRITE_OK_SEND;
+
+    // Internal Units
+    SIMON* u_SIMON;
+    void generateKey(uint8_t *key);
 
     // TEST
     sc_in<bool> i_UNBOUNDEDFIFO_NOTEMPTY;
@@ -74,6 +92,7 @@ public:
     // Module's processes
     void p_SEND();
     void p_RECEIVE();
+    void p_SEND_CYPHER();
 
     // Auxiliar functions
     UIntVar getHeaderAddresses(unsigned short src, unsigned short destination);

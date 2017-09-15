@@ -20,7 +20,8 @@ SOURCES += \
     VarPacketSizeFixInterval.cpp \
     VarIdleFixPacketSize.cpp \
     VarBurstFixInterval.cpp \
-    ConstantInjection.cpp
+    ConstantInjection.cpp \
+    Simon.cpp
 
 HEADERS += \
     ../src/PluginManager.h \
@@ -38,6 +39,7 @@ HEADERS += \
     VarPacketSizeFixInterval.h \
     VarIdleFixPacketSize.h \
     VarBurstFixInterval.h \
-    ConstantInjection.h
+    ConstantInjection.h \
+    Simon.h
 
 OTHER_FILES += simconf.conf

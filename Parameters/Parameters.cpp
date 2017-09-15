@@ -15,6 +15,7 @@ Parameters::Parameters() {
     pluginsDir = const_cast<char*>("./plugins");
     confFile = const_cast<char*>("simconf.conf");
     seed = 0;
+    useSimon = false;
 
     // Network info
     numElements = 16;
@@ -45,6 +46,7 @@ Parameters::Parameters(const Parameters &c) {
     this->pluginsDir = c.pluginsDir;
     this->confFile = c.confFile;
     this->seed = c.seed;
+    this->useSimon = c.useSimon;
 
     this->numElements = c.numElements;
     this->xSize = c.xSize;
@@ -73,6 +75,7 @@ Parameters& Parameters::operator = (const Parameters& c) {
     this->pluginsDir = c.pluginsDir;
     this->confFile = c.confFile;
     this->seed = c.seed;
+    this->useSimon = c.useSimon;
 
     this->numElements = c.numElements;
     this->xSize = c.xSize;
