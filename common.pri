@@ -4,7 +4,7 @@ CONFIG += console
 CONFIG += exceptions
 CONFIG += c++11
 
-SYSTEMC_PATH =
+SYSTEMC_PATH = C:/systemc-2.3.1a
 isEmpty(SYSTEMC_PATH) {
     error("SYSTEMC_PATH not defined. Please fix it (file: common.pri)")
 }
