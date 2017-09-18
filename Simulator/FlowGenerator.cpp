@@ -48,16 +48,6 @@ FlowGenerator::FlowGenerator(sc_module_name mn,
     SC_METHOD(p_SEND_CYPHER);
     sensitive << w_SIMON_SEND;
 
-    // SIMON
-    w_SIMON_KEY.init(8);
-    // Simon bind
-    u_SIMON =  new SIMON("Simon" + FG_ID);
-    u_SIMON->i_DATA(w_FLIT_SEND);
-    u_SIMON->i_KEY(w_SIMON_KEY);
-    u_SIMON->i_TYPE(w_SIMON_TYPE);
-
-    u_SIMON->o_DATA(w_SIMON_SEND);
-
 }
 
 UIntVar FlowGenerator::getHeaderAddresses(unsigned short src,unsigned short dst) {
@@ -174,25 +164,14 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
     headerFlit.data = flit;
     headerFlit.packet_ptr = packet;
 
-    // SIMON (remover chave fixa)
-    uint8_t simon64_32_key[] = {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19};
-    for(unsigned short i = 0; i < w_SIMON_KEY.size(); i++) {
-        w_SIMON_KEY[i].write(simon64_32_key[i]);
-    }
-    w_SIMON_TYPE.write(true); //Passar Tipo
-    w_FLIT_SEND.write(headerFlit); // Passa texto claro "Flit"
-
-    //Flit cifrado = w_SIMON_SEND.read();
-    //this->sendFlit(cifrado,virtualChannel); // Send header
+   this->sendFlit(cifrado,virtualChannel); // Send header
 
     /////////////////// Payload ///////////////////
     for(unsigned short i = 0; i < payloadLength - 1; i++) {
         Flit payload;
         payload.data = i; // The content of the flit is only the number of flit in the packet
         payload.packet_ptr = packet;
-        //SIMON
-        w_FLIT_SEND.write(payload);
-       // this->sendFlit(payload,virtualChannel); // Sending payload
+        this->sendFlit(payload,virtualChannel); // Sending payload
     }
 
     /////////////////// Trailer ///////////////////
@@ -546,9 +525,4 @@ void FlowGenerator::p_RECEIVE() {
         }
     }
 
-}
-
-void FlowGenerator::generateKey(uint8_t *key){
-
-    uint8_t a = std::hex(std::uniform_int_distribution<uint8_t>(0,255));
 }
