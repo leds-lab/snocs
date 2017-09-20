@@ -182,7 +182,7 @@ int sc_main(int argc, char* argv[]) {
     // System signals
     sc_clock                 w_CLK("CLK", CLK_PERIOD, SC_NS); // System clock | Tclk=1 ns
     sc_signal<bool>          w_RST;                           // Reset
-    sc_signal<unsigned long long> w_GLOBAL_CLOCK;                  // Number of cycles
+    sc_signal<unsigned long long> w_GLOBAL_CLOCK;             // Number of cycles
 
     // Wires to connect System Components to the network - Transmission interface
     sc_vector<sc_signal<Flit> > w_IN_DATA("w_IN_DATA",numElements);        // Network data input
@@ -227,6 +227,8 @@ int sc_main(int argc, char* argv[]) {
     //////////////////////////////////////////////////////////////////////////////
     StopSim* u_STOP = new StopSim("StopSim",numElements,(char *)"stopsim");
     //////////////////////////////////////////////////////////////////////////////
+//    strcpy(u_NOC->moduleName(),u_STOP->nocName);
+    u_STOP->nocName = u_NOC->moduleName();
     u_STOP->i_CLK(w_CLK);
     u_STOP->i_RST(w_RST);
     u_STOP->o_EOS(w_EOS);
@@ -245,6 +247,8 @@ int sc_main(int argc, char* argv[]) {
     // System signals
     u_NOC->i_CLK(w_CLK);
     u_NOC->i_RST(w_RST);
+    u_NOC->i_CLK_GLOBAL(w_GLOBAL_CLOCK);
+    u_NOC->i_EOS(w_EOS);
 
     unsigned long long totalPacketsToSend = 0;
 

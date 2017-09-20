@@ -11,7 +11,9 @@ include(../socindefines.pri)
 TARGET = noc_SoCIN_Ring
 
 SOURCES += SoCIN_Ring.cpp \
-    ../PluginManager/PluginManager.cpp
+    ../PluginManager/PluginManager.cpp \
+    ../TrafficMeter/TrafficMeter.cpp
 
 HEADERS += SoCIN_Ring.h \
-    ../PluginManager/PluginManager.h
+    ../PluginManager/PluginManager.h \
+    ../TrafficMeter/TrafficMeter.h

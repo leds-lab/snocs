@@ -105,6 +105,7 @@ void TrafficMeter::writeInfo() {
     if( v_BOP ) {
         this->packetHeader = v_DATA;
         this->cycleOfArriving = i_CLK_CYCLES.read();
+        this->hops = dataFlit.packet_ptr->hops;
     }
 
     // In the last flit (trailer -> v_EOP) write informations in the log
@@ -118,7 +119,7 @@ void TrafficMeter::writeInfo() {
             fprintf(outFile,"%10lu\t"  , packet->packetId); // TEMP
             fprintf(outFile,"%4u\t"    , src);
             fprintf(outFile,"%4u\t"    , dest);
-            fprintf(outFile,"%4u\t"    , packet->hops);
+            fprintf(outFile,"%4u\t"    , hops);
             fprintf(outFile,"  %2u\t"  , flowId);
             fprintf(outFile,"  %2u\t"  , trafficClass);
             fprintf(outFile,"%10lu\t"  , packet->deadline);

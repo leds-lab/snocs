@@ -11,8 +11,10 @@ include(../socindefines.pri)
 TARGET = noc_SoCIN_3D
 
 SOURCES += SoCIN_3D.cpp \
-    ../PluginManager/PluginManager.cpp
+    ../PluginManager/PluginManager.cpp \
+    ../TrafficMeter/TrafficMeter.cpp
 
 
 HEADERS += SoCIN_3D.h \
-    ../PluginManager/PluginManager.h
+    ../PluginManager/PluginManager.h \
+    ../TrafficMeter/TrafficMeter.h

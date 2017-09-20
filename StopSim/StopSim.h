@@ -29,8 +29,10 @@ protected:
     unsigned long long stopCycle;
     FILE* fp_out;
 
+
     void configureStopOptions();
 public:
+    const char* nocName;
     enum StopMethod { AllPacketsDelivered  = 0,
                       ByTime,
                       ByCycles,

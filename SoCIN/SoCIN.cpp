@@ -1,6 +1,7 @@
 #include "SoCIN.h"
 #include "../Router/Router.h"
 #include "../PluginManager/PluginManager.h"
+#include "../TrafficMeter/TrafficMeter.h"
 
 //#define DEBUG_SOCIN
 //#define WAVEFORM_SOCIN
@@ -176,6 +177,77 @@ SoCINfp_VC::SoCINfp_VC(sc_module_name mn)
             }
 
             u_ROUTER[routerId] = router_VC;
+        }
+    }
+
+    for( unsigned char x = 0; x < numberOfYWires; x++ ) {
+        char strXWMeter[20];
+        sprintf(strXWMeter,"int_x_w_%u",x);
+        // Tm for WEST link
+        TrafficMeter* u_TM_LEFT = new TrafficMeter(strXWMeter,WORK_DIR,strXWMeter,INoC::TT_Orthogonal2D,false);
+        // System signals
+        u_TM_LEFT->i_CLK(i_CLK);
+        u_TM_LEFT->i_RST(i_RST);
+        u_TM_LEFT->i_CLK_CYCLES(i_CLK_GLOBAL);
+        u_TM_LEFT->i_EOS(i_EOS);
+        // Link signals
+        u_TM_LEFT->i_DATA(w_X_DATA_TO_LEFT[x]);
+        u_TM_LEFT->i_VALID(w_X_VALID_TO_LEFT[x]);
+        u_TM_LEFT->i_RETURN(w_X_RETURN_TO_LEFT[x]);
+        if( NUM_VC > 1 ) {
+            u_TM_LEFT->i_VC_SEL(w_X_VC_SELECTOR_TO_LEFT[x]);
+        }
+
+        char strXEMeter[20];
+        sprintf(strXEMeter,"int_x_e_%u",x);
+        // Tm for EAST link
+        TrafficMeter* u_TM_RIGHT = new TrafficMeter(strXEMeter,WORK_DIR,strXEMeter,INoC::TT_Orthogonal2D,false);
+        // System signals
+        u_TM_RIGHT->i_CLK(i_CLK);
+        u_TM_RIGHT->i_RST(i_RST);
+        u_TM_RIGHT->i_CLK_CYCLES(i_CLK_GLOBAL);
+        u_TM_RIGHT->i_EOS(i_EOS);
+        // Link signals
+        u_TM_RIGHT->i_DATA(w_X_DATA_TO_RIGHT[x]);
+        u_TM_RIGHT->i_VALID(w_X_VALID_TO_RIGHT[x]);
+        u_TM_RIGHT->i_RETURN(w_X_RETURN_TO_RIGHT[x]);
+        if( NUM_VC > 1 ) {
+            u_TM_RIGHT->i_VC_SEL(w_X_VC_SELECTOR_TO_RIGHT[x]);
+        }
+    }
+    for( unsigned char y = 0; y < numberOfYWires; y++ ) {
+        char strYNMeter[20];
+        sprintf(strYNMeter,"int_y_n_%u",y);
+        // Tm for NORTH link
+        TrafficMeter* u_TM_NORTH = new TrafficMeter(strYNMeter,WORK_DIR,strYNMeter,INoC::TT_Orthogonal2D,false);
+        // System signals
+        u_TM_NORTH->i_CLK(i_CLK);
+        u_TM_NORTH->i_RST(i_RST);
+        u_TM_NORTH->i_CLK_CYCLES(i_CLK_GLOBAL);
+        u_TM_NORTH->i_EOS(i_EOS);
+        // Link signals
+        u_TM_NORTH->i_DATA(w_Y_DATA_TO_NORTH[y]);
+        u_TM_NORTH->i_VALID(w_Y_VALID_TO_NORTH[y]);
+        u_TM_NORTH->i_RETURN(w_Y_RETURN_TO_NORTH[y]);
+        if( NUM_VC > 1 ) {
+            u_TM_NORTH->i_VC_SEL(w_Y_VC_SELECTOR_TO_NORTH[y]);
+        }
+
+        char strYSMeter[20];
+        sprintf(strYSMeter,"int_y_s_%u",y);
+        // Tm for SOUTH link
+        TrafficMeter* u_TM_SOUTH = new TrafficMeter(strYSMeter,WORK_DIR,strYSMeter,INoC::TT_Orthogonal2D,false);
+        // System signals
+        u_TM_SOUTH->i_CLK(i_CLK);
+        u_TM_SOUTH->i_RST(i_RST);
+        u_TM_SOUTH->i_CLK_CYCLES(i_CLK_GLOBAL);
+        u_TM_SOUTH->i_EOS(i_EOS);
+        // Link signals
+        u_TM_SOUTH->i_DATA(w_Y_DATA_TO_SOUTH[y]);
+        u_TM_SOUTH->i_VALID(w_Y_VALID_TO_SOUTH[y]);
+        u_TM_SOUTH->i_RETURN(w_Y_RETURN_TO_SOUTH[y]);
+        if( NUM_VC > 1 ) {
+            u_TM_SOUTH->i_VC_SEL(w_Y_VC_SELECTOR_TO_SOUTH[y]);
         }
     }
 
@@ -497,7 +569,64 @@ SoCINfp::SoCINfp(sc_module_name mn)
             u_ROUTER[routerId] = router;
         }
     }
+    for( unsigned char x = 0; x < numberOfXWires; x++ ) {
+        char strXWMeter[20];
+        sprintf(strXWMeter,"int_x_w_%u",x);
+        // Tm for WEST link
+        TrafficMeter* u_TM_LEFT = new TrafficMeter(strXWMeter,WORK_DIR,strXWMeter,INoC::TT_Orthogonal2D,false);
+        // System signals
+        u_TM_LEFT->i_CLK(i_CLK);
+        u_TM_LEFT->i_RST(i_RST);
+        u_TM_LEFT->i_CLK_CYCLES(i_CLK_GLOBAL);
+        u_TM_LEFT->i_EOS(i_EOS);
+        // Link signals
+        u_TM_LEFT->i_DATA(w_X_DATA_TO_LEFT[x]);
+        u_TM_LEFT->i_VALID(w_X_VALID_TO_LEFT[x]);
+        u_TM_LEFT->i_RETURN(w_X_RETURN_TO_LEFT[x]);
 
+        char strXEMeter[20];
+        sprintf(strXEMeter,"int_x_e_%u",x);
+        // Tm for EAST link
+        TrafficMeter* u_TM_RIGHT = new TrafficMeter(strXEMeter,WORK_DIR,strXEMeter,INoC::TT_Orthogonal2D,false);
+        // System signals
+        u_TM_RIGHT->i_CLK(i_CLK);
+        u_TM_RIGHT->i_RST(i_RST);
+        u_TM_RIGHT->i_CLK_CYCLES(i_CLK_GLOBAL);
+        u_TM_RIGHT->i_EOS(i_EOS);
+        // Link signals
+        u_TM_RIGHT->i_DATA(w_X_DATA_TO_RIGHT[x]);
+        u_TM_RIGHT->i_VALID(w_X_VALID_TO_RIGHT[x]);
+        u_TM_RIGHT->i_RETURN(w_X_RETURN_TO_RIGHT[x]);
+    }
+    for( unsigned char y = 0; y < numberOfYWires; y++ ) {
+        char strYNMeter[20];
+        sprintf(strYNMeter,"int_y_n_%u",y);
+        // Tm for NORTH link
+        TrafficMeter* u_TM_NORTH = new TrafficMeter(strYNMeter,WORK_DIR,strYNMeter,INoC::TT_Orthogonal2D,false);
+        // System signals
+        u_TM_NORTH->i_CLK(i_CLK);
+        u_TM_NORTH->i_RST(i_RST);
+        u_TM_NORTH->i_CLK_CYCLES(i_CLK_GLOBAL);
+        u_TM_NORTH->i_EOS(i_EOS);
+        // Link signals
+        u_TM_NORTH->i_DATA(w_Y_DATA_TO_NORTH[y]);
+        u_TM_NORTH->i_VALID(w_Y_VALID_TO_NORTH[y]);
+        u_TM_NORTH->i_RETURN(w_Y_RETURN_TO_NORTH[y]);
+
+        char strYSMeter[20];
+        sprintf(strYSMeter,"int_y_s_%u",y);
+        // Tm for SOUTH link
+        TrafficMeter* u_TM_SOUTH = new TrafficMeter(strYSMeter,WORK_DIR,strYSMeter,INoC::TT_Orthogonal2D,false);
+        // System signals
+        u_TM_SOUTH->i_CLK(i_CLK);
+        u_TM_SOUTH->i_RST(i_RST);
+        u_TM_SOUTH->i_CLK_CYCLES(i_CLK_GLOBAL);
+        u_TM_SOUTH->i_EOS(i_EOS);
+        // Link signals
+        u_TM_SOUTH->i_DATA(w_Y_DATA_TO_SOUTH[y]);
+        u_TM_SOUTH->i_VALID(w_Y_VALID_TO_SOUTH[y]);
+        u_TM_SOUTH->i_RETURN(w_Y_RETURN_TO_SOUTH[y]);
+    }
 #ifdef DEBUG_SOCIN
     SC_METHOD(p_DEBUG);
     sensitive << i_CLK.pos();

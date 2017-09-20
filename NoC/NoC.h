@@ -61,6 +61,8 @@ public:
     // System signals
     sc_in<bool> i_CLK;
     sc_in<bool> i_RST;
+    sc_in<unsigned long long> i_CLK_GLOBAL;
+    sc_in<bool> i_EOS;
 
     // Routers interface - Local communication ports
     sc_vector<sc_in<Flit> >  i_DATA_IN;

@@ -39,6 +39,7 @@ protected:
 
     UIntVar packetHeader;
     unsigned long long cycleOfArriving;
+    unsigned short hops;
 
     INoC::TopologyType topologyType;
     bool isExternal;                    // Flag to indicates if the traffic meter is external of the network.

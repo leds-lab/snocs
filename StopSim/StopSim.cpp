@@ -136,6 +136,7 @@ void StopSim::p_STOP() {
 
 void StopSim::endSimulation(FILE* fp_out) {
     fprintf(fp_out,"%llu", i_CLK_CYCLES.read());
+    fprintf(fp_out,"\n%s",nocName);
     fclose(fp_out);
     o_EOS.write(1);
     wait();

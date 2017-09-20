@@ -11,8 +11,10 @@ include(../socindefines.pri)
 TARGET = noc_SoCIN_Spider
 
 SOURCES += SoCIN_Spider.cpp \
-    ../PluginManager/PluginManager.cpp
+    ../PluginManager/PluginManager.cpp \
+    ../TrafficMeter/TrafficMeter.cpp
 
 HEADERS += SoCIN_Spider.h \
-    ../PluginManager/PluginManager.h
+    ../PluginManager/PluginManager.h \
+    ../TrafficMeter/TrafficMeter.h
 

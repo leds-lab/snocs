@@ -11,7 +11,9 @@ include(../socindefines.pri)
 TARGET = noc_SoCIN_Torus
 
 SOURCES += SoCIN_Torus.cpp \
-    ../PluginManager/PluginManager.cpp
+    ../PluginManager/PluginManager.cpp \
+    ../TrafficMeter/TrafficMeter.cpp
 
 HEADERS += SoCIN_Torus.h \
-    ../PluginManager/PluginManager.h
+    ../PluginManager/PluginManager.h \
+    ../TrafficMeter/TrafficMeter.h

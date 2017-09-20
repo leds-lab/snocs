@@ -1,6 +1,7 @@
 #include "SoCIN_Spider.h"
 #include "../Router/Router.h"
 #include "../PluginManager/PluginManager.h"
+#include "../TrafficMeter/TrafficMeter.h"
 
 //#define WAVEFORM_SOCIN
 
@@ -144,6 +145,60 @@ SoCIN_Spider::SoCIN_Spider(sc_module_name mn)
 
         u_ROUTER[routerId] = router;
     }
+
+    for( unsigned char i = 0; i < numberOfElements; i++ ) {
+        char strCWMeter[20];
+        sprintf(strCWMeter,"int_cw_%u",i);
+        //Tm for CLOCKWISE link
+        TrafficMeter* u_TM_LEFT = new TrafficMeter(strCWMeter,WORK_DIR,strCWMeter,INoC::TT_Non_Orthogonal,false);
+        // System signals
+        u_TM_LEFT->i_CLK(i_CLK);
+        u_TM_LEFT->i_RST(i_RST);
+        u_TM_LEFT->i_CLK_CYCLES(i_CLK_GLOBAL);
+        u_TM_LEFT->i_EOS(i_EOS);
+        // Link signals
+        u_TM_LEFT->i_DATA(w_DATA_TO_LEFT[i]);
+        u_TM_LEFT->i_VALID(w_VALID_TO_LEFT[i]);
+        u_TM_LEFT->i_RETURN(w_RETURN_TO_LEFT[i]);
+        if( NUM_VC > 1 ) {
+            u_TM_LEFT->i_VC_SEL(w_VC_SELECTOR_TO_LEFT[i]);
+        }
+
+        char strCCWMeter[20];
+        sprintf(strCCWMeter,"int_ccw_%u",i);
+        // Tm for COUNTERCLOCKWISE link
+        TrafficMeter* u_TM_RIGHT = new TrafficMeter(strCCWMeter,WORK_DIR,strCCWMeter,INoC::TT_Non_Orthogonal,false);
+        // System signals
+        u_TM_RIGHT->i_CLK(i_CLK);
+        u_TM_RIGHT->i_RST(i_RST);
+        u_TM_RIGHT->i_CLK_CYCLES(i_CLK_GLOBAL);
+        u_TM_RIGHT->i_EOS(i_EOS);
+        // Link signals
+        u_TM_RIGHT->i_DATA(w_DATA_TO_RIGHT[i]);
+        u_TM_RIGHT->i_VALID(w_VALID_TO_RIGHT[i]);
+        u_TM_RIGHT->i_RETURN(w_RETURN_TO_RIGHT[i]);
+        if( NUM_VC > 1 ) {
+            u_TM_RIGHT->i_VC_SEL(w_VC_SELECTOR_TO_RIGHT[i]);
+        }
+
+        char strAMeter[20];
+        sprintf(strAMeter,"int_a_%u",i);
+        // Tm for ACROSS link
+        TrafficMeter* u_TM_ACROSS = new TrafficMeter(strAMeter,WORK_DIR,strAMeter,INoC::TT_Non_Orthogonal,false);
+        // System signals
+        u_TM_ACROSS->i_CLK(i_CLK);
+        u_TM_ACROSS->i_RST(i_RST);
+        u_TM_ACROSS->i_CLK_CYCLES(i_CLK_GLOBAL);
+        u_TM_ACROSS->i_EOS(i_EOS);
+        // Link signals
+        u_TM_ACROSS->i_DATA(w_DATA_ACROSS[i]);
+        u_TM_ACROSS->i_VALID(w_VALID_ACROSS[i]);
+        u_TM_ACROSS->i_RETURN(w_RETURN_ACROSS[i]);
+        if( NUM_VC > 1 ) {
+            u_TM_ACROSS->i_VC_SEL(w_VC_SELECTOR_ACROSS[i]);
+        }
+    }
+
 #ifdef WAVEFORM_SOCIN
     tf = sc_create_vcd_trace_file("socin_spider");
     sc_trace(tf,i_CLK,"CLK");

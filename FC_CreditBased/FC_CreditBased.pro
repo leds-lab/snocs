@@ -6,6 +6,7 @@
 
 include(../FlowControl/FlowControl.pro)
 include(../plugin.pri)
+include(../socindefines.pri)
 
 TARGET = fc_creditbased
 
