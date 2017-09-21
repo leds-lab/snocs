@@ -137,49 +137,43 @@ void SIMON::Simon_EDI(){
 
     // Create generic tmp variables
     uint8_t ciphertext_buffer[4];
+    uint8_t simon64_32_data[4];
 
     //uint8_t simon64_32_key[] = {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19}; //Pegar Chave
     //uint8_t simon64_32_plain[] = {0x77, 0x68, 0x65, 0x65};
-    uint8_t simon64_32_cipher[]= {0xBB,0xE9, 0x9B, 0xC6};
+    //uint8_t simon64_32_cipher[]= {0xBB,0xE9, 0x9B, 0xC6};
 
     Simon_Init(&s_cipher_object, i_KEY); //result = Simon_Init(&s_cipher_object, simon64_32_key);
 
-
-    //Pega FLit
+    //Get FLit
     Flit f = i_DATA.read();
-
     bool isHeader = false;
 
     if( f.data[FLIT_WIDTH-2] == 1 ) {
         isHeader = true;
     }
     if( !isHeader ) {
-        uint8_t simon64_32_plain[4];
 
-        // 1 = Encrypt
-        /*
-        sc_uint<8> bSC4 = f.data.range(31,24);
-        UIntVar bVAR4(0,8);
-        bVAR4 = f.data.range(31,24);
-        */
-
-        simon64_32_plain[3]=  f.data.range(31,24);
-        simon64_32_plain[2]=  f.data.range(23,16);
-        simon64_32_plain[1]=  f.data.range(15,8);
-        simon64_32_plain[0]=  f.data.range(7,0);
+        // Desmenbra data do flit de 8 em 8 bits
+        simon64_32_data[3]=  f.data.range(31,24);
+        simon64_32_data[2]=  f.data.range(23,16);
+        simon64_32_data[1]=  f.data.range(15,8);
+        simon64_32_data[0]=  f.data.range(7,0);
 
         // 2 = Decrypt
         if(i_TYPE.read()){
             //Simon_Encrypt_32(&s_cipher_object.key_schedule, &f.data, &ciphertext_buffer);
-            Simon_Encrypt_32(&s_cipher_object.key_schedule, &simon64_32_plain, &ciphertext_buffer);
+            Simon_Encrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
         }else{
             //Simon_Decrypt_32(&s_cipher_object.key_schedule, &f.data, &ciphertext_buffer);
-            Simon_Decrypt_32(&s_cipher_object.key_schedule, &simon64_32_cipher, &ciphertext_buffer);
+            Simon_Decrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
         }
 
-
-
-        f.data = ciphertext_buffer; // ALTERAR
+        // Remonta data do flit
+        f.data.range(31,24) = ciphertext_buffer[3];
+        f.data.range(23,16) = ciphertext_buffer[2];
+        f.data.range(15,8) = ciphertext_buffer[1];
+        f.data.range(7,0) = ciphertext_buffer[0];
     }
 
     o_DATA.write(f);

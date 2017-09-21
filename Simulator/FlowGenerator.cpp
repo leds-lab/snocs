@@ -164,7 +164,7 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
     headerFlit.data = flit;
     headerFlit.packet_ptr = packet;
 
-   this->sendFlit(cifrado,virtualChannel); // Send header
+   this->sendFlit(headerFlit,virtualChannel); // Send header
 
     /////////////////// Payload ///////////////////
     for(unsigned short i = 0; i < payloadLength - 1; i++) {
@@ -501,6 +501,7 @@ void FlowGenerator::p_RECEIVE() {
             if ((i_READ_OK_RECEIVE.read()==1) && trailer) {
                 o_NUMBER_OF_PACKETS_RECEIVED.write(o_NUMBER_OF_PACKETS_RECEIVED.read() + 1);
                 FlowParameters fp;
+
                 //preencher FP
                 //                fp.
                 this->sendPacket(fp,i_CLK_CYCLES.read(),2,NORMAL);

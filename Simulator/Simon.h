@@ -28,7 +28,6 @@ public:
     };
 
     sc_in<Flit> i_DATA;
-    //sc_vector<sc_in<sc_uint<16> > > i_KEY;
     sc_vector<sc_in<uint8_t > > i_KEY;
     sc_in<bool> i_TYPE;
 
@@ -40,9 +39,6 @@ public:
     void Simon_Decrypt_32(const uint8_t *key_schedule, const uint8_t *ciphertext, uint8_t *plaintext);
     void Simon_Init(Simon_Cipher *cipher_object, void *key);
     void Simon_EDI();
-
-    //void Simon_Encrypt_32(const uint8_t *key_schedule, const uint8_t *plaintext, uint8_t *ciphertext);
-    //void Simon_Decrypt_32(const uint8_t *key_schedule, const uint8_t *ciphertext, uint8_t *plaintext);
 
     SC_HAS_PROCESS(SIMON);
     SIMON(sc_module_name);
