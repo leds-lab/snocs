@@ -158,7 +158,7 @@ void SIMON::Simon_EDI(){
         //Pega Chave Correta
 
         //Inicia o SIMON
-        Simon_Init(&s_cipher_object, i_KEY);
+        Simon_Init(&s_cipher_object, &w_KEY[][]);
     }
     if( !isHeader ) {
 
