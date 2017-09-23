@@ -23,8 +23,6 @@ const uint8_t  z_assign[] = {0, 0, 1, 2, 3, 2, 3, 2, 3, 4};
 
 SIMON::SIMON(sc_module_name nm):sc_module(nm)
 {
-    i_KEY.init(4);
-
     SC_METHOD(Simon_EDI);
     sensitive << i_DATA;
 }
@@ -143,14 +141,24 @@ void SIMON::Simon_EDI(){
     //uint8_t simon64_32_plain[] = {0x77, 0x68, 0x65, 0x65};
     //uint8_t simon64_32_cipher[]= {0xBB,0xE9, 0x9B, 0xC6};
 
-    Simon_Init(&s_cipher_object, i_KEY); //result = Simon_Init(&s_cipher_object, simon64_32_key);
-
     //Get FLit
     Flit f = i_DATA.read();
     bool isHeader = false;
 
     if( f.data[FLIT_WIDTH-2] == 1 ) {
         isHeader = true;
+
+        // Verifica se criptografa ou descriptografa
+        if(f.data[23] == 1 ){
+            w_TYPE.write(true);
+        }else {
+            w_TYPE.write(false);
+        }
+
+        //Pega Chave Correta
+
+        //Inicia o SIMON
+        Simon_Init(&s_cipher_object, i_KEY);
     }
     if( !isHeader ) {
 
@@ -160,8 +168,7 @@ void SIMON::Simon_EDI(){
         simon64_32_data[1]=  f.data.range(15,8);
         simon64_32_data[0]=  f.data.range(7,0);
 
-        // 2 = Decrypt
-        if(i_TYPE.read()){
+        if(w_TYPE.read()){
             //Simon_Encrypt_32(&s_cipher_object.key_schedule, &f.data, &ciphertext_buffer);
             Simon_Encrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
         }else{

@@ -154,7 +154,7 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
     flit.range(CMD_POSITION,CMD_POSITION-1) = packetType;   // Switching (NORMAL, ALLOC, RELEASE, GRANT)
     flit.range(CLS_POS,CLS_POS-2) = flowParam.traffic_class;// Traffic Class
     flit.range(FID_POS,FID_POS-1) = flowParam.flow_id;      // Flow id
-    flit[23] = true || false; // Tipo para o SIMON
+    flit[23] = 1; //Tipo para o SIMON // 1 = Encrypt, 0 = Decrypt
 
     // TODO Verify what virtual channel must be used according the traffic class
     unsigned short virtualChannel = flowParam.traffic_class;

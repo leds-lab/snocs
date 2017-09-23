@@ -28,10 +28,10 @@ public:
     };
 
     sc_in<Flit> i_DATA;
-    sc_vector<sc_in<uint8_t > > i_KEY;
-    sc_in<bool> i_TYPE;
-
     sc_out<Flit> o_DATA;
+
+    sc_signal<uint8_t> w_KEY[9][8];
+    sc_signal<bool> w_TYPE;
 
     Simon_Cipher s_cipher_object;
 
