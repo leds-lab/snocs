@@ -145,20 +145,22 @@ void SIMON::Simon_EDI(){
     Flit f = i_DATA.read();
     bool isHeader = false;
 
-    if( f.data[FLIT_WIDTH-2] == 1 ) {
+    if( f.data[FLIT_WIDTH-2] == 1) {
         isHeader = true;
+        if(){ // Destino for diferente do distribuidor
+            // Verifica se criptografa ou descriptografa
+            if(f.data[23] == 1 ){
+                w_TYPE.write(true);
+                f.data[23] = 0; // Altera para o simon descriptografar o pacote no destino
+            }else {
+                w_TYPE.write(false);
+            }
 
-        // Verifica se criptografa ou descriptografa
-        if(f.data[23] == 1 ){
-            w_TYPE.write(true);
-        }else {
-            w_TYPE.write(false);
+            //Pega Chave Correta
+
+            //Inicia o SIMON
+            Simon_Init(&s_cipher_object, &w_KEY[][]);
         }
-
-        //Pega Chave Correta
-
-        //Inicia o SIMON
-        Simon_Init(&s_cipher_object, &w_KEY[][]);
     }
     if( !isHeader ) {
 

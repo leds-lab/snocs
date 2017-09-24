@@ -120,13 +120,6 @@ void FlowGenerator::sendFlit(Flit flit, unsigned short virtualChannel) {
     }
 }
 
-void FlowGenerator::p_SEND_CYPHER() {
-
-    Flit f = w_SIMON_SEND.read();
-    sendFlit( f, 0 );
-
-}
-
 void FlowGenerator::sendPacket(FlowParameters flowParam,
                                unsigned long long cycleToSend,
                                unsigned long payloadLength,
@@ -138,55 +131,156 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
         sc_stop();
     }
 
-    UIntVar flit(0,FLIT_WIDTH); // Auxiliary variable to build the flit to be sent (FLIT_WIDTH is defined in Parameters.h)
+    if(USE_SIMON) {
 
-    Packet* packet = new Packet;
-    packet->requiredBW = flowParam.required_bw;
-    packet->deadline = flowParam.deadline;
-    packet->packetCreationCycle = cycleToSend + 1;
-    packet->packetId = PARAMS->pckId++;
-    packet->payloadLength = payloadLength;
-    packet->hops = 0;
+        UIntVar flit(0,FLIT_WIDTH); // Auxiliary variable to build the flit to be sent (FLIT_WIDTH is defined in Parameters.h)
+        UIntVar flit_dist(0,FLIT_WIDTH); // Auxiliary variable to build the flit to be sent (FLIT_WIDTH is defined in Parameters.h)
+        // TODO Verify what virtual channel must be used according the traffic class
+        unsigned short virtualChannel = flowParam.traffic_class;
 
-    /////////////////// Header ///////////////////
-    flit = getHeaderAddresses(FG_ID,flowParam.destination); // Get Addressing according the topology type
-    flit[FLIT_WIDTH-2] = 1;                                 // BOP high - Header
-    flit.range(CMD_POSITION,CMD_POSITION-1) = packetType;   // Switching (NORMAL, ALLOC, RELEASE, GRANT)
-    flit.range(CLS_POS,CLS_POS-2) = flowParam.traffic_class;// Traffic Class
-    flit.range(FID_POS,FID_POS-1) = flowParam.flow_id;      // Flow id
-    flit[23] = 1; //Tipo para o SIMON // 1 = Encrypt, 0 = Decrypt
+        //////////////////////////////////////////////////////
+        ////////////////////Solicita Chave////////////////////
+        //////////////////////////////////////////////////////
 
-    // TODO Verify what virtual channel must be used according the traffic class
-    unsigned short virtualChannel = flowParam.traffic_class;
+        Packet* packet_dist = new Packet;
+        packet_dist->requiredBW = flowParam.required_bw;
+        packet_dist->deadline = flowParam.deadline;
+        packet_dist->packetCreationCycle = cycleToSend + 1;
+        packet_dist->packetId = PARAMS->pckId++;
+        packet_dist->payloadLength = 1;
+        packet_dist->hops = 0;
 
-    // It sends the header
-    Flit headerFlit;
-    headerFlit.data = flit;
-    headerFlit.packet_ptr = packet;
+        /////////////////// Cabeçalho solicitando chave para o destribuidor ///////////////////
+        flit_dist = getHeaderAddresses(FG_ID,DISTRIBUTOR_KEY); // Get Addressing according the topology type
+        flit_dist[FLIT_WIDTH-2] = 1;                                 // BOP high - Header
+        flit_dist.range(CMD_POSITION,CMD_POSITION-1) = packetType;   // Switching (NORMAL, ALLOC, RELEASE, GRANT)
+        flit_dist.range(CLS_POS,CLS_POS-2) = flowParam.traffic_class;// Traffic Class
+        flit_dist.range(FID_POS,FID_POS-1) = flowParam.flow_id;      // Flow id
 
-   this->sendFlit(headerFlit,virtualChannel); // Send header
+        // It sends the header
+        Flit headerFlit_dist;
+        headerFlit_dist.data = flit;
+        headerFlit_dist.packet_ptr = packet_dist;
+        this->sendFlit(headerFlit_dist,virtualChannel); // Send header
 
-    /////////////////// Payload ///////////////////
-    for(unsigned short i = 0; i < payloadLength - 1; i++) {
-        Flit payload;
-        payload.data = i; // The content of the flit is only the number of flit in the packet
-        payload.packet_ptr = packet;
+        /////////////////// Payload ///////////////////
+        Flit payload_dist;
+        payload_dist.data = i; // The content of the flit is only the number of flit in the packet
+        payload_dist.packet_ptr = packet_dist;
         this->sendFlit(payload,virtualChannel); // Sending payload
+
+
+        /////////////////// Trailer ///////////////////
+        flit_dist = packet_dist->packetId; // Put the packet ID on the trailer payload
+        flit_dist[FLIT_WIDTH-1] = 1; // Trailer
+
+        Flit trailer_dist;
+        trailer_dist.data = flit_dist;
+        trailer_dist.packet_ptr = packet_dist;
+        this->sendFlit(trailer_dist, virtualChannel); // Send trailer
+
+
+        //////////////////////////////////////////////////////
+        ////////////////////Envia dados///////////////////////
+        //////////////////////////////////////////////////////
+
+        Packet* packet = new Packet;
+        packet->requiredBW = flowParam.required_bw;
+        packet->deadline = flowParam.deadline;
+        packet->packetCreationCycle = cycleToSend + 1;
+        packet->packetId = PARAMS->pckId++;
+        packet->payloadLength = payloadLength;
+        packet->hops = 0;
+
+        /////////////////// Header ///////////////////
+        flit = getHeaderAddresses(FG_ID,flowParam.destination); // Get Addressing according the topology type
+        flit[FLIT_WIDTH-2] = 1;                                 // BOP high - Header
+        flit.range(CMD_POSITION,CMD_POSITION-1) = packetType;   // Switching (NORMAL, ALLOC, RELEASE, GRANT)
+        flit.range(CLS_POS,CLS_POS-2) = flowParam.traffic_class;// Traffic Class
+        flit.range(FID_POS,FID_POS-1) = flowParam.flow_id;      // Flow id
+        flit[23] = 1; //Tipo para o SIMON // 1 = Encrypt, 0 = Decrypt
+
+        // It sends the header
+        Flit headerFlit;
+        headerFlit.data = flit;
+        headerFlit.packet_ptr = packet;
+
+       this->sendFlit(headerFlit,virtualChannel); // Send header
+
+        /////////////////// Payload ///////////////////
+        for(unsigned short i = 0; i < payloadLength - 1; i++) {
+            Flit payload;
+            payload.data = i; // The content of the flit is only the number of flit in the packet
+            payload.packet_ptr = packet;
+            this->sendFlit(payload,virtualChannel); // Sending payload
+        }
+
+        /////////////////// Trailer ///////////////////
+        // It sends the trailer flit: the lowest word with "Bye" string
+        //    char msg[4] = "Bye"; // 4 bytes -> [0]: B , [1]: y, [2]: e, [3]: \0
+        //    //   =   ASCI:  B       |        y       |       e       |   \0
+        //    flit = ( (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
+        // Send trailer with the packet id
+        flit = packet->packetId; // Put the packet ID on the trailer payload
+        flit[FLIT_WIDTH-1] = 1; // Trailer
+
+        Flit trailer;
+        trailer.data = flit;
+        trailer.packet_ptr = packet;
+        this->sendFlit(trailer, virtualChannel); // Send trailer
+
+    }else{
+
+        UIntVar flit(0,FLIT_WIDTH); // Auxiliary variable to build the flit to be sent (FLIT_WIDTH is defined in Parameters.h)
+
+        Packet* packet = new Packet;
+        packet->requiredBW = flowParam.required_bw;
+        packet->deadline = flowParam.deadline;
+        packet->packetCreationCycle = cycleToSend + 1;
+        packet->packetId = PARAMS->pckId++;
+        packet->payloadLength = payloadLength;
+        packet->hops = 0;
+
+        /////////////////// Header ///////////////////
+        flit = getHeaderAddresses(FG_ID,flowParam.destination); // Get Addressing according the topology type
+        flit[FLIT_WIDTH-2] = 1;                                 // BOP high - Header
+        flit.range(CMD_POSITION,CMD_POSITION-1) = packetType;   // Switching (NORMAL, ALLOC, RELEASE, GRANT)
+        flit.range(CLS_POS,CLS_POS-2) = flowParam.traffic_class;// Traffic Class
+        flit.range(FID_POS,FID_POS-1) = flowParam.flow_id;      // Flow id
+
+        // TODO Verify what virtual channel must be used according the traffic class
+        unsigned short virtualChannel = flowParam.traffic_class;
+
+        // It sends the header
+        Flit headerFlit;
+        headerFlit.data = flit;
+        headerFlit.packet_ptr = packet;
+
+       this->sendFlit(headerFlit,virtualChannel); // Send header
+
+        /////////////////// Payload ///////////////////
+        for(unsigned short i = 0; i < payloadLength - 1; i++) {
+            Flit payload;
+            payload.data = i; // The content of the flit is only the number of flit in the packet
+            payload.packet_ptr = packet;
+            this->sendFlit(payload,virtualChannel); // Sending payload
+        }
+
+        /////////////////// Trailer ///////////////////
+        // It sends the trailer flit: the lowest word with "Bye" string
+        //    char msg[4] = "Bye"; // 4 bytes -> [0]: B , [1]: y, [2]: e, [3]: \0
+        //    //   =   ASCI:  B       |        y       |       e       |   \0
+        //    flit = ( (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
+        // Send trailer with the packet id
+        flit = packet->packetId; // Put the packet ID on the trailer payload
+        flit[FLIT_WIDTH-1] = 1; // Trailer
+
+        Flit trailer;
+        trailer.data = flit;
+        trailer.packet_ptr = packet;
+        this->sendFlit(trailer, virtualChannel); // Send trailer
+
     }
-
-    /////////////////// Trailer ///////////////////
-    // It sends the trailer flit: the lowest word with "Bye" string
-    //    char msg[4] = "Bye"; // 4 bytes -> [0]: B , [1]: y, [2]: e, [3]: \0
-    //    //   =   ASCI:  B       |        y       |       e       |   \0
-    //    flit = ( (msg[0] << 24) | (msg[1] << 16) | (msg[2] << 8) | (msg[3]) );
-    // Send trailer with the packet id
-    flit = packet->packetId; // Put the packet ID on the trailer payload
-    flit[FLIT_WIDTH-1] = 1; // Trailer
-
-    Flit trailer;
-    trailer.data = flit;
-    trailer.packet_ptr = packet;
-    this->sendFlit(trailer, virtualChannel); // Send trailer
 }
 
 void FlowGenerator::sendBurst(FlowParameters flowParam, unsigned long long cycleToSend) {
@@ -490,7 +584,7 @@ void FlowGenerator::p_RECEIVE() {
     //    bool header;
     Flit f;
 
-    if(FG_ID == 4) {
+    if(FG_ID == DISTRIBUTOR_KEY) {
         // Key Gen
         while(1) {
             f = i_DATA_RECEIVE.read();

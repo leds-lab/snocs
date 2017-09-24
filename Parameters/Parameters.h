@@ -35,7 +35,6 @@ class PluginManager;
 #define PLUGINS_DIR PARAMS->pluginsDir      // Plugins folder
 #define CONF_FILE PARAMS->confFile          // File with simulator definitions
 #define SEED PARAMS->seed                   // Seed for the pseudo-random number generator on the Flow Generator
-#define USE_SIMON PARAMS->useSimon
 // Network info
 #define NUM_ELEMENTS PARAMS->numElements    // Number of elements in the network
 #define X_SIZE PARAMS->xSize                // Network X dimension
@@ -114,6 +113,10 @@ class PluginManager;
 
 // Plugin manager instance
 #define PLUGIN_MANAGER PARAMS->pm           // Plugin manager
+
+// SIMON
+#define USE_SIMON PARAMS->useSimon
+#define DISTRIBUTOR_KEY 4
 
 /////////////////////////////////////////////////////////////////////////
 /// Parameters of the system

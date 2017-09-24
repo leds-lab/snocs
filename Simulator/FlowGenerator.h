@@ -77,7 +77,6 @@ public:
     // Module's processes
     void p_SEND();
     void p_RECEIVE();
-    void p_SEND_CYPHER();
 
     // Auxiliar functions
     UIntVar getHeaderAddresses(unsigned short src, unsigned short destination);
