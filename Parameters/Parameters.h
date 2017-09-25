@@ -116,7 +116,9 @@ class PluginManager;
 
 // SIMON
 #define USE_SIMON PARAMS->useSimon
-#define DISTRIBUTOR_KEY 4
+#define DISTRIBUTOR_KEY_POS 4
+#define DISTRIBUTOR_KEY_POS_X 1
+#define DISTRIBUTOR_KEY_POS_Y 1
 
 /////////////////////////////////////////////////////////////////////////
 /// Parameters of the system

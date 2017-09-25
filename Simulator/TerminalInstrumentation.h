@@ -141,7 +141,6 @@ public:
             u_FG->i_CLK(i_CLK);
             u_FG->i_RST(i_RST);
             u_FG->i_CLK_CYCLES(i_CLK_CYCLES);
-            u_FG->o_SIMON_TYPE(fio_simon);
 
 //            u_FG->o_DATA_SEND(w_DATA_SEND);
 //            u_FG->o_WRITE_SEND(w_WRITE_SEND);
@@ -156,9 +155,10 @@ public:
                 u_FG->o_VC_SEND(o_VC);
             }
 
-            SIMON* a = new SIMON("SIMON");
+            /*
+            SIMON* a = new SIMON("SIMON",TG_ID);
             a->i_DATA(w_DATA_TO_SIMON);
-
+            */
 
             // FIFO após o SIMON
             IMemory* u_FIFO_SEND = PLUGIN_MANAGER->memoryInstance("Fifo_ENVIO_InTG",TG_ID,0,FIFO_IN_DEPTH);

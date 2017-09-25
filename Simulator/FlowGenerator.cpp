@@ -138,46 +138,48 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
         // TODO Verify what virtual channel must be used according the traffic class
         unsigned short virtualChannel = flowParam.traffic_class;
 
-        //////////////////////////////////////////////////////
-        ////////////////////Solicita Chave////////////////////
-        //////////////////////////////////////////////////////
+        if(FG_ID != DISTRIBUTOR_KEY_POS){
+            //////////////////////////////////////////////////////
+            ////////////////////Solicita Chave////////////////////
+            //////////////////////////////////////////////////////
 
-        Packet* packet_dist = new Packet;
-        packet_dist->requiredBW = flowParam.required_bw;
-        packet_dist->deadline = flowParam.deadline;
-        packet_dist->packetCreationCycle = cycleToSend + 1;
-        packet_dist->packetId = PARAMS->pckId++;
-        packet_dist->payloadLength = 1;
-        packet_dist->hops = 0;
+            Packet* packet_dist = new Packet;
+            packet_dist->requiredBW = flowParam.required_bw;
+            packet_dist->deadline = flowParam.deadline;
+            packet_dist->packetCreationCycle = cycleToSend + 1;
+            packet_dist->packetId = PARAMS->pckId++;
+            packet_dist->payloadLength = 1;
+            packet_dist->hops = 0;
 
-        /////////////////// Cabeçalho solicitando chave para o destribuidor ///////////////////
-        flit_dist = getHeaderAddresses(FG_ID,DISTRIBUTOR_KEY); // Get Addressing according the topology type
-        flit_dist[FLIT_WIDTH-2] = 1;                                 // BOP high - Header
-        flit_dist.range(CMD_POSITION,CMD_POSITION-1) = packetType;   // Switching (NORMAL, ALLOC, RELEASE, GRANT)
-        flit_dist.range(CLS_POS,CLS_POS-2) = flowParam.traffic_class;// Traffic Class
-        flit_dist.range(FID_POS,FID_POS-1) = flowParam.flow_id;      // Flow id
+            /////////////////// Cabeçalho solicitando chave para o destribuidor ///////////////////
+            flit_dist = getHeaderAddresses(FG_ID,DISTRIBUTOR_KEY_POS); // Get Addressing according the topology type
+            flit_dist[FLIT_WIDTH-2] = 1;                                 // BOP high - Header
+            flit_dist.range(CMD_POSITION,CMD_POSITION-1) = packetType;   // Switching (NORMAL, ALLOC, RELEASE, GRANT)
+            flit_dist.range(CLS_POS,CLS_POS-2) = flowParam.traffic_class;// Traffic Class
+            flit_dist.range(FID_POS,FID_POS-1) = flowParam.flow_id;      // Flow id
 
-        // It sends the header
-        Flit headerFlit_dist;
-        headerFlit_dist.data = flit;
-        headerFlit_dist.packet_ptr = packet_dist;
-        this->sendFlit(headerFlit_dist,virtualChannel); // Send header
+            // It sends the header
+            Flit headerFlit_dist;
+            headerFlit_dist.data = flit;
+            headerFlit_dist.packet_ptr = packet_dist;
+            this->sendFlit(headerFlit_dist,virtualChannel); // Send header
 
-        /////////////////// Payload ///////////////////
-        Flit payload_dist;
-        payload_dist.data = i; // The content of the flit is only the number of flit in the packet
-        payload_dist.packet_ptr = packet_dist;
-        this->sendFlit(payload,virtualChannel); // Sending payload
+            /////////////////// Payload ///////////////////
+            Flit payload_dist;
+            payload_dist.data = flowParam.destination; // Coloca destino no corpo do flit--
+            payload_dist.packet_ptr = packet_dist;
+            this->sendFlit(payload,virtualChannel); // Sending payload
 
 
-        /////////////////// Trailer ///////////////////
-        flit_dist = packet_dist->packetId; // Put the packet ID on the trailer payload
-        flit_dist[FLIT_WIDTH-1] = 1; // Trailer
+            /////////////////// Trailer ///////////////////
+            flit_dist = packet_dist->packetId; // Put the packet ID on the trailer payload
+            flit_dist[FLIT_WIDTH-1] = 1; // Trailer
 
-        Flit trailer_dist;
-        trailer_dist.data = flit_dist;
-        trailer_dist.packet_ptr = packet_dist;
-        this->sendFlit(trailer_dist, virtualChannel); // Send trailer
+            Flit trailer_dist;
+            trailer_dist.data = flit_dist;
+            trailer_dist.packet_ptr = packet_dist;
+            this->sendFlit(trailer_dist, virtualChannel); // Send trailer
+        }
 
 
         //////////////////////////////////////////////////////
@@ -584,7 +586,7 @@ void FlowGenerator::p_RECEIVE() {
     //    bool header;
     Flit f;
 
-    if(FG_ID == DISTRIBUTOR_KEY) {
+    if(FG_ID == DISTRIBUTOR_KEY_POS) {
         // Key Gen
         while(1) {
             f = i_DATA_RECEIVE.read();

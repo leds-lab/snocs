@@ -14,6 +14,16 @@ uint64_t z_arrays[5] = {0b000110011100001101010010001011111011001110000110101001
                         0b0011110000101100111001010001001000000111101001100011010111011011,
                         0b0011110111001001010011000011101000000100011011010110011110001011};
 
+uint8_t temp_key[9][8] = {{0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19}
+                         };
+
 // Valid Cipher Parameters
 const uint8_t simon_rounds[] = {32, 36, 36, 42, 44, 52, 54, 68, 69, 72};
 const uint8_t simon_block_sizes[] = {32, 48, 48, 64, 64, 96, 96, 128, 128, 128};
@@ -21,8 +31,24 @@ const uint16_t simon_key_sizes[] = {64, 72, 96, 96, 128, 96, 144, 128, 192, 256}
 const uint8_t  z_assign[] = {0, 0, 1, 2, 3, 2, 3, 2, 3, 4};
 
 
-SIMON::SIMON(sc_module_name nm):sc_module(nm)
+SIMON::SIMON(sc_module_name nm,
+             unsigned short int SIMON_ID)
+    :sc_module(nm),
+     SIMON_ID(SIMON_ID)
 {
+
+    if(SIMON_ID == DISTRIBUTOR_KEY_POS){
+        for(unsigned short x = 0; i < 9; i++) {
+            for(unsigned short y = 0; i < 8; i++) {
+                w_KEY[x][y] = temp_key[x][y];
+            }
+        }
+    }else{
+        for(unsigned short y = 0; i < 8; i++) {
+            w_KEY[DISTRIBUTOR_KEY_POS-1][y] = temp_key[SIMON_ID][y];
+        }
+    }
+
     SC_METHOD(Simon_EDI);
     sensitive << i_DATA;
 }
@@ -136,6 +162,7 @@ void SIMON::Simon_EDI(){
     // Create generic tmp variables
     uint8_t ciphertext_buffer[4];
     uint8_t simon64_32_data[4];
+    uint8_t cipher_buffer[4];
 
     //uint8_t simon64_32_key[] = {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19}; //Pegar Chave
     //uint8_t simon64_32_plain[] = {0x77, 0x68, 0x65, 0x65};
@@ -147,22 +174,33 @@ void SIMON::Simon_EDI(){
 
     if( f.data[FLIT_WIDTH-2] == 1) {
         isHeader = true;
-        if(){ // Destino for diferente do distribuidor
-            // Verifica se criptografa ou descriptografa
-            if(f.data[23] == 1 ){
-                w_TYPE.write(true);
-                f.data[23] = 0; // Altera para o simon descriptografar o pacote no destino
-            }else {
-                w_TYPE.write(false);
-            }
-
-            //Pega Chave Correta
-
-            //Inicia o SIMON
-            Simon_Init(&s_cipher_object, &w_KEY[][]);
+        // Verifica se criptografa ou descriptografa
+        if(f.data[23] == 1 ){
+            w_TYPE.write(true);
+            f.data[23] = 0; // Altera para o simon descriptografar o pacote no destino
+        }else {
+            w_TYPE.write(false);
         }
+
+        //Pega Chave Correta
+
+        unsigned xDst = f.range(RIB_WIDTH-1,RIB_WIDTH/2);
+        unsigned yDst = f.range(RIB_WIDTH/2-1,0);
+
+        if(xDst == DISTRIBUTOR_KEY_POS_X && yDst == DISTRIBUTOR_KEY_POS_Y){
+            for(unsigned short i = 0; i < 4; i++) {
+                cipher_buffer[i] = w_KEY[DISTRIBUTOR_KEY_POS -1][i];
+            }
+        }else{
+            for(unsigned short i = 0; i < 4; i++) {
+                cipher_buffer[i] = w_KEY[SIMON_ID -1][i];
+            }
+        }
+        //Inicia o SIMON
+        Simon_Init(&s_cipher_object, &cipher_buffer);
     }
-    if( !isHeader ) {
+
+    if( !isHeader) {
 
         // Desmenbra data do flit de 8 em 8 bits
         simon64_32_data[3]=  f.data.range(31,24);

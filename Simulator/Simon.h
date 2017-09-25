@@ -41,7 +41,10 @@ public:
     void Simon_EDI();
 
     SC_HAS_PROCESS(SIMON);
-    SIMON(sc_module_name);
+    SIMON(sc_module_name nm,unsigned short int SIMON_ID);
+
+private:
+    unsigned short SIMON_ID;
 };
 
 #endif // SIMON_H
