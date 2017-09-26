@@ -14,7 +14,8 @@ uint64_t z_arrays[5] = {0b000110011100001101010010001011111011001110000110101001
                         0b0011110000101100111001010001001000000111101001100011010111011011,
                         0b0011110111001001010011000011101000000100011011010110011110001011};
 
-uint8_t temp_key[9][8] = {{0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+uint8_t initials_key[9][8] = {{0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
                           {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
                           {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
                           {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
@@ -36,16 +37,16 @@ SIMON::SIMON(sc_module_name nm,
     :sc_module(nm),
      SIMON_ID(SIMON_ID)
 {
-
+    // Distribui as chaves iniciais
     if(SIMON_ID == DISTRIBUTOR_KEY_POS){
-        for(unsigned short x = 0; i < 9; i++) {
-            for(unsigned short y = 0; i < 8; i++) {
-                w_KEY[x][y] = temp_key[x][y];
+        for(unsigned short x = 0; x < 9; x++) {
+            for(unsigned short y = 0; y < 8; y++) {
+                w_KEY[x][y] = initials_key[x][y];
             }
         }
     }else{
-        for(unsigned short y = 0; i < 8; i++) {
-            w_KEY[DISTRIBUTOR_KEY_POS-1][y] = temp_key[SIMON_ID][y];
+        for(unsigned short y = 0; y < 8; y++) {
+            w_KEY[DISTRIBUTOR_KEY_POS-1][y] = initials_key[SIMON_ID-1][y];
         }
     }
 
@@ -182,25 +183,42 @@ void SIMON::Simon_EDI(){
             w_TYPE.write(false);
         }
 
-        //Pega Chave Correta
+        // Pega Chave Correta
+        // Coordenadas Origem
+        xSrc = f.range(RIB_WIDTH*2-1,RIB_WIDTH*2-RIB_WIDTH/2);
+        ySrc = f.range(RIB_WIDTH*2-RIB_WIDTH/2-1,RIB_WIDTH);
+        // Coordenadas Destino
+        xDst = f.range(RIB_WIDTH-1,RIB_WIDTH/2);
+        yDst = f.range(RIB_WIDTH/2-1,0);
 
-        unsigned xDst = f.range(RIB_WIDTH-1,RIB_WIDTH/2);
-        unsigned yDst = f.range(RIB_WIDTH/2-1,0);
-
-        if(xDst == DISTRIBUTOR_KEY_POS_X && yDst == DISTRIBUTOR_KEY_POS_Y){
-            for(unsigned short i = 0; i < 4; i++) {
+        // Envia
+        if( COORDINATE_2D_TO_ID(xDst,yDst) == DISTRIBUTOR_KEY_POS){
+            for(unsigned short i = 0; i < 8; i++) {
                 cipher_buffer[i] = w_KEY[DISTRIBUTOR_KEY_POS -1][i];
             }
         }else{
-            for(unsigned short i = 0; i < 4; i++) {
-                cipher_buffer[i] = w_KEY[SIMON_ID -1][i];
+            for(unsigned short i = 0; i < 8; i++) {
+                cipher_buffer[i] = w_KEY[COORDINATE_2D_TO_ID(xDst,yDst) -1][i];
+            }
+        }
+
+        // Recebe
+        if( COORDINATE_2D_TO_ID(xSrc,ySrc) == DISTRIBUTOR_KEY_POS){
+            // Guardar id do destinatario da chave (pegar do cabeçalho)
+            for(unsigned short i = 0; i < 8; i++) {
+                cipher_buffer[i] = w_KEY[DISTRIBUTOR_KEY_POS -1][i];
+            }
+        }else{
+            for(unsigned short i = 0; i < 8; i++) {
+                cipher_buffer[i] = w_KEY[COORDINATE_2D_TO_ID(xSrc,ySrc) -1][i];
             }
         }
         //Inicia o SIMON
         Simon_Init(&s_cipher_object, &cipher_buffer);
     }
 
-    if( !isHeader) {
+     // Receber e armazenar chave
+    if( !isHeader && COORDINATE_2D_TO_ID(xSrc,ySrc) != DISTRIBUTOR_KEY_POS) {
 
         // Desmenbra data do flit de 8 em 8 bits
         simon64_32_data[3]=  f.data.range(31,24);
@@ -209,10 +227,8 @@ void SIMON::Simon_EDI(){
         simon64_32_data[0]=  f.data.range(7,0);
 
         if(w_TYPE.read()){
-            //Simon_Encrypt_32(&s_cipher_object.key_schedule, &f.data, &ciphertext_buffer);
             Simon_Encrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
         }else{
-            //Simon_Decrypt_32(&s_cipher_object.key_schedule, &f.data, &ciphertext_buffer);
             Simon_Decrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
         }
 
@@ -221,6 +237,29 @@ void SIMON::Simon_EDI(){
         f.data.range(23,16) = ciphertext_buffer[2];
         f.data.range(15,8) = ciphertext_buffer[1];
         f.data.range(7,0) = ciphertext_buffer[0];
+
+    }else if(!isHeader && COORDINATE_2D_TO_ID(xSrc,ySrc) == DISTRIBUTOR_KEY_POS){
+
+        // Desmenbra data do flit de 8 em 8 bits
+        simon64_32_data[3]=  f.data.range(31,24);
+        simon64_32_data[2]=  f.data.range(23,16);
+        simon64_32_data[1]=  f.data.range(15,8);
+        simon64_32_data[0]=  f.data.range(7,0);
+
+        if(w_TYPE.read()){
+            Simon_Encrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
+        }else{
+            Simon_Decrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
+        }
+
+        // Remonta data do flit
+        f.data.range(31,24) = ciphertext_buffer[3];
+        f.data.range(23,16) = ciphertext_buffer[2];
+        f.data.range(15,8) = ciphertext_buffer[1];
+        f.data.range(7,0) = ciphertext_buffer[0];
+
+        // GUARDAR Chave w_KEY[][]
+
     }
 
     o_DATA.write(f);

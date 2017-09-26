@@ -35,6 +35,17 @@ public:
 
     Simon_Cipher s_cipher_object;
 
+    //Destinatario da chave
+    unsigned short destination_key;
+
+    //Coordenadas de destino do pacote recebido
+    unsigned xSrc ;
+    unsigned ySrc ;
+
+    //Coordenadas de destino do pacote recebido
+    unsigned xDst ;
+    unsigned yDst ;
+
     void Simon_Encrypt_32(const uint8_t *key_schedule, const uint8_t *plaintext, uint8_t *ciphertext);
     void Simon_Decrypt_32(const uint8_t *key_schedule, const uint8_t *ciphertext, uint8_t *plaintext);
     void Simon_Init(Simon_Cipher *cipher_object, void *key);

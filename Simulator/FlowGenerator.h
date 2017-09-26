@@ -74,6 +74,14 @@ public:
     // TEST
     sc_in<bool> i_UNBOUNDEDFIFO_NOTEMPTY;
 
+    // SIMON variables
+    uint8_t temp_key[8];
+    unsigned short destination_keys_p_RECEIVE[2]; // Grava destinatarios das chaves
+    unsigned short switch_destination_flit; //  Controla o envio do destino da chave no flit
+
+    // SIMON functions
+    uint8 genKEY(unsigned short i);
+
     // Module's processes
     void p_SEND();
     void p_RECEIVE();
