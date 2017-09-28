@@ -175,6 +175,7 @@ void SIMON::Simon_EDI(){
 
     if( f.data[FLIT_WIDTH-2] == 1) {
         isHeader = true;
+
         // Verifica se criptografa ou descriptografa
         if(f.data[23] == 1 ){
             w_TYPE.write(true);
@@ -191,76 +192,79 @@ void SIMON::Simon_EDI(){
         xDst = f.range(RIB_WIDTH-1,RIB_WIDTH/2);
         yDst = f.range(RIB_WIDTH/2-1,0);
 
-        // Envia
-        if( COORDINATE_2D_TO_ID(xDst,yDst) == DISTRIBUTOR_KEY_POS){
-            for(unsigned short i = 0; i < 8; i++) {
-                cipher_buffer[i] = w_KEY[DISTRIBUTOR_KEY_POS -1][i];
+        if(w_TYPE.read()){
+            // Envia
+            if( COORDINATE_2D_TO_ID(xDst,yDst) == DISTRIBUTOR_KEY_POS){
+                for(unsigned short i = 0; i < 8; i++) {
+                    cipher_buffer[i] = w_KEY[DISTRIBUTOR_KEY_POS -1][i];
+                }
+            }else{
+                for(unsigned short i = 0; i < 8; i++) {
+                    cipher_buffer[i] = w_KEY[COORDINATE_2D_TO_ID(xDst,yDst) -1][i];
+                }
             }
-        }else{
-            for(unsigned short i = 0; i < 8; i++) {
-                cipher_buffer[i] = w_KEY[COORDINATE_2D_TO_ID(xDst,yDst) -1][i];
+        }else
+            // Recebe
+            if( COORDINATE_2D_TO_ID(xSrc,ySrc) == DISTRIBUTOR_KEY_POS){
+                // Guardar id do destinatario da chave (pegar do cabeçalho)
+                for(unsigned short i = 0; i < 8; i++) {
+                    cipher_buffer[i] = w_KEY[DISTRIBUTOR_KEY_POS -1][i];
+                }
+            }else{
+                for(unsigned short i = 0; i < 8; i++) {
+                    cipher_buffer[i] = w_KEY[COORDINATE_2D_TO_ID(xSrc,ySrc) -1][i];
+                }
             }
-        }
 
-        // Recebe
-        if( COORDINATE_2D_TO_ID(xSrc,ySrc) == DISTRIBUTOR_KEY_POS){
-            // Guardar id do destinatario da chave (pegar do cabeçalho)
-            for(unsigned short i = 0; i < 8; i++) {
-                cipher_buffer[i] = w_KEY[DISTRIBUTOR_KEY_POS -1][i];
-            }
-        }else{
-            for(unsigned short i = 0; i < 8; i++) {
-                cipher_buffer[i] = w_KEY[COORDINATE_2D_TO_ID(xSrc,ySrc) -1][i];
-            }
-        }
         //Inicia o SIMON
         Simon_Init(&s_cipher_object, &cipher_buffer);
     }
 
-     // Receber e armazenar chave
-    if( !isHeader && COORDINATE_2D_TO_ID(xSrc,ySrc) != DISTRIBUTOR_KEY_POS) {
+    // Receber e armazenar chave
+    if(!isHeader ){
+        if(COORDINATE_2D_TO_ID(xSrc,ySrc) != DISTRIBUTOR_KEY_POS) {
 
-        // Desmenbra data do flit de 8 em 8 bits
-        simon64_32_data[3]=  f.data.range(31,24);
-        simon64_32_data[2]=  f.data.range(23,16);
-        simon64_32_data[1]=  f.data.range(15,8);
-        simon64_32_data[0]=  f.data.range(7,0);
+            // Desmenbra data do flit de 8 em 8 bits
+            simon64_32_data[3]=  f.data.range(31,24);
+            simon64_32_data[2]=  f.data.range(23,16);
+            simon64_32_data[1]=  f.data.range(15,8);
+            simon64_32_data[0]=  f.data.range(7,0);
 
-        if(w_TYPE.read()){
-            Simon_Encrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
-        }else{
-            Simon_Decrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
+            if(w_TYPE.read()){
+                Simon_Encrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
+            }else{
+                Simon_Decrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
+            }
+
+            // Remonta data do flit
+            f.data.range(31,24) = ciphertext_buffer[3];
+            f.data.range(23,16) = ciphertext_buffer[2];
+            f.data.range(15,8) = ciphertext_buffer[1];
+            f.data.range(7,0) = ciphertext_buffer[0];
+
+        }else if(COORDINATE_2D_TO_ID(xSrc,ySrc) == DISTRIBUTOR_KEY_POS){
+
+            // Desmenbra data do flit de 8 em 8 bits
+            simon64_32_data[3]=  f.data.range(31,24);
+            simon64_32_data[2]=  f.data.range(23,16);
+            simon64_32_data[1]=  f.data.range(15,8);
+            simon64_32_data[0]=  f.data.range(7,0);
+
+            if(w_TYPE.read()){
+                Simon_Encrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
+            }else{
+                Simon_Decrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
+            }
+
+            // Remonta data do flit
+            f.data.range(31,24) = ciphertext_buffer[3];
+            f.data.range(23,16) = ciphertext_buffer[2];
+            f.data.range(15,8) = ciphertext_buffer[1];
+            f.data.range(7,0) = ciphertext_buffer[0];
+
+            // GUARDAR Chave w_KEY[][]
+
         }
-
-        // Remonta data do flit
-        f.data.range(31,24) = ciphertext_buffer[3];
-        f.data.range(23,16) = ciphertext_buffer[2];
-        f.data.range(15,8) = ciphertext_buffer[1];
-        f.data.range(7,0) = ciphertext_buffer[0];
-
-    }else if(!isHeader && COORDINATE_2D_TO_ID(xSrc,ySrc) == DISTRIBUTOR_KEY_POS){
-
-        // Desmenbra data do flit de 8 em 8 bits
-        simon64_32_data[3]=  f.data.range(31,24);
-        simon64_32_data[2]=  f.data.range(23,16);
-        simon64_32_data[1]=  f.data.range(15,8);
-        simon64_32_data[0]=  f.data.range(7,0);
-
-        if(w_TYPE.read()){
-            Simon_Encrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
-        }else{
-            Simon_Decrypt_32(&s_cipher_object.key_schedule, &simon64_32_data, &ciphertext_buffer);
-        }
-
-        // Remonta data do flit
-        f.data.range(31,24) = ciphertext_buffer[3];
-        f.data.range(23,16) = ciphertext_buffer[2];
-        f.data.range(15,8) = ciphertext_buffer[1];
-        f.data.range(7,0) = ciphertext_buffer[0];
-
-        // GUARDAR Chave w_KEY[][]
-
     }
-
     o_DATA.write(f);
 }

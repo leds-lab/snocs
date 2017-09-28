@@ -159,7 +159,9 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
             flit.range(CLS_POS,CLS_POS-2) = flowParam.traffic_class;// Traffic Class
             flit.range(FID_POS,FID_POS-1) = flowParam.flow_id;      // Flow id
             flit[23] = 1; //Tipo para o SIMON // 1 = Encrypt, 0 = Decrypt
-            //flit[] = destination_keys_p_RECEIVE[switch_destination_flit];
+            unsigned xSrc = ID_TO_COORDINATE_2D_X(src);
+            unsigned ySrc = ID_TO_COORDINATE_2D_Y(src);
+            flit.range(19,16) = destination_keys_p_RECEIVE[switch_destination_flit]; // ID do destinatario da chave
 
             // It sends the header
             Flit headerFlit;
@@ -680,10 +682,9 @@ void FlowGenerator::p_RECEIVE() {
                     fp.payload_length = 2;
                     fp.destination = destination_keys_p_RECEIVE[0];
                     //preencher fp
-
                     this->sendPacket(fp,i_CLK_CYCLES.read(),2,NORMAL);
 
-                    switch_destination_flit--;
+                    switch_destination_flit = 0;
                     this->sendPacket(fp,i_CLK_CYCLES.read(),2,NORMAL);
                     //            std::cout << "\nFG " << FG_ID << " - received: " << number_of_packets_received << " @ " << sc_time_stamp();
                 }
