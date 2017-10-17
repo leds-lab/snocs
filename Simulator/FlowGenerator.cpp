@@ -45,9 +45,6 @@ FlowGenerator::FlowGenerator(sc_module_name mn,
     SC_CTHREAD(p_RECEIVE, i_CLK.pos());
     sensitive << i_CLK.pos() << i_RST.pos();
 
-    SC_METHOD(p_SEND_CYPHER);
-    sensitive << w_SIMON_SEND;
-
 }
 
 UIntVar FlowGenerator::getHeaderAddresses(unsigned short src,unsigned short dst) {
@@ -159,8 +156,6 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
             flit.range(CLS_POS,CLS_POS-2) = flowParam.traffic_class;// Traffic Class
             flit.range(FID_POS,FID_POS-1) = flowParam.flow_id;      // Flow id
             flit[23] = 1; //Tipo para o SIMON // 1 = Encrypt, 0 = Decrypt
-            unsigned xSrc = ID_TO_COORDINATE_2D_X(src);
-            unsigned ySrc = ID_TO_COORDINATE_2D_Y(src);
             flit.range(19,16) = destination_keys_p_RECEIVE[switch_destination_flit]; // ID do destinatario da chave
 
             // It sends the header
@@ -227,7 +222,7 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
             Flit payload_dist;
             payload_dist.data = flowParam.destination; // Coloca destino no corpo do flit--
             payload_dist.packet_ptr = packet_dist;
-            this->sendFlit(payload,virtualChannel); // Sending payload
+            this->sendFlit(payload_dist,virtualChannel); // Sending payload
 
 
             /////////////////// Trailer ///////////////////
@@ -657,15 +652,15 @@ void FlowGenerator::p_RECEIVE() {
 
                 // Pega endereço de origem do pacote (cabeçalho)
                 if(header){
-                    unsigned xSrc = f.range(RIB_WIDTH*2-1,RIB_WIDTH*2-RIB_WIDTH/2);
-                    unsigned ySrc = f.range(RIB_WIDTH*2-RIB_WIDTH/2-1,RIB_WIDTH);
+                    sc_unsigned xSrc = data.range(RIB_WIDTH*2-1,RIB_WIDTH*2-RIB_WIDTH/2);
+                    sc_unsigned ySrc = data.range(RIB_WIDTH*2-RIB_WIDTH/2-1,RIB_WIDTH);
 
                     destination_keys_p_RECEIVE[0] = COORDINATE_2D_TO_ID(xSrc,ySrc);
                 }
 
                 // Pega destino (payload)
                 if(!header && !trailer){
-                    destination_keys_p_RECEIVE[1] = f.data;
+                    destination_keys_p_RECEIVE[1] = data;
                 }
 
                 if ((i_READ_OK_RECEIVE.read()==1) && trailer) {
@@ -680,7 +675,8 @@ void FlowGenerator::p_RECEIVE() {
                     FlowParameters fp;
                     fp.type = 0;
                     fp.payload_length = 2;
-                    fp.destination = destination_keys_p_RECEIVE[0];
+                    fp.destination = destination_keys_p_RECEIVE[0].to_uint();
+
                     //preencher fp
                     this->sendPacket(fp,i_CLK_CYCLES.read(),2,NORMAL);
 
