@@ -466,6 +466,12 @@ void printConfiguration(InputParser &opt) {
         std::cout << prefix << "Simulation seed: " << SEED << std::endl;
     }
 
+    if( USE_SIMON ) {
+        std::cout << prefix << "Using SIMON cryptograph!" << std::endl;
+    } else {
+        std::cout << prefix << "Don't use cryptograph !" << std::endl;
+    }
+
 }
 
 int getIntArg(InputParser& opt,std::string arg, int defaultValue, int min, int max = 0) {
@@ -580,6 +586,12 @@ unsigned int setupSimulator(int argc, char* argv[], InputParser &opt) {
         }
     } else {
         return 2;    // Main show message 2 from the SETUP_MESSAGES[2] vector
+    }
+
+    if( opt.cmdOptionExists("-simon") ) {
+        USE_SIMON = true;
+    } else {
+        USE_SIMON = false;
     }
 
     return 0;

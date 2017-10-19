@@ -13,7 +13,7 @@
 #include "VarPacketSizeFixIdle.h"
 #include "VarPacketSizeFixInterval.h"
 
-//#define DEBUG_FG_ADDRESSING
+#define DEBUG_FG_ADDRESSING
 
 FlowGenerator::FlowGenerator(sc_module_name mn,
                              unsigned short int FG_ID,
@@ -128,6 +128,7 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
         sc_stop();
     }
 
+
     if(USE_SIMON) {
 
         UIntVar flit(0,FLIT_WIDTH); // Auxiliary variable to build the flit to be sent (FLIT_WIDTH is defined in Parameters.h)
@@ -137,6 +138,9 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
 
         if(FG_ID == DISTRIBUTOR_KEY_POS){
 
+            #ifdef DEBUG_FG_ADDRESSING
+                std::cout << "\n[FG Distribuidor - Envia Chave] Addressing :: " << FG_ID ;
+            #endif
             //////////////////////////////////////////////////////
             ////////////////////Envia dados///////////////////////
             //////////////////////////////////////////////////////
@@ -193,10 +197,13 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
             this->sendFlit(trailer, virtualChannel); // Send trailer
 
         }else{
+
+            #ifdef DEBUG_FG_ADDRESSING
+                std::cout << "\n[FG] Solicita chave -- Addressing :: " << FG_ID ;
+            #endif
             //////////////////////////////////////////////////////
             ////////////////////Solicita Chave////////////////////
             //////////////////////////////////////////////////////
-
             Packet* packet_dist = new Packet;
             packet_dist->requiredBW = flowParam.required_bw;
             packet_dist->deadline = flowParam.deadline;
@@ -211,10 +218,11 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
             flit_dist.range(CMD_POSITION,CMD_POSITION-1) = packetType;   // Switching (NORMAL, ALLOC, RELEASE, GRANT)
             flit_dist.range(CLS_POS,CLS_POS-2) = flowParam.traffic_class;// Traffic Class
             flit_dist.range(FID_POS,FID_POS-1) = flowParam.flow_id;      // Flow id
+            flit_dist[23] = 1; //Tipo para o SIMON // 1 = Encrypt, 0 = Decrypt
 
             // It sends the header
             Flit headerFlit_dist;
-            headerFlit_dist.data = flit;
+            headerFlit_dist.data = flit_dist;
             headerFlit_dist.packet_ptr = packet_dist;
             this->sendFlit(headerFlit_dist,virtualChannel); // Send header
 
@@ -235,6 +243,10 @@ void FlowGenerator::sendPacket(FlowParameters flowParam,
             this->sendFlit(trailer_dist, virtualChannel); // Send trailer
 
 
+            #ifdef DEBUG_FG_ADDRESSING
+                std::cout << "\n[FG] Envia dados -- Addressing :: " << FG_ID ;
+            #endif
+                wait();
             //////////////////////////////////////////////////////
             ////////////////////Envia dados///////////////////////
             //////////////////////////////////////////////////////
@@ -643,7 +655,6 @@ void FlowGenerator::p_RECEIVE() {
     if(USE_SIMON){
 
         if(FG_ID == DISTRIBUTOR_KEY_POS) {
-            // Key Gen
             while(1) {
                 f = i_DATA_RECEIVE.read();
                 data = f.data;
@@ -652,6 +663,10 @@ void FlowGenerator::p_RECEIVE() {
 
                 // Pega endereço de origem do pacote (cabeçalho)
                 if(header){
+                    #ifdef DEBUG_FG_ADDRESSING
+                        std::cout << "\n[FG Distribuidor - Recebe Solicitacao] Addressing :: " << FG_ID ;
+                    #endif
+
                     sc_unsigned xSrc = data.range(RIB_WIDTH*2-1,RIB_WIDTH*2-RIB_WIDTH/2);
                     sc_unsigned ySrc = data.range(RIB_WIDTH*2-RIB_WIDTH/2-1,RIB_WIDTH);
 
@@ -664,25 +679,58 @@ void FlowGenerator::p_RECEIVE() {
                 }
 
                 if ((i_READ_OK_RECEIVE.read()==1) && trailer) {
-                    o_NUMBER_OF_PACKETS_RECEIVED.write(o_NUMBER_OF_PACKETS_RECEIVED.read() + 1);
-
-                    // Gera chave
+                    #ifdef DEBUG_FG_ADDRESSING
+                        std::cout << "\n[FG Distribuidor - Gera Chave] Addressing :: " << FG_ID ;
+                    #endif
                     for(unsigned short i = 0; i < 8; i++) {
                         temp_key[i] = genKEY(i);
                     }
 
                     switch_destination_flit = 1;
-                    FlowParameters fp;
-                    fp.type = 0;
-                    fp.payload_length = 2;
-                    fp.destination = destination_keys_p_RECEIVE[0].to_uint();
+                    FlowParameters fp_1;
+                    fp_1.burst_size = 0;  // Rajada - Nao precisa
+                    fp_1.deadline = 0;    // Prazo - Sem prazo
+                    fp_1.flow_id = 0;     // Thread ID
+                    fp_1.type = 0;        // Injecao Constante
+                    fp_1.payload_length = 2; // Chave de 64 bits - 2 flits de 32
+                    fp_1.destination = destination_keys_p_RECEIVE[0].to_uint();
+                    fp_1.iat = 0;  // Intervalo entre envios
+                    fp_1.idle = 0; // Tempo ocioso - nao precisa esperar
+                    fp_1.last_payload_length = 0; // Nao usara rajada para o ultimo pacote ter tamanho diferente
+                    fp_1.parameter1 = 0; // Alfa On - Pareto
+                    fp_1.parameter2 = 0; // Alfa Off - Pareto
+                    fp_1.pck_2send = 1;   // Numero de pacotes para enviar
+                    fp_1.required_bw = f.packet_ptr->requiredBW; // Mesma largura de banda do pacote recebido
+                    fp_1.switching_type = NORMAL; // Envio Wormhole
+                    fp_1.traffic_class = 0; // Canal virtual - sempre primeiro
+                    #ifdef DEBUG_FG_ADDRESSING
+                        std::cout << "\n[FG Distribuidor - Inicia envio 1] Addressing :: " << FG_ID << " Destinho ::" <<destination_keys_p_RECEIVE[0].to_uint() ;
+                    #endif
+                    this->sendPacket(fp_1,i_CLK_CYCLES.read(),2,NORMAL);
 
-                    //preencher fp
-                    this->sendPacket(fp,i_CLK_CYCLES.read(),2,NORMAL);
+                    wait();
 
                     switch_destination_flit = 0;
-                    this->sendPacket(fp,i_CLK_CYCLES.read(),2,NORMAL);
-                    //            std::cout << "\nFG " << FG_ID << " - received: " << number_of_packets_received << " @ " << sc_time_stamp();
+                    FlowParameters fp_2;
+                    fp_2.burst_size = 0;  // Rajada - Nao precisa
+                    fp_2.deadline = 0;    // Prazo - Sem prazo
+                    fp_2.flow_id = 0;     // Thread ID
+                    fp_2.type = 0;        // Injecao Constante
+                    fp_2.payload_length = 2; // Chave de 64 bits - 2 flits de 32
+                    fp_2.destination = destination_keys_p_RECEIVE[1].to_uint();
+                    fp_2.iat = 0;  // Intervalo entre envios
+                    fp_2.idle = 0; // Tempo ocioso - nao precisa esperar
+                    fp_2.last_payload_length = 0; // Nao usara rajada para o ultimo pacote ter tamanho diferente
+                    fp_2.parameter1 = 0; // Alfa On - Pareto
+                    fp_2.parameter2 = 0; // Alfa Off - Pareto
+                    fp_2.pck_2send = 1;   // Numero de pacotes para enviar
+                    fp_2.required_bw = f.packet_ptr->requiredBW; // Mesma largura de banda do pacote recebido
+                    fp_2.switching_type = NORMAL; // Envio Wormhole
+                    fp_2.traffic_class = 0; // Canal virtual - sempre primeiro
+                    #ifdef DEBUG_FG_ADDRESSING
+                        std::cout << "\n[FG Distribuidor - Inicia envio 2] Addressing :: " << FG_ID << " Destinho ::" <<destination_keys_p_RECEIVE[0].to_uint() ;
+                    #endif
+                    this->sendPacket(fp_2,i_CLK_CYCLES.read(),2,NORMAL);
                 }
                 wait();
             }
@@ -692,11 +740,26 @@ void FlowGenerator::p_RECEIVE() {
                 f = i_DATA_RECEIVE.read();
                 data = f.data;
                 trailer = data[FLIT_WIDTH-1];
-                //        header = data[FLIT_WIDTH-2];
+                header = data[FLIT_WIDTH-2];
+
+                // Pega endereço de origem do pacote (cabeçalho)
+                if(header){
+                    #ifdef DEBUG_FG_ADDRESSING
+                        std::cout << "\n[FG - Recebe Dados] Addressing :: " << FG_ID ;
+                    #endif
+                    sc_unsigned xSrc = data.range(RIB_WIDTH*2-1,RIB_WIDTH*2-RIB_WIDTH/2);
+                    sc_unsigned ySrc = data.range(RIB_WIDTH*2-RIB_WIDTH/2-1,RIB_WIDTH);
+                    if(COORDINATE_2D_TO_ID(xSrc,ySrc) == DISTRIBUTOR_KEY_POS){
+                        countPacket = true;
+                    }
+                }
 
                 if ((i_READ_OK_RECEIVE.read()==1) && trailer) {
-                    o_NUMBER_OF_PACKETS_RECEIVED.write(o_NUMBER_OF_PACKETS_RECEIVED.read() + 1);
-                    //            std::cout << "\nFG " << FG_ID << " - received: " << number_of_packets_received << " @ " << sc_time_stamp();
+                    if(countPacket){
+                        o_NUMBER_OF_PACKETS_RECEIVED.write(o_NUMBER_OF_PACKETS_RECEIVED.read() + 1);
+                        //            std::cout << "\nFG " << FG_ID << " - received: " << number_of_packets_received << " @ " << sc_time_stamp();
+                    }
+                    countPacket = false;
                 }
                 wait();
             }

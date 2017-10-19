@@ -78,6 +78,7 @@ public:
     uint8_t temp_key[8];
     UIntVar destination_keys_p_RECEIVE[2]; // Grava destinatarios das chaves
     unsigned short switch_destination_flit; //  Controla o envio do destino da chave no flit
+    bool countPacket;
 
     // SIMON functions
     uint8_t genKEY(unsigned short i);

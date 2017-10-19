@@ -34,8 +34,8 @@ public:
 
 
     sc_signal<uint8_t> w_KEY[9][8]; // Matriz para armazenar chaves
-    sc_signal<bool> w_TYPE_SEND;  // Tipo de operação
-    sc_signal<bool> w_TYPE_RECEIVE;  // Tipo de operação
+    sc_signal<bool> type_send;  // Tipo de operação
+    bool type_receive;  // Tipo de operação
 
     Simon_Cipher s_cipher_object_send;
     Simon_Cipher s_cipher_object_receive;
