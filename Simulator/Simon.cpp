@@ -8,24 +8,15 @@
 #define rshift_three(x) (((x) >> 3) | (((x) & 0x7) << (word_size - 3)))
 #define rshift_one(x)   (((x) >> 1) | (((x) & 0x1) << (word_size - 1)))
 
-#define DEBUG_SIMON
-
+//#define DEBUG_SIMON
+//SC_DEFAULT_WRITER_POLICY
 uint64_t z_arrays[5] = {0b0001100111000011010100100010111110110011100001101010010001011111,
                         0b0001011010000110010011111011100010101101000011001001111101110001,
                         0b0011001101101001111110001000010100011001001011000000111011110101,
                         0b0011110000101100111001010001001000000111101001100011010111011011,
                         0b0011110111001001010011000011101000000100011011010110011110001011};
 
-uint8_t initials_key[9][8] = {{0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
-                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
-                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
-                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
-                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
-                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
-                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
-                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
-                          {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19}
-                         };
+
 
 // Valid Cipher Parameters
 const uint8_t simon_rounds[] = {32, 36, 36, 42, 44, 52, 54, 68, 69, 72};
@@ -37,18 +28,18 @@ const uint8_t  z_assign[] = {0, 0, 1, 2, 3, 2, 3, 2, 3, 4};
 SIMON::SIMON(sc_module_name nm,
              unsigned short int SIMON_ID)
     :sc_module(nm),
-     SIMON_ID(SIMON_ID)
+      SIMON_ID(SIMON_ID)
 {
     // Distribui as chaves iniciais
     if(SIMON_ID == DISTRIBUTOR_KEY_POS){
         for(unsigned short x = 0; x < 9; x++) {
             for(unsigned short y = 0; y < 8; y++) {
-                w_KEY[x][y] = initials_key[x][y];
+                l_key[x][y] = initials_key[x][y];
             }
         }
     }else{
         for(unsigned short y = 0; y < 8; y++) {
-            w_KEY[DISTRIBUTOR_KEY_POS-1][y] = initials_key[SIMON_ID-1][y];
+            l_key[DISTRIBUTOR_KEY_POS][y] = initials_key[SIMON_ID][y];
         }
     }
 
@@ -161,34 +152,50 @@ void SIMON::Simon_Init(Simon_Cipher *cipher_object, void *key) {
     //return 0;
 }
 
-
-
 void SIMON::Simon_EDI_SEND(){
+
+#ifdef DEBUG_SIMON
+    std::cout << "\n[SIMON - "<< SIMON_ID  <<"] SEND : ";
+#endif
 
     // Create generic tmp variables
     uint8_t ciphertext_buffer[4];
     uint8_t simon64_32_data[4];
-    uint8_t cipher_buffer[4];
+    uint8_t cipher_buffer[8];
 
     //Get FLit
     Flit f = i_DATA_SEND.read();
     bool isHeader = false;
 
+#ifdef DEBUG_SIMON
+    if(f.data[FLIT_WIDTH-2]){
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Header_ini : " << " FLIT DATA :: ";
+    }else if(f.data[FLIT_WIDTH-1]){
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Payload_ini_trailer : " << " FLIT DATA :: ";
+    }else{
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Payload_ini : " << " FLIT DATA :: " ;
+    }
+    for(int i=33;i>0;i--){
+        std::cout << f.data[i] ;
+    }
+
+    if(f.data[FLIT_WIDTH-2]){
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Header_ini : " <<  " FLITT TYPE :: " << f.data[23] ;
+    }
+#endif
+
     if(f.data[FLIT_WIDTH-2]) {
         isHeader = true;
 
-        #ifdef DEBUG_SIMON
-            std::cout << "\n[SIMON] SEND_Header_ini : " << SIMON_ID << " FLIT DATA :: " << f.data ;
-            std::cout << "\n[SIMON] SEND_Header_ini : " <<  " FLITT TYPE :: " << f.data[23] ;
-        #endif
-
         // Verifica se criptografa ou descriptografa
+        /*
         if(f.data[23]){
-            type_send = 1;
+            type_send = true;
             f.data[23] = 0; // Altera para o simon descriptografar o pacote no destino
         }else {
             type_send = false;
         }
+        */
 
         // Pega Chave Correta
         // Coordenadas Origem
@@ -198,55 +205,38 @@ void SIMON::Simon_EDI_SEND(){
         xDst_send = f.data.range(RIB_WIDTH-1,RIB_WIDTH/2);
         yDst_send = f.data.range(RIB_WIDTH/2-1,0);
 
-        #ifdef DEBUG_SIMON
-            std::cout << "\n[SIMON] SEND_Header_ini : " <<  " xSrc_send :: " << xSrc_send ;
-            std::cout << "\n[SIMON] SEND_Header_ini : " <<  " ySrc_send :: " << ySrc_send ;
-            std::cout << "\n[SIMON] SEND_Header_ini : " <<  " xDst_send :: " << xDst_send ;
-            std::cout << "\n[SIMON] SEND_Header_ini : " <<  " yDst_send :: " << yDst_send ;
-            std::cout << "\n[SIMON] SEND_Header_ini : " <<  " type_send :: " << type_send ;
-        #endif
+#ifdef DEBUG_SIMON
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Header_ini : " <<  " xSrc_send :: " << xSrc_send ;
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Header_ini : " <<  " ySrc_send :: " << ySrc_send ;
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Header_ini : " <<  " xDst_send :: " << xDst_send ;
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Header_ini : " <<  " yDst_send :: " << yDst_send ;
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Header_ini : " <<  " Origem_ID :: " << COORDINATE_2D_TO_ID(xSrc_send,ySrc_send);
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Header_ini : " <<  " Destino_ID :: " << COORDINATE_2D_TO_ID(xDst_send,yDst_send);
 
-        if(type_send){
-            // Envia
+#endif
+
+        //if(type_send){
             if( COORDINATE_2D_TO_ID(xDst_send,yDst_send) == DISTRIBUTOR_KEY_POS){
                 for(unsigned short i = 0; i < 8; i++) {
-                    cipher_buffer[i] = w_KEY[DISTRIBUTOR_KEY_POS -1][i];
+                    cipher_buffer[i] = l_key[DISTRIBUTOR_KEY_POS][i];
                 }
             }else{
                 for(unsigned short i = 0; i < 8; i++) {
-                    cipher_buffer[i] = w_KEY[COORDINATE_2D_TO_ID(xDst_send,yDst_send).to_int() -1][i];
+                    cipher_buffer[i] = l_key[COORDINATE_2D_TO_ID(xDst_send,yDst_send).to_int()][i];
                 }
             }
-        }else
-            // Recebe
-            if( COORDINATE_2D_TO_ID(xSrc_send,ySrc_send) == DISTRIBUTOR_KEY_POS){
-                // Guardar id do destinatario da chave (pegar do cabeçalho)
-                for(unsigned short i = 0; i < 8; i++) {
-                    cipher_buffer[i] = w_KEY[DISTRIBUTOR_KEY_POS -1][i];
-                }
-                // Pega id do destino da mensagem
-                // para armazenar na posição correta do vetor
-                ctr_packet_key_send = 0;
-                destination_key_send = f.data.range(19,16).to_int();
-            }else{
-                for(unsigned short i = 0; i < 8; i++) {
-                    cipher_buffer[i] = w_KEY[COORDINATE_2D_TO_ID(xSrc_send,ySrc_send).to_int() -1][i];
-                }
-            }
-
-        #ifdef DEBUG_SIMON
-            std::cout << "\n[SIMON] SEND_Header_fin : " << SIMON_ID << " FLIT DATA :: " << f.data ;
-        #endif
+        //}
+#ifdef DEBUG_SIMON
+    std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Key :"<< " Cipher_Buffer :: " ;
+   for(int i=0;i<8;i++){
+        std::cout <<  cipher_buffer[i] ;
+    }
+#endif
         //Inicia o SIMON
         Simon_Init(&s_cipher_object_send, &cipher_buffer);
     }
 
-    // Receber e armazenar chave
     if(!isHeader ){
-
-        #ifdef DEBUG_SIMON
-            std::cout << "\n[SIMON] SEND_Payload : " << SIMON_ID << " FLIT DATA :: " << f.data ;
-        #endif
 
         // Desmenbra data do flit de 8 em 8 bits
         simon64_32_data[3]=  f.data.range(31,24).to_int();
@@ -254,11 +244,11 @@ void SIMON::Simon_EDI_SEND(){
         simon64_32_data[1]=  f.data.range(15,8).to_int();
         simon64_32_data[0]=  f.data.range(7,0).to_int();
 
-        if(type_send){
-            Simon_Encrypt_32(s_cipher_object_send.key_schedule, simon64_32_data, ciphertext_buffer);
-        }else{
-            Simon_Decrypt_32(s_cipher_object_send.key_schedule, simon64_32_data, ciphertext_buffer);
-        }
+        //if(type_send){
+        Simon_Encrypt_32(s_cipher_object_send.key_schedule, simon64_32_data, ciphertext_buffer);
+        //}else{
+        //   Simon_Decrypt_32(s_cipher_object_send.key_schedule, simon64_32_data, ciphertext_buffer);
+        //}
 
         // Remonta data do flit
         f.data.range(31,24) = ciphertext_buffer[3];
@@ -266,48 +256,69 @@ void SIMON::Simon_EDI_SEND(){
         f.data.range(15,8) = ciphertext_buffer[1];
         f.data.range(7,0) = ciphertext_buffer[0];
 
-        // GUARDAR Chave w_KEY[][]
-        if(COORDINATE_2D_TO_ID(xSrc_send,ySrc_send) == DISTRIBUTOR_KEY_POS){
-            w_KEY[destination_key_send][3+ctr_packet_key_send] = ciphertext_buffer[3];
-            w_KEY[destination_key_send][2+ctr_packet_key_send] = ciphertext_buffer[2];
-            w_KEY[destination_key_send][1+ctr_packet_key_send] = ciphertext_buffer[1];
-            w_KEY[destination_key_send][0+ctr_packet_key_send] = ciphertext_buffer[0];
-
-            ctr_packet_key_send += 4;
-        }
-
     }
+
+#ifdef DEBUG_SIMON
+    if(f.data[FLIT_WIDTH-2]){
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Header_end :" << " FLIT DATA :: ";
+    }else if(f.data[FLIT_WIDTH-1]){
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Payload_end_trailer :" << " FLIT DATA :: ";
+    }else{
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_Payload_end :" << " FLIT DATA :: " ;
+    }
+    for(int i=33;i>0;i--){
+        std::cout << f.data[i] ;
+    }
+    std::cout << "\n[SIMON - "<< SIMON_ID <<"] SEND_END : \n\n ------------------------------------- \n\n";
+#endif
+
     o_DATA_SEND.write(f);
 }
 
+/*---------------------------------*/
+/*------------RECEIVE--------------*/
+/*---------------------------------*/
+
 void SIMON::Simon_EDI_RECEIVE(){
 
-    #ifdef DEBUG_SIMON
-        std::cout << "\n[SIMON] RECEIVE : " << SIMON_ID ;
-    #endif
+#ifdef DEBUG_SIMON
+    std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE" ;
+#endif
+
     // Create generic tmp variables
     uint8_t ciphertext_buffer[4];
     uint8_t simon64_32_data[4];
-    uint8_t cipher_buffer[4];
-
-    //uint8_t simon64_32_key[] = {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19}; //Pegar Chave
-    //uint8_t simon64_32_plain[] = {0x77, 0x68, 0x65, 0x65};
-    //uint8_t simon64_32_cipher[]= {0xBB,0xE9, 0x9B, 0xC6};
+    uint8_t cipher_buffer[8];
 
     //Get FLit
     Flit f = i_DATA_RECEIVE.read();
     bool isHeader = false;
 
+#ifdef DEBUG_SIMON
+    if(f.data[FLIT_WIDTH-2]){
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Header_ini :" << " FLIT DATA :: ";
+    }else if(f.data[FLIT_WIDTH-1]){
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Payload_ini_trailer: " << " FLIT DATA :: ";
+    }else{
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Payload_ini: " << " FLIT DATA :: " ;
+    }
+    for(int i=33;i>0;i--){
+        std::cout << f.data[i] ;
+    }
+#endif
+
     if( f.data[FLIT_WIDTH-2] == 1) {
         isHeader = true;
 
         // Verifica se criptografa ou descriptografa
+        /*
         if(f.data[23] == 1 ){
             type_receive = true;
             f.data[23] = 0; // Altera para o simon descriptografar o pacote no destino
         }else {
             type_receive = false;
         }
+        */
 
         // Pega Chave Correta
         // Coordenadas Origem
@@ -317,23 +328,19 @@ void SIMON::Simon_EDI_RECEIVE(){
         xDst_receive = f.data.range(RIB_WIDTH-1,RIB_WIDTH/2);
         yDst_receive = f.data.range(RIB_WIDTH/2-1,0);
 
-        if(type_receive){
-            // Envia
-            if( COORDINATE_2D_TO_ID(xDst_send,yDst_send) == DISTRIBUTOR_KEY_POS){
-                for(unsigned short i = 0; i < 8; i++) {
-                    cipher_buffer[i] = w_KEY[DISTRIBUTOR_KEY_POS -1][i];
-                }
-            }else{
-                for(unsigned short i = 0; i < 8; i++) {
-                    cipher_buffer[i] = w_KEY[COORDINATE_2D_TO_ID(xDst_send,yDst_send).to_int() -1][i];
-                }
-            }
-        }else
-            // Recebe
-            if( COORDINATE_2D_TO_ID(xSrc_send,ySrc_send) == DISTRIBUTOR_KEY_POS){
+#ifdef DEBUG_SIMON
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Header_ini : " <<  " xSrc_send :: " << xSrc_receive ;
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Header_ini : " <<  " ySrc_send :: " << ySrc_receive ;
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Header_ini : " <<  " xDst_send :: " << xDst_receive ;
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Header_ini : " <<  " yDst_send :: " << yDst_receive ;
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Header_ini : " <<  " Origem_ID :: " << COORDINATE_2D_TO_ID(xSrc_receive,ySrc_receive);
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Header_ini : " <<  " Destino_ID :: " << COORDINATE_2D_TO_ID(xDst_receive,yDst_receive);
+#endif
+        //if(!type_receive){
+            if( COORDINATE_2D_TO_ID(xSrc_receive,ySrc_receive) == DISTRIBUTOR_KEY_POS){
                 // Guardar id do destinatario da chave (pegar do cabeçalho)
                 for(unsigned short i = 0; i < 8; i++) {
-                    cipher_buffer[i] = w_KEY[DISTRIBUTOR_KEY_POS -1][i];
+                    cipher_buffer[i] = l_key[DISTRIBUTOR_KEY_POS][i];
                 }
                 // Pega id do destino da mensagem
                 // para armazenar na posição correta do vetor
@@ -341,27 +348,34 @@ void SIMON::Simon_EDI_RECEIVE(){
                 destination_key_receive = f.data.range(19,16).to_int();
             }else{
                 for(unsigned short i = 0; i < 8; i++) {
-                    cipher_buffer[i] = w_KEY[COORDINATE_2D_TO_ID(xSrc_send,ySrc_send).to_int() -1][i];
+                    cipher_buffer[i] = l_key[COORDINATE_2D_TO_ID(xSrc_receive,ySrc_receive).to_int()][i];
                 }
             }
-
-        //Inicia o SIMON
-        Simon_Init(&s_cipher_object_receive, &cipher_buffer);
+#ifdef DEBUG_SIMON
+    std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Key :" << " Cipher_Buffer :: " ;
+   for(int i=0;i<8;i++){
+        std::cout <<  cipher_buffer[i] ;
     }
+#endif
 
+            //Inicia o SIMON
+            Simon_Init(&s_cipher_object_receive, &cipher_buffer);
+        //}
+    }
     // Receber e armazenar chave
     if(!isHeader ){
+
         // Desmenbra data do flit de 8 em 8 bits
         simon64_32_data[3]=  f.data.range(31,24).to_int();
         simon64_32_data[2]=  f.data.range(23,16).to_int();
         simon64_32_data[1]=  f.data.range(15,8).to_int();
         simon64_32_data[0]=  f.data.range(7,0).to_int();
 
-        if(type_receive){
-            Simon_Encrypt_32(s_cipher_object_receive.key_schedule, simon64_32_data, ciphertext_buffer);
-        }else{
+        //if(type_receive){
+        //    Simon_Encrypt_32(s_cipher_object_receive.key_schedule, simon64_32_data, ciphertext_buffer);
+        //}else{
             Simon_Decrypt_32(s_cipher_object_receive.key_schedule, simon64_32_data, ciphertext_buffer);
-        }
+        //}
 
         // Remonta data do flit
         f.data.range(31,24) = ciphertext_buffer[3];
@@ -369,16 +383,41 @@ void SIMON::Simon_EDI_RECEIVE(){
         f.data.range(15,8) = ciphertext_buffer[1];
         f.data.range(7,0) = ciphertext_buffer[0];
 
-        // GUARDAR Chave w_KEY[][]
-        if(COORDINATE_2D_TO_ID(xSrc_send,ySrc_send) == DISTRIBUTOR_KEY_POS){
-            w_KEY[destination_key_receive][3+ctr_packet_key_receive] = ciphertext_buffer[3];
-            w_KEY[destination_key_receive][2+ctr_packet_key_receive] = ciphertext_buffer[2];
-            w_KEY[destination_key_receive][1+ctr_packet_key_receive] = ciphertext_buffer[1];
-            w_KEY[destination_key_receive][0+ctr_packet_key_receive] = ciphertext_buffer[0];
-
+        // GUARDAR Chave l_key[][]
+        if(COORDINATE_2D_TO_ID(xSrc_receive,ySrc_receive) == DISTRIBUTOR_KEY_POS){
+            l_key[destination_key_receive][3+ctr_packet_key_receive] = ciphertext_buffer[3];
+            l_key[destination_key_receive][2+ctr_packet_key_receive] = ciphertext_buffer[2];
+            l_key[destination_key_receive][1+ctr_packet_key_receive] = ciphertext_buffer[1];
+            l_key[destination_key_receive][0+ctr_packet_key_receive] = ciphertext_buffer[0];
             ctr_packet_key_receive += 4;
+
+#ifdef DEBUG_SIMON
+    std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Armazena chave : "<< destination_key_receive << " :: " ;
+    std::cout << l_key[destination_key_receive][3+ctr_packet_key_receive] << "  " ;
+    std::cout << l_key[destination_key_receive][2+ctr_packet_key_receive] << "  " ;
+    std::cout << l_key[destination_key_receive][1+ctr_packet_key_receive] << "  " ;
+    std::cout << l_key[destination_key_receive][0+ctr_packet_key_receive] << "  " ;
+#endif
+
         }
 
     }
+
+#ifdef DEBUG_SIMON
+    if(f.data[FLIT_WIDTH-2]){
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Header_end :" << " FLIT DATA :: ";
+    }else if(f.data[FLIT_WIDTH-1]){
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Payload_end_trailer:" << " FLIT DATA :: ";
+    }else{
+        std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_Payload_end :"<< " FLIT DATA :: " ;
+    }
+    for(int i=33;i>0;i--){
+        std::cout << f.data[i] ;
+    }
+    std::cout << "\n--->>>> TIME: " << sc_time_stamp();
+    std::cout << "\n[SIMON - "<< SIMON_ID <<"] RECEIVE_END \n\n ------------------------------------- \n\n";
+#endif
+
     o_DATA_RECEIVE.write(f);
+
 }

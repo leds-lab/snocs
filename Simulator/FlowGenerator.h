@@ -8,6 +8,7 @@
 #include "../src/StopSim.h"
 #include "UnboundedFifo.h"
 
+#include <queue>
 
 // SIMON
 #include "simon.h"
@@ -74,11 +75,17 @@ public:
     // TEST
     sc_in<bool> i_UNBOUNDEDFIFO_NOTEMPTY;
 
+    Flit fNull;
+
     // SIMON variables
     uint8_t temp_key[8];
     UIntVar destination_keys_p_RECEIVE[2]; // Grava destinatarios das chaves
     unsigned short switch_destination_flit; //  Controla o envio do destino da chave no flit
-    bool countPacket;
+    sc_unsigned xSrc_receive;
+    sc_unsigned ySrc_receive;
+    unsigned short addrToSend;
+    std::queue<Packet *> queuePacketToSend;
+    std::queue<FlowParameters> queueFlowToSend;
 
     // SIMON functions
     uint8_t genKEY(unsigned short i);

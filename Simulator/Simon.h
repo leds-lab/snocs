@@ -33,9 +33,9 @@ public:
     sc_out<Flit> o_DATA_RECEIVE;
 
 
-    sc_signal<uint8_t> w_KEY[9][8]; // Matriz para armazenar chaves
-    sc_signal<bool> type_send;  // Tipo de operação
-    bool type_receive;  // Tipo de operação
+    uint8_t l_key[9][8]; // Matriz para armazenar chaves
+    //bool type_send;  // Tipo de operação
+    //bool type_receive;  // Tipo de operação
 
     Simon_Cipher s_cipher_object_send;
     Simon_Cipher s_cipher_object_receive;
@@ -63,6 +63,33 @@ public:
     void Simon_Init(Simon_Cipher *cipher_object, void *key);
     void Simon_EDI_SEND();
     void Simon_EDI_RECEIVE();
+
+    /*
+    uint8_t initials_key[9][8] = {{0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                              {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                              {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                              {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                              {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                              {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                              {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                              {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
+                              {0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19}
+                             };
+    */
+
+
+    uint8_t initials_key[9][8] = {
+                              {63, 12, 45, 234, 146, 221, 178, 49},
+                              {63, 12, 45, 234, 146, 221, 178, 49},
+                              {63, 12, 45, 234, 146, 221, 178, 49},
+                              {63, 12, 45, 234, 146, 221, 178, 49},
+                              {63, 12, 45, 234, 146, 221, 178, 49},
+                              {63, 12, 45, 234, 146, 221, 178, 49},
+                              {63, 12, 45, 234, 146, 221, 178, 49},
+                              {63, 12, 45, 234, 146, 221, 178, 49},
+                              {63, 12, 45, 234, 146, 221, 178, 49}
+                             };
+
 
     SC_HAS_PROCESS(SIMON);
     SIMON(sc_module_name nm,unsigned short int SIMON_ID);
