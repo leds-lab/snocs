@@ -13,6 +13,7 @@
 #include "VarPacketSizeFixIdle.h"
 #include "VarPacketSizeFixInterval.h"
 
+
 //#define DEBUG_FG_ADDRESSING
 
 FlowGenerator::FlowGenerator(sc_module_name mn,
@@ -20,6 +21,20 @@ FlowGenerator::FlowGenerator(sc_module_name mn,
                              INoC::TopologyType topologyType,
                              unsigned short numberOfCyclesPerFlit)
     : SoCINModule(mn),
+      i_CLK("iCLK"),
+      i_RST("iRST"),
+      i_CLK_CYCLES("iCLK_CYCLES"),
+      o_DATA_SEND("oDATA_SEND"),
+      o_WRITE_SEND("oWRITE_SEND"),
+      i_WRITE_OK_SEND("iWRITE_SEND"),
+      o_VC_SEND("oVC_SEND"),
+      i_DATA_RECEIVE("iDATA_RECEIVE"),
+      i_READ_OK_RECEIVE("iROK_RECEIVE"),
+      o_READ_RECEIVE("oREAD_RECEIVE"),
+      o_END_OF_TRANSMISSION("o_EOT"),
+      o_NUMBER_OF_PACKETS_SENT("o_PCKT_SENT"),
+      o_NUMBER_OF_PACKETS_RECEIVED("o_PCKT_RECEIVED"),
+      i_UNBOUNDEDFIFO_NOTEMPTY("i_UFIFO_NOT_EMPTY"),
       fNull(0),
       topologyType(topologyType),
       FG_ID(FG_ID),

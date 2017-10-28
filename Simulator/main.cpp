@@ -199,7 +199,7 @@ int sc_main(int argc, char* argv[]) {
     // Status signals of the traffic generators attached to the terminals of the NoC
     sc_vector<sc_signal<bool> >         w_TG_EOT("w_TG_EOT",numElements);
     sc_vector<sc_signal<unsigned int> > w_TG_NUM_PACKETS_SENT("w_TG_NUM_PACKETS_SENT",numElements);
-    sc_vector<sc_signal<unsigned int> > w_TG_NUM_PACKETS_RECEIVED("w_TG_NUM_PACKETS_RECEIVED",numElements);
+    sc_vector<sc_signal<unsigned int,SC_MANY_WRITERS> > w_TG_NUM_PACKETS_RECEIVED("w_TG_NUM_PACKETS_RECEIVED",numElements);
 
     // Configuring wires to virtual channels
     unsigned short vcWidth = 0;

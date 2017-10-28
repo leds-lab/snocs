@@ -37,9 +37,9 @@ public:
     sc_vector<sc_out<bool> > o_VC; // Virtual channel selector of the packet sent
 
     // Internal signals
-    sc_signal<Flit> w_DATA_SEND;
+    sc_signal<Flit,SC_MANY_WRITERS> w_DATA_SEND;
     sc_signal<bool> w_WRITE_OK_SEND;
-    sc_signal<bool> w_WRITE_SEND;
+    sc_signal<bool,SC_MANY_WRITERS> w_WRITE_SEND;
     sc_signal<bool> w_READ_OK_SEND;
     sc_signal<bool> w_READ_SEND;
 
@@ -47,7 +47,7 @@ public:
     sc_signal<bool> w_WRITE_OK_RECEIVE;
     sc_signal<bool> w_WRITE_RECEIVE;
     sc_signal<bool> w_READ_OK_RECEIVE;
-    sc_signal<bool> w_READ_RECEIVE;
+    sc_signal<bool,SC_MANY_WRITERS> w_READ_RECEIVE;
 
     // Internal data structures
     unsigned short int TG_ID;
