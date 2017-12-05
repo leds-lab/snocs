@@ -37,7 +37,8 @@ SUBDIRS += \
     tst_Demultiplexers \
     tst_InputController \
     tst_AndParam \
-    tst_PluginManager
+    tst_PluginManager \
+    ParIS_Serial
 
 OTHER_FILES += \
     app.pri \

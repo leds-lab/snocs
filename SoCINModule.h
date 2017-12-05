@@ -123,6 +123,7 @@ public:
                       TTrafficMeter,
                       TTerminalInstrumentation,
                       TFlowGenerator,
+                      TLink,
                       OtherT
                     };
 
