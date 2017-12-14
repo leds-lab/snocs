@@ -61,7 +61,7 @@ ParIS_N_VC_Serial::ParIS_N_VC_Serial(sc_module_name mn,
         // Instantiate internal units
         u_XIN[i] = new XIN_N_VC(strXIN,nPorts,nVirtualChannels,ROUTER_ID,i);
         u_XOUT[i] = new XOUT_N_VC(strXOUT,nPorts,nVirtualChannels,ROUTER_ID,i);
-        u_CONVERTER[i] = new Converter(strConverter);
+        u_CONVERTER[i] = new Converter(strConverter,ROUTER_ID,i);
     }
 
     // Binding ports
@@ -334,7 +334,7 @@ ParIS_Serial::ParIS_Serial(sc_module_name mn,
 
         char strConverter[10];
         sprintf(strConverter,"conv(%u)",i);
-        u_CONVERTER[i] = new Converter(strConverter);
+        u_CONVERTER[i] = new Converter(strConverter,ROUTER_ID,i);
     }
 
     // Binding ports
@@ -466,12 +466,17 @@ ParIS_Serial::ParIS_Serial(sc_module_name mn,
         char strData[11];
         sprintf(strData,"wDATA%s",strI);
         sc_trace(tf,w_DATA[i],strData);
+
+        char strDataConv[20];
+        sprintf(strDataConv,"wDATA_Conv%s",strI);
+        sc_trace(tf,w_DATA_CONV[i],strDataConv);
+
     }
 
 #endif
 }
 
-ParIS_Serial::~ParIS() {
+ParIS_Serial::~ParIS_Serial() {
 #ifdef WAVEFORM_PARIS
     sc_close_vcd_trace_file(tf);
 #endif

@@ -5,6 +5,9 @@
 #include "Ser2Par.h"
 
 class Converter : public SoCINModule {
+protected:
+    unsigned short router;
+    unsigned short portNumber;
 public:
 
     // Interface
@@ -22,11 +25,13 @@ public:
     sc_signal<bool> w_RETURN;
     sc_signal<bool> w_DATA;
 
+    sc_signal<Packet *> _packet_reference; // Not circuit related
+
     // Internal units
     Par2Ser* u_PAR_SER;
     Ser2Par* u_SER_PAR;
 
-    Converter(sc_module_name mn);
+    Converter(sc_module_name mn,unsigned short router,unsigned short portNumber);
 
     const char* moduleName() const { return "Converter_Parallel_Serial_Parallel"; }
     ModuleType moduleType() const { return SoCINModule::OtherT; }
