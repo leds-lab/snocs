@@ -4,7 +4,13 @@
 #include <cstdio>
 #include <cstring>
 #include <algorithm>
-#include <dlfcn.h>
+// TODO Atualizar o carregamento de bibliotecas dinâmicas em tempo de execução no Windows
+
+#if __unix__ || __APPLE__
+#  include <dlfcn.h>
+#elif __WIN32__
+#  include <windows.h>
+#endif
 
 #include "../src/NoC.h"
 #include "../src/Router.h"
@@ -16,6 +22,33 @@ std::string removeChar(std::string& str, char toRemove) {
     str.erase(std::remove(str.begin(),str.end(),toRemove),str.end());
     return str;
 }
+
+#if __WIN32__
+LPWSTR convertString(std::string& instr)
+{
+    // Assumes std::string is encoded in the current Windows ANSI codepage
+    int bufferlen = ::MultiByteToWideChar(CP_ACP, 0, instr.c_str(), instr.size(), NULL, 0);
+
+    if (bufferlen == 0)
+    {
+        // Something went wrong. Perhaps, check GetLastError() and log.
+        return 0;
+    }
+
+    // Allocate new LPWSTR - must deallocate it later
+    LPWSTR widestr = new WCHAR[bufferlen + 1];
+
+    ::MultiByteToWideChar(CP_ACP, 0, instr.c_str(), instr.size(), widestr, bufferlen);
+
+    // Ensure wide string is null terminated
+    widestr[bufferlen] = 0;
+
+    // Do something with widestr
+    return widestr;
+    //delete[] widestr;
+}
+
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////// Plugin Loader ////////////////////////////////////
@@ -35,8 +68,13 @@ bool PluginLoader::load() {
         std::cout << "Plugin " << pluginName << " already loaded." << std::endl;
         return true;
     }
-
+#if __unix__ || __APPLE__
     libHandler = dlopen(fileName.c_str(),RTLD_NOW);
+#elif __WIN32__
+    LPCWSTR filename = convertString(fileName);
+    libHandler = LoadLibrary(filename);
+    delete[] filename;
+#endif
     if( !libHandler ) {
         loaded = false;
     } else {
@@ -51,12 +89,29 @@ bool PluginLoader::unload() {
         std::cout << "Plugin " << pluginName << " not loaded." << std::endl;
         return false;
     }
-
+#if __unix__ || __APPLE__
     return dlclose(libHandler);
+#elif __WIN32__
+    HINSTANCE handler = (HINSTANCE)libHandler;
+    return FreeLibrary(handler);
+#endif
 }
 
 char* PluginLoader::error() {
+#if __unix__ || __APPLE__
     return dlerror();
+#elif __WIN32__
+    LPVOID lpMsgBuf;
+    DWORD dw = GetLastError();
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                  FORMAT_MESSAGE_FROM_SYSTEM |
+                  FORMAT_MESSAGE_IGNORE_INSERTS,
+                  NULL,dw,MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                  (LPTSTR) &lpMsgBuf,
+                  0, NULL );
+    char* errorMsg = static_cast<char* >(lpMsgBuf);
+    return errorMsg;
+#endif
 }
 
 bool PluginLoader::isLoaded() {
@@ -64,7 +119,13 @@ bool PluginLoader::isLoaded() {
 }
 
 void* PluginLoader::loadSymbol(std::string symbol) {
+#if __unix__ || __APPLE__
     return dlsym(libHandler,symbol.c_str());
+#elif __WIN32__
+    HMODULE handler = (HMODULE) libHandler;
+    void* function = (void*) GetProcAddress(handler,symbol.c_str());
+    return function;
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
