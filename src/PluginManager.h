@@ -22,6 +22,11 @@ CONTACT: Prof. Cesar Zeferino (zeferino@univali.br)
 #include <vector>
 #include <systemc>
 
+#if __WIN32__
+#   include <windows.h>
+#endif
+
+
 // Forward declarations - interfaces
 class INoC;
 class IRouter;
@@ -34,7 +39,11 @@ class SoCINModule;
 
 class PluginLoader {
 private:
+#if __unix__ || __APPLE__
     void* libHandler;
+#elif __WIN32__
+    HMODULE libHandler;
+#endif
     std::string fileName;
     std::string pluginName;
     bool loaded;

@@ -68,6 +68,8 @@ bool PluginLoader::load() {
         std::cout << "Plugin " << pluginName << " already loaded." << std::endl;
         return true;
     }
+    // For debug purpose or feedback on start of
+//    std::cout << "Load plugin: " << fileName << std::endl;
 #if __unix__ || __APPLE__
     libHandler = dlopen(fileName.c_str(),RTLD_NOW);
 #elif __WIN32__
@@ -92,8 +94,7 @@ bool PluginLoader::unload() {
 #if __unix__ || __APPLE__
     return dlclose(libHandler);
 #elif __WIN32__
-    HINSTANCE handler = (HINSTANCE)libHandler;
-    return FreeLibrary(handler);
+    return FreeLibrary(libHandler);
 #endif
 }
 
@@ -122,9 +123,7 @@ void* PluginLoader::loadSymbol(std::string symbol) {
 #if __unix__ || __APPLE__
     return dlsym(libHandler,symbol.c_str());
 #elif __WIN32__
-    HMODULE handler = (HMODULE) libHandler;
-    void* function = (void*) GetProcAddress(handler,symbol.c_str());
-    return function;
+    return (void*) GetProcAddress(libHandler,symbol.c_str());
 #endif
 }
 
@@ -341,9 +340,9 @@ INoC* PluginManager::nocInstance(sc_module_name name) {
     }
 
     create_NoC* new_NoC = (create_NoC*) this->noc->loadSymbol("new_NoC");
-    const char* dlsym_error = this->noc->error();
-    if( dlsym_error ) {
-        std::cerr << "Error on load symbom of factory creator function - NoC: " << dlsym_error << std::endl;
+    if( !new_NoC ) {
+        const char* dlsym_error = this->noc->error();
+        std::cerr << "Error on load symbol of factory creator function - NoC: " << dlsym_error << std::endl;
         return NULL;
     }
     INoC* n = new_NoC(sc_get_curr_simcontext(),name);
@@ -363,8 +362,8 @@ IRouter* PluginManager::routerInstance(sc_module_name name,
         return NULL;
     }
     create_Router* new_Router = (create_Router* ) this->router->loadSymbol("new_Router");
-    const char* dlsym_error = this->router->error();
-    if(dlsym_error) {
+    if(!new_Router) {
+        const char* dlsym_error = this->router->error();
        std::cerr << "Error on load symbol of factory creator function - Router: " << dlsym_error << std::endl;
        return NULL;
     }
@@ -385,8 +384,8 @@ IRouting* PluginManager::routingInstance(sc_core::sc_module_name name,
         return NULL;
     }
     create_Routing* new_Routing = (create_Routing* ) this->routing->loadSymbol("new_Routing");
-    const char* dlsym_error = this->routing->error();
-    if(dlsym_error) {
+    if(!new_Routing) {
+        const char* dlsym_error = this->routing->error();
        std::cerr << "Error on load symbol of factory creator function - Routing: " << dlsym_error << std::endl;
        return NULL;
     }
@@ -406,8 +405,8 @@ IInputFlowControl* PluginManager::inputFlowControlInstance(sc_core::sc_module_na
         return NULL;
     }
     create_InputFlowControl* new_IFC = (create_InputFlowControl* ) this->flowControl->loadSymbol("new_IFC");
-    const char* dlsym_error = this->flowControl->error();
-    if(dlsym_error) {
+    if(!new_IFC) {
+        const char* dlsym_error = this->flowControl->error();
        std::cerr << "Error on load symbol of factory creator function - IFC: " << dlsym_error << std::endl;
        return NULL;
     }
@@ -428,8 +427,8 @@ IOutputFlowControl* PluginManager::outputFlowControlInstance(sc_core::sc_module_
         return NULL;
     }
     create_OutputFlowControl* new_OFC = (create_OutputFlowControl* ) this->flowControl->loadSymbol("new_OFC");
-    const char* dlsym_error = this->flowControl->error();
-    if(dlsym_error) {
+    if(!new_OFC) {
+       const char* dlsym_error = this->flowControl->error();
        std::cerr << "Error on load symbol of factory creator function - OFC: " << dlsym_error << std::endl;
        return NULL;
     }
@@ -450,8 +449,8 @@ IMemory* PluginManager::memoryInstance(sc_core::sc_module_name name,
         return NULL;
     }
     create_Memory* new_Memory = (create_Memory* ) this->memory->loadSymbol("new_Memory");
-    const char* dlsym_error = this->memory->error();
-    if(dlsym_error) {
+    if(!new_Memory) {
+        const char* dlsym_error = this->memory->error();
        std::cerr << "Error on load symbol of factory creator function - Memory: " << dlsym_error << std::endl;
        return NULL;
     }
@@ -472,8 +471,8 @@ IPriorityGenerator* PluginManager::priorityGeneratorInstance(sc_core::sc_module_
         return NULL;
     }
     create_PriorityGenerator* new_PG = (create_PriorityGenerator* ) this->priorityGenerator->loadSymbol("new_PG");
-    const char* dlsym_error = this->priorityGenerator->error();
-    if(dlsym_error) {
+    if(!new_PG) {
+        const char* dlsym_error = this->priorityGenerator->error();
        std::cerr << "Error on load symbol of factory creator function - PG: " << dlsym_error << std::endl;
        return NULL;
     }
@@ -490,8 +489,8 @@ void PluginManager::destroyNoC(INoC *n) {
     }
 
     destroy_NoC* delete_NoC = (destroy_NoC* ) this->noc->loadSymbol("delete_NoC");
-    const char* dlsym_error = this->noc->error();
-    if( dlsym_error ) {
+    if( !delete_NoC ) {
+        const char* dlsym_error = this->noc->error();
         std::cerr << "Error on load symbol of factory destroy function - NoC: " << dlsym_error << std::endl;
         return;
     }
@@ -504,8 +503,8 @@ void PluginManager::destroyRouter(IRouter *rout) {
     }
 
     destroy_Router* delete_Router = (destroy_Router* ) this->router->loadSymbol("delete_Router");
-    const char* dlsym_error = this->router->error();
-    if( dlsym_error ) {
+    if( !delete_Router ) {
+        const char* dlsym_error = this->router->error();
         std::cerr << "Error on load symbol of factory destroy function - Router: " << dlsym_error << std::endl;
         return;
     }
@@ -518,8 +517,8 @@ void PluginManager::destroyRouting(IRouting *rout) {
     }
 
     destroy_Routing* delete_Routing = (destroy_Routing* ) this->routing->loadSymbol("delete_Routing");
-    const char* dlsym_error = this->routing->error();
-    if( dlsym_error ) {
+    if( !delete_Routing ) {
+        const char* dlsym_error = this->routing->error();
         std::cerr << "Error on load symbol of factory destroy function - Routing: " << dlsym_error << std::endl;
         return;
     }
@@ -532,8 +531,8 @@ void PluginManager::destroyInputFlowControl(IInputFlowControl *ifc) {
     }
 
     destroy_InputFlowControl* delete_IFC = (destroy_InputFlowControl* ) this->flowControl->loadSymbol("delete_IFC");
-    const char* dlsym_error = this->flowControl->error();
-    if( dlsym_error ) {
+    if( !delete_IFC ) {
+        const char* dlsym_error = this->flowControl->error();
         std::cerr << "Error on load symbol of factory destroy function - IFC: " << dlsym_error << std::endl;
         return;
     }
@@ -546,8 +545,8 @@ void PluginManager::destroyOutputFlowControl(IOutputFlowControl *ofc) {
     }
 
     destroy_OutputFlowControl* delete_OFC = (destroy_OutputFlowControl* ) this->flowControl->loadSymbol("delete_OFC");
-    const char* dlsym_error = this->flowControl->error();
-    if( dlsym_error ) {
+    if( !delete_OFC ) {
+        const char* dlsym_error = this->flowControl->error();
         std::cerr << "Error on load symbol of factory destroy function - OFC: " << dlsym_error << std::endl;
         return;
     }
@@ -561,8 +560,8 @@ void PluginManager::destroyMemory(IMemory *mem) {
     }
 
     destroy_Memory* delete_Memory = (destroy_Memory* ) this->memory->loadSymbol("delete_Memory");
-    const char* dlsym_error = this->memory->error();
-    if( dlsym_error ) {
+    if( !delete_Memory ) {
+        const char* dlsym_error = this->memory->error();
         std::cerr << "Error on load symbol of factory destroy function - Memory: " << dlsym_error << std::endl;
         return;
     }
@@ -575,8 +574,8 @@ void PluginManager::destroyPriorityGenerator(IPriorityGenerator *pg) {
     }
 
     destroy_PriorityGenerator* delete_PG = (destroy_PriorityGenerator* ) this->priorityGenerator->loadSymbol("delete_PG");
-    const char* dlsym_error = this->priorityGenerator->error();
-    if( dlsym_error ) {
+    if( !delete_PG ) {
+        const char* dlsym_error = this->priorityGenerator->error();
         std::cerr << "Error on load symbol of factory destroy function - PG: " << dlsym_error << std::endl;
         return;
     }
