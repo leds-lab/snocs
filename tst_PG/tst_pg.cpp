@@ -1,4 +1,10 @@
+//#define USE_TEST
+
+#ifdef USE_TEST
+
 #include "../src/PriorityGenerator.h"
+
+//TODO Mudar para carregar com o PluginLoader
 
 #include <dlfcn.h>
 #include <ctime>
@@ -71,3 +77,5 @@ int sc_main(int argc, char *argv[]) {
 
     return 0;
 }
+
+#endif

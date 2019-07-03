@@ -1,5 +1,9 @@
+//#define USE_TEST
+
+#ifdef USE_TEST
 #include "../src/Arbiter.h"
 
+// TODO: mudar para usar PluginLoader
 #include <dlfcn.h>
 #include <ctime>
 
@@ -77,3 +81,4 @@ int sc_main(int argc, char *argv[]) {
 
     return 0;
 }
+#endif
