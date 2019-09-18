@@ -16,6 +16,7 @@ Parameters::Parameters() {
     confFile = const_cast<char*>("simconf.conf");
     seed = 0;
     useSimon = false;
+    distKeyCore = 1;
 
     // Network info
     numElements = 16;
@@ -47,6 +48,7 @@ Parameters::Parameters(const Parameters &c) {
     this->confFile = c.confFile;
     this->seed = c.seed;
     this->useSimon = c.useSimon;
+    this->distKeyCore = c.distKeyCore;
 
     this->numElements = c.numElements;
     this->xSize = c.xSize;
@@ -76,6 +78,7 @@ Parameters& Parameters::operator = (const Parameters& c) {
     this->confFile = c.confFile;
     this->seed = c.seed;
     this->useSimon = c.useSimon;
+    this->distKeyCore = c.distKeyCore;
 
     this->numElements = c.numElements;
     this->xSize = c.xSize;

@@ -588,6 +588,16 @@ unsigned int setupSimulator(int argc, char* argv[], InputParser &opt) {
         return 2;    // Main show message 2 from the SETUP_MESSAGES[2] vector
     }
 
+    if(opt.cmdOptionExists("-nelements" ) ){
+        DISTRIBUTOR_KEY_POS = getIntArg(opt,"-simon",1,0,NUM_ELEMENTS); // TODO verificar maximo
+    } else {
+        if(opt.cmdOptionExists("-zsize")) {
+            DISTRIBUTOR_KEY_POS = getIntArg(opt,"-simon",1,0,X_SIZE*Y_SIZE*Z_SIZE); // TODO verificar maximo
+        } else {
+            DISTRIBUTOR_KEY_POS = getIntArg(opt,"-simon",1,0,X_SIZE*Y_SIZE); // TODO verificar maximo
+        }
+    }
+
     if( opt.cmdOptionExists("-simon") ) {
         USE_SIMON = true;
     } else {

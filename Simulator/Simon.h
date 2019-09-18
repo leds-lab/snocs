@@ -63,6 +63,10 @@ public:
     void Simon_Init(Simon_Cipher *cipher_object, void *key);
     void Simon_EDI_SEND();
     void Simon_EDI_RECEIVE();
+//    uint8_t Simon_Initial_Key();
+    void Simon_Initial_Key();
+
+    uint8_t** initials_key; //[NUM_ELEMENTS][8] = Simon_Initial_Key();
 
     /*
     uint8_t initials_key[9][8] = {{0x00, 0x01, 0x08, 0x09, 0x10, 0x11, 0x18, 0x19},
@@ -77,8 +81,8 @@ public:
                              };
     */
 
-
-    uint8_t initials_key[9][8] = {
+    /*
+    uint8_t initials_key[][8] = {
                               {63, 12, 45, 234, 146, 221, 178, 49},
                               {63, 12, 45, 234, 146, 221, 178, 49},
                               {63, 12, 45, 234, 146, 221, 178, 49},
@@ -89,7 +93,7 @@ public:
                               {63, 12, 45, 234, 146, 221, 178, 49},
                               {63, 12, 45, 234, 146, 221, 178, 49}
                              };
-
+    */
 
     SC_HAS_PROCESS(SIMON);
     SIMON(sc_module_name nm,unsigned short int SIMON_ID);

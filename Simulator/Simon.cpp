@@ -30,6 +30,12 @@ SIMON::SIMON(sc_module_name nm,
     :sc_module(nm),
       SIMON_ID(SIMON_ID)
 {
+    initials_key = new uint8_t*[NUM_ELEMENTS];
+    for(int i = 0; i < NUM_ELEMENTS; i++) {
+        initials_key[i] = new uint8_t[8];
+    }
+    Simon_Initial_Key();
+
     // Distribui as chaves iniciais
     if(SIMON_ID == DISTRIBUTOR_KEY_POS){
         for(unsigned short x = 0; x < 9; x++) {
@@ -420,4 +426,18 @@ void SIMON::Simon_EDI_RECEIVE(){
 
     o_DATA_RECEIVE.write(f);
 
+}
+
+void SIMON::Simon_Initial_Key()
+{
+    /*
+     * Aplica a quantidade de chaves pre compartilhadas de acordo a
+     * quantidade de nodos existentes
+    */
+    uint8_t vector_keys_temp [8] = {63, 12, 45, 234, 146, 221, 178, 49};
+    for (int numElements = 0; numElements < NUM_ELEMENTS; ++numElements) {
+        initials_key[numElements] = vector_keys_temp;
+    }
+
+//    return initials_key_temp;
 }

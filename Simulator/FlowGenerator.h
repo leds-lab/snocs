@@ -11,7 +11,7 @@
 #include <queue>
 
 // SIMON
-#include "simon.h"
+#include "Simon.h"
 
 // Switching types
 #define WH 0

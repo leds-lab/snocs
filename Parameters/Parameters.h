@@ -116,7 +116,7 @@ class PluginManager;
 
 // SIMON
 #define USE_SIMON PARAMS->useSimon
-#define DISTRIBUTOR_KEY_POS 4
+#define DISTRIBUTOR_KEY_POS PARAMS->distKeyCore
 
 /////////////////////////////////////////////////////////////////////////
 /// Parameters of the system
@@ -136,7 +136,6 @@ public:
     char* pluginsDir;
     char* confFile;
     unsigned int seed; // For the PRNG on Flow Generator
-    bool useSimon;
     // Network info
     unsigned short numElements;
     unsigned short xSize;
@@ -153,6 +152,10 @@ public:
     unsigned short numVirtualChannels;
     unsigned short fifoInDepth;
     unsigned short fifoOutDepth;
+
+    bool useSimon;
+    unsigned int distKeyCore;
+
 
 private:
     // Singleton
