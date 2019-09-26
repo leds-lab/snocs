@@ -23,6 +23,7 @@ const uint8_t simon_rounds[] = {32, 36, 36, 42, 44, 52, 54, 68, 69, 72};
 const uint8_t simon_block_sizes[] = {32, 48, 48, 64, 64, 96, 96, 128, 128, 128};
 const uint16_t simon_key_sizes[] = {64, 72, 96, 96, 128, 96, 144, 128, 192, 256};
 const uint8_t  z_assign[] = {0, 0, 1, 2, 3, 2, 3, 2, 3, 4};
+const uint8_t vector_keys_temp [] = {63, 12, 45, 234, 146, 221, 178, 49};
 
 
 SIMON::SIMON(sc_module_name nm,
@@ -38,8 +39,15 @@ SIMON::SIMON(sc_module_name nm,
 
     // Distribui as chaves iniciais
     if(SIMON_ID == DISTRIBUTOR_KEY_POS){
-        for(unsigned short x = 0; x < 9; x++) {
+        for(unsigned short x = 0; x < NUM_ELEMENTS; x++) {
             for(unsigned short y = 0; y < 8; y++) {
+                if(y == 7){
+                    std::printf("%d", initials_key[x][y]);
+                    std::cout<<std::endl;
+                }else{
+                    std::printf("%d", initials_key[x][y]);
+                    std::cout<<", ";
+                }
                 l_key[x][y] = initials_key[x][y];
             }
         }
@@ -434,10 +442,38 @@ void SIMON::Simon_Initial_Key()
      * Aplica a quantidade de chaves pre compartilhadas de acordo a
      * quantidade de nodos existentes
     */
-    uint8_t vector_keys_temp [8] = {63, 12, 45, 234, 146, 221, 178, 49};
     for (int numElements = 0; numElements < NUM_ELEMENTS; ++numElements) {
-        initials_key[numElements] = vector_keys_temp;
+        for(int col = 0; col < 8; col++){
+            int8_t value = 0;
+            switch(col){
+            //63, 12, 45, 234, 146, 221, 178, 49
+                case 0:
+                value = 63;
+                break;
+                case 1:
+                value = 12;
+                break;
+                case 2:
+                value = 45;
+                break;
+                case 3:
+                value = 234;
+                break;
+                case 4:
+                value = 146;
+                break;
+                case 5:
+                value = 221;
+                break;
+                case 6:
+                value = 178;
+                break;
+                case 7:
+                value = 49;
+                break;
+            }
+            initials_key[numElements][col] = value;
+        }
     }
 
-//    return initials_key_temp;
 }

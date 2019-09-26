@@ -101,7 +101,9 @@ void showHelp() {
               << "  -trace              Generate waveforms." << std::endl
               << "                      Default= Don't generate waveforms" << std::endl << std::endl
               << "  -seed               Simulation seed for the pseudo-random number generators." << std::endl
-              << "                      Default=0" << std::endl << std::endl;
+              << "                      Default=0" << std::endl << std::endl
+              << "  -simon              Enable Simon encryption. 1 < Value <= Number of cores" << std::endl
+              << "                      Default=1, Min: 1, Max: Number of cores" << std::endl << std::endl;
     std::cout << "\nIMPORTANT: <xsize> and <ysize> options define the system size for 2D and 3D\n"
                  "topologies (i.e. number of elements). In 2D the the limits for the <values> are\n"
                  " different than 3D, because the network protocol used (Header Flit Format).\n";
@@ -593,8 +595,10 @@ unsigned int setupSimulator(int argc, char* argv[], InputParser &opt) {
     } else {
         if(opt.cmdOptionExists("-zsize")) {
             DISTRIBUTOR_KEY_POS = getIntArg(opt,"-simon",1,0,X_SIZE*Y_SIZE*Z_SIZE); // TODO verificar maximo
+            NUM_ELEMENTS = X_SIZE * Y_SIZE * Z_SIZE;
         } else {
             DISTRIBUTOR_KEY_POS = getIntArg(opt,"-simon",1,0,X_SIZE*Y_SIZE); // TODO verificar maximo
+            NUM_ELEMENTS = X_SIZE * Y_SIZE;
         }
     }
 
